@@ -33,11 +33,12 @@ function bars(container, metric) {
   const rows = data.methods;
   const w = 540, h = 330, left = 76, right = 14, top = 25, bottom = 58;
   const max = Math.max(...rows.map(r => r[metric] + (metric === 'cv_rmse' ? r.cv_std : 0))) * 1.12;
-  const y = v => h - bottom - v / max * (h - top - bottom);
+  const min = metric === 'cv_rmse' ? Math.min(0, ...rows.map(r => r.cv_rmse - r.cv_std)) * 1.12 : 0;
+  const y = v => h - bottom - (v - min) / (max - min) * (h - top - bottom);
   const step = (w - left - right) / rows.length;
   const svg = node('svg', {viewBox: `0 0 ${w} ${h}`, role: 'img', 'aria-label': metric === 'cv_rmse' ? '各方法交叉驗證 RMSE 與標準差' : '各方法選取特徵數'});
   for (let i = 0; i <= 4; i++) {
-    const value = max * i / 4;
+    const value = min + (max - min) * i / 4;
     svg.append(node('line', {x1: left, x2: w - right, y1: y(value), y2: y(value), class: 'grid-line'}));
     svg.append(node('text', {x: left - 10, y: y(value) + 4, 'text-anchor': 'end', class: 'chart-label'}, fmt(value, 0)));
   }
@@ -47,7 +48,7 @@ function bars(container, metric) {
     rect.append(node('title', {}, `${row.method}\nCV RMSE: ${fmt(row.cv_rmse)} ± ${fmt(row.cv_std)}\nFeatures: ${row.count}`));
     activate(rect, row.method); svg.append(rect);
     if (metric === 'cv_rmse') {
-      const low = y(Math.max(0, row.cv_rmse - row.cv_std)), high = y(row.cv_rmse + row.cv_std);
+      const low = y(row.cv_rmse - row.cv_std), high = y(row.cv_rmse + row.cv_std);
       svg.append(node('path', {d: `M ${center} ${low} V ${high} M ${center-5} ${low} H ${center+5} M ${center-5} ${high} H ${center+5}`, stroke: 'var(--ink)', fill: 'none', 'pointer-events': 'none'}));
     } else svg.append(node('text', {x: center, y: y(row.count) - 8, 'text-anchor': 'middle', class: 'chart-label'}, row.count));
     svg.append(node('text', {x: center, y: h - bottom + 22, 'text-anchor': 'middle', class: 'chart-label'}, row.method));
