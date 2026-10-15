@@ -1,5 +1,29 @@
 # Feature Lab · 特徵選擇實驗室
 
+## 多資料集頁面
+
+透過每頁左側的「切換實驗 / DATASET」下拉選單（手機版位於頂部），可自由切換：
+
+- [50 Startups · 創業獲利](https://cg3599.github.io/20261014-hw2-Multiple-Linear-regression/)
+- [Cars · 汽車售價](https://cg3599.github.io/20261014-hw2-Multiple-Linear-regression/cars.html)
+
+兩頁共用版型、配色與持久化明暗模式。Cars 頁面呈現 `main2.py` 實際輸出：Baseline 與五種選擇方法的 CV RMSE / 標準差、特徵數與明細、CV 最佳模型的測試指標、預測散點圖、殘差圖與逐筆預測。點選方法、長條或表格可切換特徵明細，並可下載方法比較 CSV。
+
+Cars 資料快照儲存在 `data/cars.csv`，來源為 [uwdata/draco](https://github.com/uwdata/draco/blob/master/data/cars.csv)。共 387 筆，309 筆訓練、78 筆測試；本次由訓練 CV 選出 SFS。測試 R² 為 -9.8159，網頁忠實保留負值與離群預測，未依測試表現重新挑選模型。
+
+重新產生 Cars 結果（需先安裝下方 requirements）：
+
+```powershell
+$env:MPLBACKEND = 'Agg'
+.\.venv\Scripts\python.exe main2.py
+```
+
+結果寫入 `results/cars/`，網站資料自動寫入 `docs/cars-data.js`；提交並推送後由 GitHub Pages 發布。`main2.py` 的模型設定保持原樣，只新增本機資料快照讀取及靜態頁面資料匯出。Python 模型不在 GitHub Pages 伺服器執行。
+
+未來新增實驗頁面時，在新頁載入 `pages.js`、`pages.css` 並保留 `aside nav`；將頁面路徑與名稱加入 `docs/pages.js` 的 `experimentPages`，所有頁面的選單就會同步更新。
+
+---
+
 使用 **50 Startups** 資料集進行多元線性迴歸，將五種特徵選擇方法的結果轉換成互動式網頁。透過曲線、表格與特徵組合，觀察「增加特徵是否真的讓模型更好？」
 
 ## 🌐 Live View

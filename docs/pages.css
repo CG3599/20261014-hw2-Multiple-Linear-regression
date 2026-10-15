@@ -1,0 +1,25 @@
+.page-menu { margin-top: 22px; }
+.page-menu label { display: block; font-size: 10px; letter-spacing: 1px; color: #a7c1c0; margin-bottom: 9px; }
+.page-menu select { width: 100%; padding: 11px 8px; border: 1px solid #548084; border-radius: 7px; background: #21464a; color: #fff; font: inherit; font-size: 12px; cursor: pointer; color-scheme: dark; }
+.page-menu select:focus-visible { outline: 2px solid #6fe0c3; outline-offset: 3px; }
+.page-menu + nav { margin-top: 20px; }
+.cars-note { border-left: 3px solid var(--teal); padding-left: 14px; }
+.cars-features { margin-top: 16px; line-height: 2; overflow-wrap: anywhere; }
+.cars-details { margin-top: 20px; }
+.cars-summary { color: var(--teal); font-size: 13px; line-height: 1.9; }
+.cars-stats strong { font-size: 27px; }
+.cars-chart { min-width: 0; }
+.chart-bar { cursor: pointer; }
+.chart-bar:focus { outline: none; stroke: var(--ink); stroke-width: 2; }
+.cars-point { opacity: .7; }
+.cars-point:hover, .cars-point:focus { opacity: 1; stroke: var(--ink); stroke-width: 2; }
+.chart-reference { stroke: var(--muted); stroke-width: 1.5; stroke-dasharray: 6 4; }
+.cars-table th, .cars-table td { text-align: right; }
+.cars-table th:first-child, .cars-table td:first-child { text-align: left; }
+.cars-table td:first-child { white-space: nowrap; }
+@media (max-width: 760px) {
+  .page-menu { margin-top: 15px; max-width: 360px; }
+  .page-menu select { font-size: 14px; }
+  .cars-stats strong { font-size: 24px; }
+  .cars-section-heading { align-items: flex-start; flex-direction: column; gap: 0; margin-bottom: 15px; }
+}

@@ -1,0 +1,659 @@
+const CARS_EXPERIMENT = {
+  "source": "https://raw.githubusercontent.com/uwdata/draco/master/data/cars.csv",
+  "data_sha256": "0634fe30dbdfc0d2d5589d55ff6da1ae56c7735446f8e54d5f4d2eae4e18fd96",
+  "seed": 42,
+  "raw_count": 387,
+  "valid_count": 387,
+  "train_count": 309,
+  "test_count": 78,
+  "input_count": 13,
+  "encoded_count": 48,
+  "methods": [
+    {
+      "method": "SFS",
+      "cv_rmse": 10512.411974801847,
+      "cv_std": 2086.963659992245,
+      "seconds": 16.991145899999992,
+      "count": 8,
+      "features": [
+        "num__RWD",
+        "num__Horsepower(HP)",
+        "num__Highway Miles Per Gallon",
+        "cat__Brand_Jaguar",
+        "cat__Brand_Kia",
+        "cat__Brand_Mercedes-Benz",
+        "cat__Brand_Porsche",
+        "cat__Type_Sedan"
+      ]
+    },
+    {
+      "method": "EFS",
+      "cv_rmse": 25318.46772842846,
+      "cv_std": 18393.89224255086,
+      "seconds": 0.8899104000000193,
+      "count": 3,
+      "features": [
+        "num__Horsepower(HP)",
+        "num__Highway Miles Per Gallon",
+        "cat__Brand_Mercedes-Benz"
+      ]
+    },
+    {
+      "method": "RFECV",
+      "cv_rmse": 31193.107381395657,
+      "cv_std": 28317.419191257795,
+      "seconds": 6.58496439999999,
+      "count": 3,
+      "features": [
+        "num__Horsepower(HP)",
+        "num__Highway Miles Per Gallon",
+        "num__Weight"
+      ]
+    },
+    {
+      "method": "Backward",
+      "cv_rmse": 34371.709483757186,
+      "cv_std": 32778.405419134826,
+      "seconds": 0.10738650000001826,
+      "count": 14,
+      "features": [
+        "num__Horsepower(HP)",
+        "num__Highway Miles Per Gallon",
+        "num__Weight",
+        "num__Wheel Base",
+        "cat__Brand_Audi",
+        "cat__Brand_BMW",
+        "cat__Brand_Cadillac",
+        "cat__Brand_Infiniti",
+        "cat__Brand_Jaguar",
+        "cat__Brand_Land Rover",
+        "cat__Brand_Lexus",
+        "cat__Brand_Mercedes-Benz",
+        "cat__Brand_Porsche",
+        "cat__Type_SUV"
+      ]
+    },
+    {
+      "method": "Lasso",
+      "cv_rmse": 39218.96469201533,
+      "cv_std": 39401.80328761469,
+      "seconds": 0.1692015999999512,
+      "count": 40,
+      "features": [
+        "num__AWD",
+        "num__RWD",
+        "num__Cyl",
+        "num__Horsepower(HP)",
+        "num__City Miles Per Gallon",
+        "num__Highway Miles Per Gallon",
+        "num__Weight",
+        "num__Wheel Base",
+        "num__Width",
+        "cat__Brand_Audi",
+        "cat__Brand_BMW",
+        "cat__Brand_Cadillac",
+        "cat__Brand_Chevrolet",
+        "cat__Brand_Ford",
+        "cat__Brand_GMC",
+        "cat__Brand_Honda",
+        "cat__Brand_Infiniti",
+        "cat__Brand_Jaguar",
+        "cat__Brand_Jeep",
+        "cat__Brand_Land Rover",
+        "cat__Brand_Lexus",
+        "cat__Brand_Lincoln",
+        "cat__Brand_Mazda",
+        "cat__Brand_Mercedes-Benz",
+        "cat__Brand_Mercury",
+        "cat__Brand_Mitsubishi",
+        "cat__Brand_Nissan",
+        "cat__Brand_Pontiac",
+        "cat__Brand_Porsche",
+        "cat__Brand_Saab",
+        "cat__Brand_Saturn",
+        "cat__Brand_Subaru",
+        "cat__Brand_Suzuki",
+        "cat__Brand_Toyota",
+        "cat__Brand_Volkswagen",
+        "cat__Brand_Volvo",
+        "cat__Brand_infrequent_sklearn",
+        "cat__Type_SUV",
+        "cat__Type_Sports Car",
+        "cat__Type_Wagon"
+      ]
+    },
+    {
+      "method": "Baseline",
+      "cv_rmse": 43169.67530767388,
+      "cv_std": 44713.08638690333,
+      "seconds": 0.08001280000001998,
+      "count": 48,
+      "features": [
+        "num__AWD",
+        "num__RWD",
+        "num__Engine Size (l)",
+        "num__Cyl",
+        "num__Horsepower(HP)",
+        "num__City Miles Per Gallon",
+        "num__Highway Miles Per Gallon",
+        "num__Weight",
+        "num__Wheel Base",
+        "num__Len",
+        "num__Width",
+        "cat__Brand_Audi",
+        "cat__Brand_BMW",
+        "cat__Brand_Buick",
+        "cat__Brand_Cadillac",
+        "cat__Brand_Chevrolet",
+        "cat__Brand_Chrysler",
+        "cat__Brand_Dodge",
+        "cat__Brand_Ford",
+        "cat__Brand_GMC",
+        "cat__Brand_Honda",
+        "cat__Brand_Hyundai",
+        "cat__Brand_Infiniti",
+        "cat__Brand_Jaguar",
+        "cat__Brand_Jeep",
+        "cat__Brand_Kia",
+        "cat__Brand_Land Rover",
+        "cat__Brand_Lexus",
+        "cat__Brand_Lincoln",
+        "cat__Brand_Mazda",
+        "cat__Brand_Mercedes-Benz",
+        "cat__Brand_Mercury",
+        "cat__Brand_Mitsubishi",
+        "cat__Brand_Nissan",
+        "cat__Brand_Pontiac",
+        "cat__Brand_Porsche",
+        "cat__Brand_Saab",
+        "cat__Brand_Saturn",
+        "cat__Brand_Subaru",
+        "cat__Brand_Suzuki",
+        "cat__Brand_Toyota",
+        "cat__Brand_Volkswagen",
+        "cat__Brand_Volvo",
+        "cat__Brand_infrequent_sklearn",
+        "cat__Type_SUV",
+        "cat__Type_Sedan",
+        "cat__Type_Sports Car",
+        "cat__Type_Wagon"
+      ]
+    }
+  ],
+  "best_method": "SFS",
+  "test": {
+    "mae": 12078.460591140001,
+    "rmse": 51791.213259576165,
+    "r2": -9.815927797493316
+  },
+  "predictions": [
+    {
+      "name": "Saturn lon3 4dr",
+      "actual": 15825.0,
+      "predicted": 17124.4449241343,
+      "residual": -1299.444924134299
+    },
+    {
+      "name": "Hyundai Elantra GLS 4dr",
+      "actual": 13839.0,
+      "predicted": 16286.203824710781,
+      "residual": -2447.203824710781
+    },
+    {
+      "name": "Chrysler Pacifica",
+      "actual": 31230.0,
+      "predicted": 39135.73330553413,
+      "residual": -7905.73330553413
+    },
+    {
+      "name": "Mitsubishi Montero XLS",
+      "actual": 33112.0,
+      "predicted": 27929.951570716832,
+      "residual": 5182.048429283168
+    },
+    {
+      "name": "Lexus RX 330",
+      "actual": 39195.0,
+      "predicted": 33217.33742340843,
+      "residual": 5977.662576591567
+    },
+    {
+      "name": "Porsche 911 Targa coupe 2dr",
+      "actual": 76765.0,
+      "predicted": 88273.24006746235,
+      "residual": -11508.24006746235
+    },
+    {
+      "name": "Chevrolet Monte Carlo SS 2dr",
+      "actual": 24225.0,
+      "predicted": 27480.22649066518,
+      "residual": -3255.22649066518
+    },
+    {
+      "name": "Dodge Durango SLT",
+      "actual": 32235.0,
+      "predicted": 32018.03055182671,
+      "residual": 216.9694481732913
+    },
+    {
+      "name": "Oldsmobile Alero GX 2dr",
+      "actual": 18825.0,
+      "predicted": 15925.138052552575,
+      "residual": 2899.8619474474253
+    },
+    {
+      "name": "BMW 330i 4dr",
+      "actual": 35495.0,
+      "predicted": 35694.10959994662,
+      "residual": -199.1095999466197
+    },
+    {
+      "name": "Chevrolet Malibu 4dr",
+      "actual": 18995.0,
+      "predicted": 17820.85632251441,
+      "residual": 1174.1436774855902
+    },
+    {
+      "name": "Chrvsler PT Cruiser GT 4dr",
+      "actual": 25955.0,
+      "predicted": 31465.17895576735,
+      "residual": -5510.178955767351
+    },
+    {
+      "name": "Mercedes-Benz C32 AMG 4dr",
+      "actual": 52120.0,
+      "predicted": 77209.63797030997,
+      "residual": -25089.637970309966
+    },
+    {
+      "name": "BMW X3 3.0i",
+      "actual": 37000.0,
+      "predicted": 31721.388110640506,
+      "residual": 5278.611889359494
+    },
+    {
+      "name": "Toyota Sienna XLE Limited",
+      "actual": 28800.0,
+      "predicted": 34416.64429499016,
+      "residual": -5616.644294990161
+    },
+    {
+      "name": "Mercury Sable GS",
+      "actual": 22595.0,
+      "predicted": 17574.17000418595,
+      "residual": 5020.829995814049
+    },
+    {
+      "name": "Suzuki Aeno S 4dr",
+      "actual": 12884.0,
+      "predicted": 18813.910162080723,
+      "residual": -5929.910162080723
+    },
+    {
+      "name": "Chevrolet Impala SS 4dr",
+      "actual": 27995.0,
+      "predicted": 36249.66933525734,
+      "residual": -8254.669335257342
+    },
+    {
+      "name": "Mercedes-Benz SLK230 convertible 2dr",
+      "actual": 40320.0,
+      "predicted": 46746.83109091177,
+      "residual": -6426.831090911772
+    },
+    {
+      "name": "Toyota 4Runner SR5 V6",
+      "actual": 27710.0,
+      "predicted": 35306.57161854877,
+      "residual": -7596.571618548769
+    },
+    {
+      "name": "Cadillac Deville 4dr",
+      "actual": 45445.0,
+      "predicted": 43123.393909887665,
+      "residual": 2321.6060901123346
+    },
+    {
+      "name": "Jaguar S-Type R 4dr",
+      "actual": 63120.0,
+      "predicted": 80580.33206362894,
+      "residual": -17460.332063628943
+    },
+    {
+      "name": "Mercedes-Benz C320 4dr",
+      "actual": 37630.0,
+      "predicted": 49830.84922689577,
+      "residual": -12200.84922689577
+    },
+    {
+      "name": "Audi A4 3.0 convertible 2dr",
+      "actual": 42490.0,
+      "predicted": 31465.17895576735,
+      "residual": 11024.821044232649
+    },
+    {
+      "name": "Lincoln LS V6 Luxury 4dr",
+      "actual": 32495.0,
+      "predicted": 35629.68626897461,
+      "residual": -3134.686268974612
+    },
+    {
+      "name": "Audi A6 3.0 4dr",
+      "actual": 36640.0,
+      "predicted": 31465.17895576735,
+      "residual": 5174.821044232649
+    },
+    {
+      "name": "Subaru Impreza WRX 4dr",
+      "actual": 25045.0,
+      "predicted": 33758.93608164575,
+      "residual": -8713.936081645748
+    },
+    {
+      "name": "Hyundai Santa Fe GLS",
+      "actual": 21589.0,
+      "predicted": -428619.42651608837,
+      "residual": 450208.42651608837
+    },
+    {
+      "name": "Oldsmobile Silhouette GL",
+      "actual": 28790.0,
+      "predicted": 24151.252137630072,
+      "residual": 4638.747862369928
+    },
+    {
+      "name": "Acura 3.5 RL 4dr",
+      "actual": 43755.0,
+      "predicted": 31362.052439759645,
+      "residual": 12392.947560240355
+    },
+    {
+      "name": "Volvo S60 2.5 4dr",
+      "actual": 31745.0,
+      "predicted": 28834.346102389703,
+      "residual": 2910.6538976102966
+    },
+    {
+      "name": "Chevrolet Malibu Maxx LS",
+      "actual": 22225.0,
+      "predicted": 29038.869033127765,
+      "residual": -6813.869033127765
+    },
+    {
+      "name": "Audi TT 3.2 coupe 2dr (convertible)",
+      "actual": 40590.0,
+      "predicted": 39600.90363167405,
+      "residual": 989.096368325947
+    },
+    {
+      "name": "Ford Taurus LX 4dr",
+      "actual": 20320.0,
+      "predicted": 17214.83433330509,
+      "residual": 3105.1656666949093
+    },
+    {
+      "name": "Ford Taurus SES Duratec 4dr",
+      "actual": 22735.0,
+      "predicted": 26899.924647392167,
+      "residual": -4164.924647392167
+    },
+    {
+      "name": "Toyota Camry LE 4dr",
+      "actual": 19560.0,
+      "predicted": 20051.92021869815,
+      "residual": -491.92021869814926
+    },
+    {
+      "name": "Cadillac Deville DTS 4dr",
+      "actual": 50595.0,
+      "predicted": 48604.29568775777,
+      "residual": 1990.7043122422328
+    },
+    {
+      "name": "Ford Focus ZTW",
+      "actual": 17475.0,
+      "predicted": 14891.650926673206,
+      "residual": 2583.3490733267936
+    },
+    {
+      "name": "Subaru Outback H-6 VDC 4dr",
+      "actual": 31545.0,
+      "predicted": 29311.52142965501,
+      "residual": 2233.478570344989
+    },
+    {
+      "name": "Suzuki Aerio SX",
+      "actual": 16497.0,
+      "predicted": 18773.476875767672,
+      "residual": -2276.476875767672
+    },
+    {
+      "name": "BMW 745Li 4dr",
+      "actual": 73195.0,
+      "predicted": 56018.640882651394,
+      "residual": 17176.359117348606
+    },
+    {
+      "name": "Buick Century Custom 4dr",
+      "actual": 22180.0,
+      "predicted": 22798.862627182894,
+      "residual": -618.8626271828944
+    },
+    {
+      "name": "Volvo XC70",
+      "actual": 35145.0,
+      "predicted": 29593.450730464472,
+      "residual": 5551.549269535528
+    },
+    {
+      "name": "Porsche Boxster S convertible 2dr",
+      "actual": 52365.0,
+      "predicted": 75776.78401391851,
+      "residual": -23411.784013918514
+    },
+    {
+      "name": "Ford Focus SE 4dr",
+      "actual": 15460.0,
+      "predicted": 14132.546298598441,
+      "residual": 1327.4537014015586
+    },
+    {
+      "name": "Ford Explorer XLT V6",
+      "actual": 29670.0,
+      "predicted": 27233.54017233672,
+      "residual": 2436.4598276632787
+    },
+    {
+      "name": "Volkswagen Golf GLS 4dr",
+      "actual": 18715.0,
+      "predicted": 10044.467317488568,
+      "residual": 8670.532682511432
+    },
+    {
+      "name": "Cadillac CTS VVT 4dr",
+      "actual": 30835.0,
+      "predicted": 40272.346947421196,
+      "residual": -9437.346947421196
+    },
+    {
+      "name": "Audi S4 Quattro 4dr",
+      "actual": 48040.0,
+      "predicted": 54975.12478918648,
+      "residual": -6935.124789186477
+    },
+    {
+      "name": "BMW 330Ci 2dr",
+      "actual": 36995.0,
+      "predicted": 35694.10959994662,
+      "residual": 1300.8904000533803
+    },
+    {
+      "name": "Mazda Tribute DX 2.0",
+      "actual": 21087.0,
+      "predicted": 11693.499269121941,
+      "residual": 9393.500730878059
+    },
+    {
+      "name": "Hyundai Elantra GT 4dr",
+      "actual": 15389.0,
+      "predicted": 16286.203824710781,
+      "residual": -897.2038247107812
+    },
+    {
+      "name": "Chrysler Sebring 4dr",
+      "actual": 19090.0,
+      "predicted": 17317.960849312796,
+      "residual": 1772.0391506872038
+    },
+    {
+      "name": "Mercury Grand Marquis GS 4dr",
+      "actual": 24695.0,
+      "predicted": 33476.028742862276,
+      "residual": -8781.028742862276
+    },
+    {
+      "name": "BMW 325xi Sport",
+      "actual": 32845.0,
+      "predicted": 23932.016066515265,
+      "residual": 8912.983933484735
+    },
+    {
+      "name": "Suzuki Verona LX 4dr",
+      "actual": 17262.0,
+      "predicted": 17214.83433330509,
+      "residual": 47.165666694909305
+    },
+    {
+      "name": "Lexus GX 470",
+      "actual": 45700.0,
+      "predicted": 32314.67299301291,
+      "residual": 13385.327006987089
+    },
+    {
+      "name": "Pontiac Montana EWB",
+      "actual": 31370.0,
+      "predicted": 23351.714223242252,
+      "residual": 8018.285776757748
+    },
+    {
+      "name": "Mercury Monterey Luxury",
+      "actual": 33995.0,
+      "predicted": 26459.72240388521,
+      "residual": 7535.277596114789
+    },
+    {
+      "name": "Nissan 350Z coupe 2dr",
+      "actual": 26910.0,
+      "predicted": 48446.774808363596,
+      "residual": -21536.774808363596
+    },
+    {
+      "name": "Saturn L300 2",
+      "actual": 23560.0,
+      "predicted": 17483.78059501516,
+      "residual": 6076.21940498484
+    },
+    {
+      "name": "Volvo S80 T6 4dr",
+      "actual": 45210.0,
+      "predicted": 41588.74141208403,
+      "residual": 3621.258587915967
+    },
+    {
+      "name": "Honda Civic Si 2dr hatch",
+      "actual": 19490.0,
+      "predicted": 19510.321560460834,
+      "residual": -20.321560460834007
+    },
+    {
+      "name": "Jaguar XKR coupe 2dr",
+      "actual": 81995.0,
+      "predicted": 80939.66773450981,
+      "residual": 1055.3322654901858
+    },
+    {
+      "name": "Acura TL 4dr",
+      "actual": 33195.0,
+      "predicted": 42826.75146870146,
+      "residual": -9631.751468701463
+    },
+    {
+      "name": "BMW Z4 convertible 3.0i 2dr",
+      "actual": 41045.0,
+      "predicted": 36053.44527082748,
+      "residual": 4991.554729172523
+    },
+    {
+      "name": "Dodge Stratus SXT 4dr",
+      "actual": 18820.0,
+      "predicted": 16518.42293492498,
+      "residual": 2301.57706507502
+    },
+    {
+      "name": "Toyota RAV4",
+      "actual": 20290.0,
+      "predicted": 19289.35538806868,
+      "residual": 1000.6446119313187
+    },
+    {
+      "name": "Chrysler Sebring convertible 2dr",
+      "actual": 25215.0,
+      "predicted": 17317.960849312796,
+      "residual": 7897.039150687204
+    },
+    {
+      "name": "Toyota MR2 Spyder convertible 2dr",
+      "actual": 25130.0,
+      "predicted": 18179.21395542125,
+      "residual": 6950.786044578748
+    },
+    {
+      "name": "Chevrolet Monte Carlo LS 2dr",
+      "actual": 21825.0,
+      "predicted": 24694.580897144733,
+      "residual": -2869.580897144733
+    },
+    {
+      "name": "Ford Expedition 4.6 XLT",
+      "actual": 34560.0,
+      "predicted": 31656.964779668502,
+      "residual": 2903.035220331498
+    },
+    {
+      "name": "Acura NSX coupe 2dr manual S",
+      "actual": 89765.0,
+      "predicted": 48304.94510732019,
+      "residual": 41460.05489267981
+    },
+    {
+      "name": "Audi A6 4.2 Quattro 4dr",
+      "actual": 49690.0,
+      "predicted": 47804.75777336995,
+      "residual": 1885.2422266300491
+    },
+    {
+      "name": "Honda Civic HX 2dr",
+      "actual": 14170.0,
+      "predicted": 15679.935903238984,
+      "residual": -1509.9359032389839
+    },
+    {
+      "name": "Nissan Altima SE 4dr",
+      "actual": 23290.0,
+      "predicted": 36546.311776443545,
+      "residual": -13256.311776443545
+    },
+    {
+      "name": "Toyota Corolla CE 4dr",
+      "actual": 14085.0,
+      "predicted": 16930.9289989558,
+      "residual": -2845.9289989557983
+    },
+    {
+      "name": "Chevrolet Aveo 4dr",
+      "actual": 11690.0,
+      "predicted": 8612.941335692638,
+      "residual": 3077.058664307362
+    }
+  ]
+};
