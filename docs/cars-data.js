@@ -13,7 +13,7 @@ const CARS_EXPERIMENT = {
       "method": "SFS",
       "cv_rmse": 10512.411974801847,
       "cv_std": 2086.963659992245,
-      "seconds": 16.991145899999992,
+      "seconds": 17.11382649999996,
       "count": 8,
       "features": [
         "num__RWD",
@@ -30,7 +30,7 @@ const CARS_EXPERIMENT = {
       "method": "EFS",
       "cv_rmse": 25318.46772842846,
       "cv_std": 18393.89224255086,
-      "seconds": 0.8899104000000193,
+      "seconds": 0.8863254000000325,
       "count": 3,
       "features": [
         "num__Horsepower(HP)",
@@ -42,7 +42,7 @@ const CARS_EXPERIMENT = {
       "method": "RFECV",
       "cv_rmse": 31193.107381395657,
       "cv_std": 28317.419191257795,
-      "seconds": 6.58496439999999,
+      "seconds": 6.572868799999924,
       "count": 3,
       "features": [
         "num__Horsepower(HP)",
@@ -54,7 +54,7 @@ const CARS_EXPERIMENT = {
       "method": "Backward",
       "cv_rmse": 34371.709483757186,
       "cv_std": 32778.405419134826,
-      "seconds": 0.10738650000001826,
+      "seconds": 0.10670690000006289,
       "count": 14,
       "features": [
         "num__Horsepower(HP)",
@@ -77,7 +77,7 @@ const CARS_EXPERIMENT = {
       "method": "Lasso",
       "cv_rmse": 39218.96469201533,
       "cv_std": 39401.80328761469,
-      "seconds": 0.1692015999999512,
+      "seconds": 0.15090090000012424,
       "count": 40,
       "features": [
         "num__AWD",
@@ -126,7 +126,7 @@ const CARS_EXPERIMENT = {
       "method": "Baseline",
       "cv_rmse": 43169.67530767388,
       "cv_std": 44713.08638690333,
-      "seconds": 0.08001280000001998,
+      "seconds": 0.06293499999992491,
       "count": 48,
       "features": [
         "num__AWD",

@@ -20,6 +20,10 @@ $env:MPLBACKEND = 'Agg'
 
 結果寫入 `results/cars/`，網站資料自動寫入 `docs/cars-data.js`；提交並推送後由 GitHub Pages 發布。`main2.py` 的模型設定保持原樣，只新增本機資料快照讀取及靜態頁面資料匯出。Python 模型不在 GitHub Pages 伺服器執行。
 
+`main2.py` 另外產生 EFS、RFECV、Lasso、Backward、SFS 五種方法各自的 1–5 個特徵比較（共 25 筆）：中文報告 `results/cars/cars_feature_count_report.html`、合併 CSV `cars_feature_count_comparison.csv`、五方法總覽圖 `cars_feature_count_metrics.png`，以及每種方法的 `cars_{方法}_feature_count.csv`、`cars_{方法}_feature_count_table.png`、`cars_{方法}_feature_count_metrics.png`。固定數量 RFECV 使用 RFE 路徑，Lasso 使用係數排名（同分以 OLS 係數排序），Backward 刪除到指定數量；EFS 在 8 個候選內窮舉，SFS 在 15 個候選內選取。RMSE 與 R² 是訓練資料外層三折交叉驗證的平均值，每折重新選取特徵；表內特徵名稱則來自完整訓練集。此額外比較不使用測試集，也不改變原本最佳模型的選擇。
+
+Cars 頁面新增固定特徵數互動區：方法切換、1–5 特徵滑桿、五方法疊圖、RMSE／R² 曲線與特徵明細，以及 25 組 CSV 下載。`cars_feature_curves.py` 同步匯出 `docs/cars-curves-data.js` 與下載 CSV，沿用既有版型及明暗模式。
+
 未來新增實驗頁面時，在新頁載入 `pages.js`、`pages.css` 並保留 `aside nav`；將頁面路徑與名稱加入 `docs/pages.js` 的 `experimentPages`，所有頁面的選單就會同步更新。
 
 ---

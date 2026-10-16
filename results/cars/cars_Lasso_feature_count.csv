@@ -1,0 +1,6 @@
+﻿Number of Features,Selected Features,RMSE,R-squared
+1,[Horsepower(HP)],11435.860273402584,0.6840094776977387
+2,"[Horsepower(HP), Brand_Mercedes-Benz]",11860.82078829119,0.6597933147884346
+3,"[Horsepower(HP), Weight, Brand_Mercedes-Benz]",11943.846821841405,0.6519376267416477
+4,"[Horsepower(HP), Weight, Brand_Mercedes-Benz, Brand_Porsche]",24485.50053104246,-1.4946710545242283
+5,"[Horsepower(HP), Highway Miles Per Gallon, Weight, Brand_Mercedes-Benz, Brand_Porsche]",32035.588485567612,-4.278728555139717

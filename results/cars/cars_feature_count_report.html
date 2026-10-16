@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="zh-Hant"><meta charset="utf-8"><title>五種特徵選擇方法比較</title>
+<style>body{font-family:Arial,"Microsoft JhengHei",sans-serif;max-width:1200px;margin:40px auto;padding:0 24px;color:#222}
+table{border-collapse:collapse;width:100%}th,td{padding:14px;text-align:left}th{border-bottom:1px solid}
+tbody tr:nth-child(odd){background:#f5f5f5}img{width:100%;height:auto}p{line-height:1.7}section{margin:48px 0}</style>
+<h1>汽車售價：五種方法 × 1–5 個特徵</h1>
+<p>RMSE 與 R² 為相同訓練資料外層三折交叉驗證的平均分數，每折重新執行前處理和特徵選擇。
+表格列出完整訓練集選出的特徵，各折特徵可能不同。此比較不使用測試集、不改變原本模型選擇。
+固定數量版本的差異註明於各方法下方。RMSE 越低越好，R² 越高越好，負值會如實保留。</p>
+<nav><a href="#EFS">EFS</a> | <a href="#RFECV">RFECV</a> | <a href="#Lasso">Lasso</a> | <a href="#Backward">Backward</a> | <a href="#SFS">SFS</a></nav><img src="cars_feature_count_metrics.png" alt="五種方法總覽"><section id="EFS"><h2>EFS</h2><p>先以訓練資料 F 分數篩出 8 個候選特徵，再以內層交叉驗證窮舉各固定數量的組合。</p><table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Number of Features</th>
+      <th>Selected Features</th>
+      <th>RMSE</th>
+      <th>R-squared</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>[Horsepower(HP)]</td>
+      <td>11435.860273</td>
+      <td>0.684009</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>[Horsepower(HP), Brand_Mercedes-Benz]</td>
+      <td>11847.393263</td>
+      <td>0.660602</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>[Horsepower(HP), Highway Miles Per Gallon, Brand_Mercedes-Benz]</td>
+      <td>25318.467728</td>
+      <td>-1.838539</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>[RWD, Horsepower(HP), Highway Miles Per Gallon, Brand_Mercedes-Benz]</td>
+      <td>29689.682277</td>
+      <td>-3.302716</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>[RWD, Horsepower(HP), Highway Miles Per Gallon, Weight, Brand_Mercedes-Benz]</td>
+      <td>27861.852706</td>
+      <td>-2.638423</td>
+    </tr>
+  </tbody>
+</table><img src="cars_EFS_feature_count_metrics.png" alt="EFS 指標折線圖"></section><section id="RFECV"><h2>RFECV</h2><p>固定數量曲線採用 RFE 逐一遞迴刪除；原本 RFECV 自動選取數量的實驗保留不變。</p><table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Number of Features</th>
+      <th>Selected Features</th>
+      <th>RMSE</th>
+      <th>R-squared</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>[Horsepower(HP)]</td>
+      <td>11435.860273</td>
+      <td>0.684009</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>[Horsepower(HP), Brand_Mercedes-Benz]</td>
+      <td>12284.892637</td>
+      <td>0.632614</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>[Horsepower(HP), Brand_Mercedes-Benz, Brand_Porsche]</td>
+      <td>11899.555346</td>
+      <td>0.654202</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>[Engine Size (l), Horsepower(HP), Brand_Mercedes-Benz, Brand_Porsche]</td>
+      <td>24459.747191</td>
+      <td>-1.492832</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>[Engine Size (l), Cyl, Horsepower(HP), Brand_Mercedes-Benz, Brand_Porsche]</td>
+      <td>32191.289266</td>
+      <td>-4.289341</td>
+    </tr>
+  </tbody>
+</table><img src="cars_RFECV_feature_count_metrics.png" alt="RFECV 指標折線圖"></section><section id="Lasso"><h2>Lasso</h2><p>依 LassoCV 的標準化係數絕對值取前 k 個；相同或零係數以標準化 OLS 係數排序，再以線性迴歸擬合。</p><table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Number of Features</th>
+      <th>Selected Features</th>
+      <th>RMSE</th>
+      <th>R-squared</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>[Horsepower(HP)]</td>
+      <td>11435.860273</td>
+      <td>0.684009</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>[Horsepower(HP), Brand_Mercedes-Benz]</td>
+      <td>11860.820788</td>
+      <td>0.659793</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>[Horsepower(HP), Weight, Brand_Mercedes-Benz]</td>
+      <td>11943.846822</td>
+      <td>0.651938</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>[Horsepower(HP), Weight, Brand_Mercedes-Benz, Brand_Porsche]</td>
+      <td>24485.500531</td>
+      <td>-1.494671</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>[Horsepower(HP), Highway Miles Per Gallon, Weight, Brand_Mercedes-Benz, Brand_Porsche]</td>
+      <td>32035.588486</td>
+      <td>-4.278729</td>
+    </tr>
+  </tbody>
+</table><img src="cars_Lasso_feature_count_metrics.png" alt="Lasso 指標折線圖"></section><section id="Backward"><h2>Backward</h2><p>每次刪除 OLS p 值最大的特徵，直到剩下 k 個；固定數量比較不使用 0.05 提前停止規則。</p><table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Number of Features</th>
+      <th>Selected Features</th>
+      <th>RMSE</th>
+      <th>R-squared</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>[Horsepower(HP)]</td>
+      <td>11435.860273</td>
+      <td>0.684009</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>[Horsepower(HP), Brand_Mercedes-Benz]</td>
+      <td>11847.393263</td>
+      <td>0.660602</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>[Horsepower(HP), Brand_Mercedes-Benz, Brand_Porsche]</td>
+      <td>11047.768849</td>
+      <td>0.706723</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>[Horsepower(HP), Highway Miles Per Gallon, Brand_Mercedes-Benz, Brand_Porsche]</td>
+      <td>10853.603182</td>
+      <td>0.714890</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>[Horsepower(HP), Highway Miles Per Gallon, Wheel Base, Brand_Mercedes-Benz, Brand_Porsche]</td>
+      <td>23038.441075</td>
+      <td>-1.269670</td>
+    </tr>
+  </tbody>
+</table><img src="cars_Backward_feature_count_metrics.png" alt="Backward 指標折線圖"></section><section id="SFS"><h2>SFS</h2><p>沿用原有 SFS：先篩出 15 個候選特徵，再以內層交叉驗證向前選取 k 個。</p><table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Number of Features</th>
+      <th>Selected Features</th>
+      <th>RMSE</th>
+      <th>R-squared</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>[Horsepower(HP)]</td>
+      <td>11435.860273</td>
+      <td>0.684009</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>[Horsepower(HP), Brand_Mercedes-Benz]</td>
+      <td>11847.393263</td>
+      <td>0.660602</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>[Horsepower(HP), Highway Miles Per Gallon, Brand_Mercedes-Benz]</td>
+      <td>10927.721033</td>
+      <td>0.712861</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>[Horsepower(HP), Highway Miles Per Gallon, Brand_Mercedes-Benz, Brand_Porsche]</td>
+      <td>10807.039194</td>
+      <td>0.719478</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>[Horsepower(HP), Highway Miles Per Gallon, Brand_Jaguar, Brand_Mercedes-Benz, Brand_Porsche]</td>
+      <td>11038.265470</td>
+      <td>0.707014</td>
+    </tr>
+  </tbody>
+</table><img src="cars_SFS_feature_count_metrics.png" alt="SFS 指標折線圖"></section></html>

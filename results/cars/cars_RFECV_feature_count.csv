@@ -1,0 +1,6 @@
+﻿Number of Features,Selected Features,RMSE,R-squared
+1,[Horsepower(HP)],11435.860273402584,0.6840094776977387
+2,"[Horsepower(HP), Brand_Mercedes-Benz]",12284.892636667675,0.6326143115778411
+3,"[Horsepower(HP), Brand_Mercedes-Benz, Brand_Porsche]",11899.555346108675,0.6542022565567936
+4,"[Engine Size (l), Horsepower(HP), Brand_Mercedes-Benz, Brand_Porsche]",24459.74719127466,-1.49283226893995
+5,"[Engine Size (l), Cyl, Horsepower(HP), Brand_Mercedes-Benz, Brand_Porsche]",32191.289265793002,-4.289341135563763

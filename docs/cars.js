@@ -98,7 +98,7 @@ function renderSelection() {
   bars('cv-chart','cv_rmse'); bars('count-chart','count');
   const url = new URL(location.href); url.searchParams.set('method',selected); history.replaceState(null,'',url);
 }
-const tabs = document.querySelector('.tabs');
+const tabs = document.querySelector('.tabs[role="tablist"]');
 order.forEach((name,i) => {
   const button=document.createElement('button'); button.type='button'; button.textContent=name; button.dataset.method=name;
   button.setAttribute('role','tab'); button.addEventListener('click',()=>choose(name));

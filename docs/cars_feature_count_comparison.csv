@@ -1,0 +1,26 @@
+﻿Number of Features,Selected Features,RMSE,R-squared,Method
+1,[Horsepower(HP)],11435.860273402584,0.6840094776977387,EFS
+2,"[Horsepower(HP), Brand_Mercedes-Benz]",11847.393262986525,0.6606018960487087,EFS
+3,"[Horsepower(HP), Highway Miles Per Gallon, Brand_Mercedes-Benz]",25318.46772842846,-1.8385392407027892,EFS
+4,"[RWD, Horsepower(HP), Highway Miles Per Gallon, Brand_Mercedes-Benz]",29689.682277421507,-3.302716413096567,EFS
+5,"[RWD, Horsepower(HP), Highway Miles Per Gallon, Weight, Brand_Mercedes-Benz]",27861.85270640032,-2.638423094767284,EFS
+1,[Horsepower(HP)],11435.860273402584,0.6840094776977387,RFECV
+2,"[Horsepower(HP), Brand_Mercedes-Benz]",12284.892636667675,0.6326143115778411,RFECV
+3,"[Horsepower(HP), Brand_Mercedes-Benz, Brand_Porsche]",11899.555346108677,0.6542022565567936,RFECV
+4,"[Engine Size (l), Horsepower(HP), Brand_Mercedes-Benz, Brand_Porsche]",24459.74719127466,-1.49283226893995,RFECV
+5,"[Engine Size (l), Cyl, Horsepower(HP), Brand_Mercedes-Benz, Brand_Porsche]",32191.289265793,-4.289341135563763,RFECV
+1,[Horsepower(HP)],11435.860273402584,0.6840094776977387,Lasso
+2,"[Horsepower(HP), Brand_Mercedes-Benz]",11860.82078829119,0.6597933147884346,Lasso
+3,"[Horsepower(HP), Weight, Brand_Mercedes-Benz]",11943.846821841404,0.6519376267416477,Lasso
+4,"[Horsepower(HP), Weight, Brand_Mercedes-Benz, Brand_Porsche]",24485.50053104246,-1.4946710545242283,Lasso
+5,"[Horsepower(HP), Highway Miles Per Gallon, Weight, Brand_Mercedes-Benz, Brand_Porsche]",32035.58848556761,-4.278728555139717,Lasso
+1,[Horsepower(HP)],11435.860273402584,0.6840094776977387,Backward
+2,"[Horsepower(HP), Brand_Mercedes-Benz]",11847.393262986525,0.6606018960487087,Backward
+3,"[Horsepower(HP), Brand_Mercedes-Benz, Brand_Porsche]",11047.768848612164,0.7067232807307251,Backward
+4,"[Horsepower(HP), Highway Miles Per Gallon, Brand_Mercedes-Benz, Brand_Porsche]",10853.603182285173,0.714889857703548,Backward
+5,"[Horsepower(HP), Highway Miles Per Gallon, Wheel Base, Brand_Mercedes-Benz, Brand_Porsche]",23038.441074885344,-1.2696696854819365,Backward
+1,[Horsepower(HP)],11435.860273402584,0.6840094776977387,SFS
+2,"[Horsepower(HP), Brand_Mercedes-Benz]",11847.393262986525,0.6606018960487087,SFS
+3,"[Horsepower(HP), Highway Miles Per Gallon, Brand_Mercedes-Benz]",10927.72103290206,0.7128608898268761,SFS
+4,"[Horsepower(HP), Highway Miles Per Gallon, Brand_Mercedes-Benz, Brand_Porsche]",10807.039193735936,0.7194778751050701,SFS
+5,"[Horsepower(HP), Highway Miles Per Gallon, Brand_Jaguar, Brand_Mercedes-Benz, Brand_Porsche]",11038.26546965804,0.7070144255491311,SFS

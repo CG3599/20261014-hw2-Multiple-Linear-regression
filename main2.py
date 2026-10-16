@@ -28,7 +28,7 @@ from sklearn.feature_selection import (
 )
 from sklearn.linear_model import LinearRegression, LassoCV
 from sklearn.model_selection import (
-    train_test_split, KFold, cross_val_score
+    train_test_split, KFold, cross_val_score, cross_validate
 )
 from sklearn.metrics import (
     mean_absolute_error, mean_squared_error, r2_score
@@ -696,3 +696,9 @@ payload = json.dumps(experiment, ensure_ascii=False, indent=2, allow_nan=False)
     "const CARS_EXPERIMENT = " + payload + ";\n", encoding="utf-8"
 )
 print("Exported Cars dashboard data.")
+
+
+# Fixed-count diagnostics for all five schemes (training CV only).
+from cars_feature_curves import export_feature_curves
+
+export_feature_curves(make_pipeline, X_train, y_train, CV_OUTER, OUTPUT_DIR)
