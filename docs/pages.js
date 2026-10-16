@@ -21,7 +21,12 @@ for (const page of experimentPages) {
 }
 pageSelect.addEventListener('change', () => {
   const page = experimentPages.find(item => item.path === pageSelect.value);
-  if (page && page.path !== currentPage) location.assign(new URL(page.path, location.href));
+  if (page && page.path !== currentPage) {
+    // Request fresh HTML when switching datasets, including after a new deployment.
+    const destination = new URL(page.path, location.href);
+    destination.searchParams.set('v', String(Date.now()));
+    location.assign(destination);
+  }
 });
 pageMenu.append(pageLabel, pageSelect);
 document.querySelector('aside nav').before(pageMenu);
