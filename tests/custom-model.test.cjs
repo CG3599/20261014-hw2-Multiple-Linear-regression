@@ -6,6 +6,8 @@ const path = require('node:path');
 global.window = global;
 require('../docs/custom-model.js');
 const model = global.FeatureLabModel;
+require('../docs/custom-charts.js');
+const charts = global.FeatureLabCharts;
 function numericTest() {
   const headers=['x1','x2','target'];
   const rows=Array.from({length:45},(_,i)=>[String(i),String((i%6)-2),String(500+23*i-9*((i%6)-2))]);
@@ -31,6 +33,23 @@ function startupTest() {
   assert.equal(out.data.raw,4);
   assert.equal(out.data.encoded,5);
   assert.equal(out.results.length,6);
+  for (const r of out.results) {
+    assert.equal(r.testActual.length,10);
+    assert.equal(r.testPredicted.length,10);
+    assert(r.testPredicted.every(Number.isFinite));
+  }
+  const rmseSvg=charts.rmseChart(out.results);
+  const r2Svg=charts.r2Chart(out.results);
+  const actualSvg=charts.scatter(out.results[0],'prediction');
+  const residualSvg=charts.scatter(out.results[0],'residual');
+  for (const picture of [rmseSvg,r2Svg,actualSvg,residualSvg]) {
+    assert(picture.startsWith('<svg'));
+    assert(picture.includes('</svg>'));
+  }
+  assert.equal((actualSvg.match(/<circle /g)||[]).length,10);
+  assert.equal((residualSvg.match(/<circle /g)||[]).length,10);
+  assert(charts.r2Chart([{method:'A',r2:-1},{method:'B',r2:0.6}]).includes('bar-negative'));
+  assert(charts.r2Chart([{method:'A',r2:null}]).includes('無有效 R²'));
   for (const r of out.results) {
     assert(Number.isFinite(r.cvRmse));
     assert(Number.isFinite(r.testRmse));
