@@ -32,7 +32,7 @@ window.FeatureLabModel = (() => {
     return {X:convert(trainRows),y:trainRows.map(o=>o.target),Xt:convert(testRows),yt:testRows.map(o=>o.target),names:colNames,trainCount,testCount:testRows.length,valid:filtered.length};}
   function analyze(payload){const {rows,headers,target,fields,split,seed,methods,k}=payload;const prepared=prepare(rows,headers,target,fields),data=encode(prepared,split,seed),{X,y,Xt,yt,names}=data,rank=relevance(X,y),kk=Math.min(k,names.length),plans=[{name:'Baseline',selected:names.map((_,i)=>i)}];
     for(const method of methods){let chosen;if(method==='EFS')chosen=efs(X,y,kk,rank,seed);else if(method==='RFECV')chosen=rfePath(X,y,rank,kk,seed);else if(method==='Lasso')chosen=lasso(X,y,kk,seed);else if(method==='Backward')chosen=backward(X,y,kk,rank);else if(method==='SFS')chosen=sfs(X,y,kk,rank,seed);else continue;plans.push({name:method,selected:chosen});}
-    const results=plans.map(plan=>{const beta=fit(X,y,plan.selected),prediction=predict(Xt,beta,plan.selected);return {method:plan.name,count:plan.selected.length,features:plan.selected.map(i=>names[i]),cvRmse:cv(X,y,plan.selected,seed),testRmse:rmse(yt,prediction),r2:r2(yt,prediction)};});
+    const results=plans.map(plan=>{const beta=fit(X,y,plan.selected),prediction=predict(Xt,beta,plan.selected);return {method:plan.name,count:plan.selected.length,features:plan.selected.map(i=>names[i]),cvRmse:cv(X,y,plan.selected,seed),testRmse:rmse(yt,prediction),r2:r2(yt,prediction),testActual:yt.slice(),testPredicted:prediction};});
     return {results,data:{valid:data.valid,train:data.trainCount,test:data.testCount,raw:prepared.index.length,encoded:names.length}};}
   return {analyze};
 })();
