@@ -48,6 +48,18 @@
 - 右側會提示原始特徵是否落在 HW2 的 **14–39 個輸入特徵**要求內；這是作業檢查提示。
 - 若運算較慢，請縮小資料筆數、候選欄位或只勾選必要的方法。瀏覽器計算不適合大型 EFS。
 
+
+### 自訂資料分析圖表
+
+執行 Custom Dataset 的迴歸分析後，網站會顯示：
+
+- **RMSE 比較圖**：各方法的 Train CV RMSE 與 Test RMSE（兩種顏色的長條圖）。
+- **Test R² 比較圖**：各方法在保留測試集上的 R²，包含可能出現的負值。
+- **Actual vs Predicted 散佈圖**：測試集實際目標值與模型預測值，虛線代表完美預測。
+- **Residual Plot（殘差圖）**：Residual = Actual − Predicted，以 0 水平線判讀模型誤差。
+
+圖表使用不依賴外部函式庫的 SVG。可以在診斷圖右上切換 Baseline、EFS、RFECV、Lasso、Backward 或 SFS，也可以點選結果表格列切換模型。預設使用 **訓練 CV RMSE 最低**的模型作為診斷圖，不依測試集成績選模型。測試集如果超過 220 個點，散佈圖會等間距抽樣顯示，但各種指標仍使用完整測試集計算。結果 CSV 仍包含全部方法的分數與選取特徵。
+
 ## 原有 Python 範例實驗
 
 ### Cars — Toyota Corolla
@@ -91,4 +103,4 @@ GitHub Pages 使用 `main` 分支的 `/docs` 目錄；提交後需等 GitHub Pag
 
 ## 自動化檢查
 
-若本機已安裝 Node.js，可從專案根目錄執行 `node tests/custom-model.test.cjs`，用合成回歸資料與 50 Startups 樣本測試 Baseline 及五方法的輸出。
+若本機已安裝 Node.js，可從專案根目錄執行 `node tests/custom-model.test.cjs`，用合成回歸資料與 50 Startups 樣本測試 Baseline、五方法的輸出，以及四種 SVG 圖表和邊界情況。
