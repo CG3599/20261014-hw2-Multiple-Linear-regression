@@ -3,8 +3,8 @@
 <meta name="description" content="Feature Lab 自訂 Dataset：CSV、Excel 或網址匯入，設定特徵與 Target，在瀏覽器執行多元線性迴歸及特徵選擇。">
 <title>Custom Dataset · Feature Lab</title>
 <script>(()=>{let t;try{t=localStorage.getItem('feature-lab-theme')}catch{}document.documentElement.dataset.theme=['light','dark'].includes(t)?t:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')})();</script>
-<link rel="stylesheet" href="style.css?v=2"><link rel="stylesheet" href="theme.css?v=2"><link rel="stylesheet" href="pages.css?v=9"><link rel="stylesheet" href="custom.css?v=1">
-<script src="pages.js?v=9" defer></script><script src="custom-model.js?v=1" defer></script><script src="custom.js?v=1" defer></script>
+<link rel="stylesheet" href="style.css?v=2"><link rel="stylesheet" href="theme.css?v=2"><link rel="stylesheet" href="pages.css?v=9"><link rel="stylesheet" href="custom.css?v=2">
+<script src="pages.js?v=9" defer></script><script src="custom-model.js?v=1" defer></script><script src="custom.js?v=2" defer></script>
 </head><body>
 <aside><a class="brand" href="./"><span class="brand-icon">ƒ</span> Feature Lab</a><span class="aside-label">AIoT / DATA ANALYTICS</span>
 <div class="side-title">特徵選擇實驗室</div><p>用更少的特徵，<br>理解模型的表現。</p>
@@ -40,6 +40,6 @@
 <div id="model-summary" class="custom-metrics"></div>
 <div class="table-scroll"><table class="custom-table"><thead><tr><th>Method</th><th>Features</th><th>Train CV RMSE ↓</th><th>Test RMSE ↓</th><th>Test R² ↑</th><th>Selected Features</th></tr></thead><tbody id="model-results"></tbody></table></div><p class="custom-note">分析於瀏覽器中使用 JavaScript 計算，並非伺服器端 sklearn。特徵選擇及交叉驗證皆限訓練資料；測試資料不參與選擇。詳細演算法限制請見下方說明。</p>
 </section>
-<section class="methodology"><span class="eyebrow">METHODOLOGY / LIMITATIONS</span><h2>這個自訂實驗與原始範例有什麼不同？</h2><p>原有 Cars 與 50 Startups 保留 Python sklearn 離線匯出的既有結果；本頁為可即時操作的瀏覽器端分析版本。EFS 先依訓練集單變量相關性預選最多 8 個候選；SFS 預選最多 12 個候選；Backward 逐步移除標準化 OLS 係數絕對值較小的特徵；RFECV 使用 RFE 係數淘汰路徑並以訓練 CV 選擇 1–k；Lasso 透過 L1 係數排名，再由 OLS 重訓。與原 Python 實驗的內層選擇／參數規則不完全一致，結果不應視為完全相同。</p><p class="caveat">安全限制：最多 3,000 筆有效分析資料、60 個原始欄位、40 個編碼後欄位、5 個特徵選取上限。類別超過 12 種的欄位不參與模型。EFS、SFS 是限制候選數的近似搜尋；訓練 CV 於已由整體訓練資料擬合的編碼特徵上執行，可能略為樂觀。正式報告可使用完整 sklearn Pipeline 在交叉驗證各折內重新擬合。</p></section>
+<section class="methodology"><span class="eyebrow">METHODOLOGY / LIMITATIONS</span><h2>這個自訂實驗與原始範例有什麼不同？</h2><p>原有 Cars 與 50 Startups 保留 Python sklearn 離線匯出的既有結果；本頁為可即時操作的瀏覽器端分析版本。EFS 先依訓練集單變量相關性預選最多 8 個候選；SFS 預選最多 12 個候選；Backward 逐步移除OLS 係數絕對值較小的特徵；RFECV 使用 RFE 係數淘汰路徑並以訓練 CV 選擇 1–k；Lasso 透過 L1 係數排名，再由 OLS 重訓。與原 Python 實驗的內層選擇／參數規則不完全一致，結果不應視為完全相同。</p><p class="caveat">安全限制：最多 3,000 筆有效分析資料、60 個原始欄位、40 個編碼後欄位、5 個特徵選取上限。類別超過 12 種的欄位不參與模型。EFS、SFS 是限制候選數的近似搜尋；訓練 CV 於已由整體訓練資料擬合的編碼特徵上執行，可能略為樂觀。正式報告可使用完整 sklearn Pipeline 在交叉驗證各折內重新擬合。</p></section>
 <footer><span>Feature Lab / Custom Dataset</span><span>Private in-browser processing.</span></footer>
 </main></body></html>
