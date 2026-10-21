@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="50 Startups 多元線性迴歸：五種特徵選擇方法與 1–5 個特徵的互動式結果比較。">
+<title>Feature Lab · 特徵選擇實驗室</title>
+<script>
+(() => {
+  let theme;
+  try { theme = localStorage.getItem('feature-lab-theme'); } catch {}
+  document.documentElement.dataset.theme = ['light', 'dark'].includes(theme)
+    ? theme : (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+})();
+</script>
+<link rel="stylesheet" href="style.css?v=2">
+<link rel="stylesheet" href="theme.css?v=2">
+<link rel="stylesheet" href="pages.css?v=3">
+<script src="pages.js?v=6" defer></script>
+<script src="data.js" defer></script><script src="app.js?v=2" defer></script></head>
+<body>
+<aside><a class="brand" href="./"><span class="brand-icon">ƒ</span> Feature Lab</a><span class="aside-label">AIoT / DATA ANALYTICS</span>
+<div class="side-title">特徵選擇實驗室</div><p>用更少的特徵，<br>理解模型的表現。</p>
+<nav aria-label="頁面導覽"><a class="active" href="#analysis">◈ &nbsp; 實驗結果</a><a href="#feature-curves">↗ &nbsp; 特徵數曲線</a><a href="#results">▦ &nbsp; 特徵組合</a><a href="#methodology">◎ &nbsp; 實驗方法</a></nav>
+<div class="side-foot"><span class="status-dot"></span> 50 Startups dataset<br><small>Multiple Linear Regression<br>EXPERIMENT 02</small></div></aside>
+<main id="analysis"><header><span>HOME / EXPERIMENT 02</span><div class="header-actions"><button id="theme-toggle" class="theme-toggle" type="button" aria-label="切換黑暗模式" aria-pressed="false">☾ 黑暗模式</button><a href="https://github.com/CG3599/20261014-hw2-Multiple-Linear-regression" target="_blank" rel="noopener">GitHub ↗</a></div></header>
+<div class="intro"><div><span class="eyebrow">FEATURE SELECTION / 02</span><h1>每個特徵，都有它的代價。</h1><p>比較五種選擇方法，探索特徵數量如何改變預測誤差與解釋能力。</p></div><button id="download" class="download">↓ &nbsp; 下載 CSV</button></div>
+<div class="stats"><article><span>資料筆數</span><strong>50 <small>startups</small></strong><p>40 筆訓練 / 10 筆測試</p></article><article><span>選擇方法</span><strong>5 <small>schemes</small></strong><p>EFS · RFECV · LassoCV · Backward · SFS</p></article><article><span>目前組合 · Test RMSE ↓</span><strong id="rmse-stat">—</strong><p>預測誤差，數值越低越好</p></article><article><span>目前組合 · Test R² ↑</span><strong id="r2-stat">—</strong><p>解釋能力，數值越高越好</p></article></div>
+<section class="workspace" id="feature-curves"><div class="section-heading"><div><span class="eyebrow">EXPLORE THE RESULTS</span><h2>從 1 個特徵，到完整模型</h2></div><span class="pill">Held-out test results</span></div>
+<div class="tabs" role="tablist" aria-label="特徵選擇方法"></div>
+<div class="controls"><div class="range-control"><label for="feature-count">特徵數量 <strong id="count-label">2 / 5</strong></label><input id="feature-count" type="range" min="1" max="5" value="2" step="1"><div class="range-labels"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div></div><label class="compare"><input id="compare" type="checkbox"> 同時比較五種方法</label></div>
+<p class="method-note" id="method-note"></p><div class="legend" id="legend" aria-label="圖例"></div>
+<div class="charts"><article class="chart-card"><div class="chart-heading"><h3>RMSE</h3><span>LOWER IS BETTER ↓</span></div><div id="rmse-chart"></div></article><article class="chart-card"><div class="chart-heading"><h3>R-squared</h3><span>HIGHER IS BETTER ↑</span></div><div id="r2-chart"></div></article></div>
+<p class="chart-hint">點選曲線上的圓點或下方表格，可查看該組合的特徵。重疊曲線代表結果相同。</p></section>
+<section class="table-section" id="results"><div class="section-heading"><div><span class="eyebrow">FEATURE COMBINATIONS</span><h2 id="table-title">特徵組合與表現</h2></div><span id="table-badge" class="pill"></span></div><div class="table-scroll"><table><thead><tr><th>Number of Features</th><th>Selected Features</th><th>RMSE ↓</th><th>R-squared ↑</th></tr></thead><tbody id="result-rows"></tbody></table></div><div id="selection-detail" aria-live="polite"></div></section>
+<section id="methodology" class="methodology"><span class="eyebrow">BEHIND THE EXPERIMENT</span><h2>如何閱讀這份結果？</h2><div class="method-grid"><article><span>01 / 同一份測試資料</span><h3>公平比較</h3><p>80% 訓練、20% 測試，random_state = 42。所有組合使用相同 10 筆測試資料評估，特徵選擇只使用訓練資料。</p></article><article><span>02 / 五個編碼後的特徵</span><h3>州別的基準</h3><p>三個數值特徵加上 New York、California 兩個虛擬變數。Florida 為基準類別。所有方法在 5 個特徵時回到相同的完整模型。</p></article><article><span>03 / 固定數量的診斷比較</span><h3>曲線不是自動選擇結果</h3><p>RFECV 使用固定數量的 RFE 路徑；LassoCV 使用係數排名，零值或同分以標準化 OLS 係數排序，再用線性迴歸重訓。Backward 移除至指定數量。</p></article></div><details><summary>查看原始自動選擇方法的比較</summary><p>以下方法依原本的自動規則選取特徵，並以 nested training CV RMSE 排序；與上方固定特徵數的診斷曲線不同。</p><div class="table-scroll"><table><thead><tr><th>Method</th><th>Features</th><th>CV RMSE ↓</th><th>Test RMSE ↓</th><th>Test R² ↑</th></tr></thead><tbody id="auto-results"></tbody></table></div></details><p class="caveat">資料僅有 50 筆，結果描述此資料切分下的表現。R² 可以小於 0，表示表現比以測試目標平均值作為預測更差。RFECV 的原始 RFE 使用未標準化係數，特徵單位會影響移除順序。網頁只展示已計算的結果，不會重新訓練模型。</p></section>
+<footer><span>Feature Lab / 50 Startups</span><span>Built for exploration. Grounded in data.</span></footer></main>
+</body></html>
