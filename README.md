@@ -34,7 +34,7 @@
 | EFS | 最多預選 8 個候選特徵，窮舉指定 k 個特徵的組合，以訓練資料三折 CV RMSE 評估 |
 | RFECV / RFE | 先預選最多 15 個候選，依 OLS 係數遞迴消除；CV 在 1–k 個特徵間挑選 |
 | Lasso (L1) | 比較 L1 懲罰強度並依係數大小選出 k 個特徵，再以 OLS 重訓 |
-| Backward | 最多預選 18 個候選，反覆刪除標準化迴歸係數絕對值最小的特徵，直到 k 個 |
+| Backward | 最多預選 18 個候選，反覆刪除 OLS 係數絕對值最小的特徵，直到 k 個 |
 | SFS | 最多預選 12 個候選，依訓練 CV 逐輪加入對表現最有幫助的特徵，直到 k 個 |
 
 **重要**：自訂頁是運算量受限的 JavaScript 版本，並非原版 `sklearn` 的完全等價實作。Backwards 使用係數排名，而不是原有 Python 版本的 p-value 刪除策略。RFECV 使用 RFE 路徑 + CV。自訂頁以訓練資料擬合補值及編碼，接著在編碼好的訓練集上執行三折 CV；內層預處理未完全隔離，CV 分數可能偏樂觀。獨立測試集不參與特徵選擇。**正式報告應以 sklearn Pipeline 的訓練折內前處理和完整巢狀交叉驗證為準。**
@@ -88,3 +88,7 @@ main5.py                     # Toyota Corolla Python
 ```
 
 GitHub Pages 使用 `main` 分支的 `/docs` 目錄；提交後需等 GitHub Pages 完成部署才能看到更新。
+
+## 自動化檢查
+
+若本機已安裝 Node.js，可從專案根目錄執行 `node tests/custom-model.test.cjs`，用合成回歸資料與 50 Startups 樣本測試 Baseline 及五方法的輸出。
