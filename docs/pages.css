@@ -23,3 +23,15 @@
   .cars-stats strong { font-size: 24px; }
   .cars-section-heading { align-items: flex-start; flex-direction: column; gap: 0; margin-bottom: 15px; }
 }
+
+/* Shared six-stage CRISP-DM methodology, responsive on both experiments. */
+.crisp-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+.crisp-grid > article { min-width:0; padding:19px 20px; border:1px solid var(--line); border-radius:10px; }
+.crisp-grid > article > span { letter-spacing:.06em; }
+.crisp-grid > article h3 { font-size:15px; line-height:1.45; }
+.crisp-grid > article p { line-height:1.8; }
+.method-list { margin-top:18px; border-top:1px solid var(--line); padding-top:12px; }
+.method-list h3 { font-size:13px; }
+.method-list ol { padding-left:19px; margin:9px 0; }
+.method-list li { font-size:12px; line-height:1.75; margin-bottom:9px; }
+@media(max-width:760px) { .crisp-grid { grid-template-columns:1fr; gap:12px; } .crisp-grid > article { padding:15px; } }
