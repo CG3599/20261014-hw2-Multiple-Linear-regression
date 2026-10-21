@@ -3,6 +3,7 @@
 const experimentPages = [
   { path: 'index.html', label: 'Cars · 汽車售價' },
   { path: 'startups.html', label: '50 Startups · 創業獲利' },
+  { path: 'custom.html', label: 'Custom Dataset · 自訂資料集' },
 ];
 const pageMenu = document.createElement('div');
 pageMenu.className = 'page-menu';
