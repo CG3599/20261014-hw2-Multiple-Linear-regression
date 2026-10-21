@@ -1,8 +1,8 @@
 'use strict';
-// Add future experiment pages here; every page uses the same menu.
+// Shared dataset switcher: Cars is the homepage and Startups is the second experiment.
 const experimentPages = [
-  {path: 'index.html', label: '50 Startups · 創業獲利'},
-  {path: 'cars.html', label: 'Cars · 汽車售價'},
+  { path: 'index.html', label: 'Cars · 汽車售價' },
+  { path: 'startups.html', label: '50 Startups · 創業獲利' },
 ];
 const pageMenu = document.createElement('div');
 pageMenu.className = 'page-menu';
@@ -22,11 +22,27 @@ for (const page of experimentPages) {
 pageSelect.addEventListener('change', () => {
   const page = experimentPages.find(item => item.path === pageSelect.value);
   if (page && page.path !== currentPage) {
-    // Request fresh HTML when switching datasets, including after a new deployment.
     const destination = new URL(page.path, location.href);
     destination.searchParams.set('v', String(Date.now()));
     location.assign(destination);
   }
 });
 pageMenu.append(pageLabel, pageSelect);
-document.querySelector('aside nav').before(pageMenu);
+const sideNav = document.querySelector('aside nav');
+if (sideNav) {
+  sideNav.before(pageMenu);
+  // Both experiment pages use the same section-nav active-state behavior.
+  const links = [...sideNav.querySelectorAll('a[href^="#"]')];
+  const updateActive = () => {
+    const sections = links.map(link => ({ link, section: document.getElementById(link.hash.slice(1)) })).filter(item => item.section);
+    const current = [...sections].reverse().find(item => item.section.getBoundingClientRect().top <= 160) || sections[0];
+    for (const item of sections) {
+      item.link.classList.toggle('active', item === current);
+      if (item === current) item.link.setAttribute('aria-current', 'location');
+      else item.link.removeAttribute('aria-current');
+    }
+  };
+  addEventListener('scroll', updateActive, { passive: true });
+  addEventListener('hashchange', updateActive);
+  updateActive();
+}
