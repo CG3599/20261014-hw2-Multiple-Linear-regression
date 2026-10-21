@@ -36,3 +36,15 @@
 #model-results td:last-child{min-width:170px}.custom-panel[hidden],.custom-import[hidden]{display:none!important}
 @media(max-width:960px){.custom-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.feature-fields{grid-template-columns:1fr}}
 @media(max-width:760px){.custom-panel{padding:18px 15px}.custom-input-row,.run-bar{flex-direction:column;align-items:stretch}.custom-config-grid{grid-template-columns:1fr}.dropzone{padding:25px 12px}.custom-tabs{gap:0}.custom-tabs button{font-size:12px;padding:10px}.custom-metrics strong{font-size:22px}}
+
+/* Dark theme consistency with the existing dashboard */
+[data-theme="dark"] .custom-panel{--panel:#192831;--input-bg:#13252e}
+[data-theme="dark"] .custom-panel .dropzone{background:#152a30}
+[data-theme="dark"] .custom-panel .custom-status,
+[data-theme="dark"] .custom-panel .custom-metrics>div{background:#14242d}
+[data-theme="dark"] .custom-import input,
+[data-theme="dark"] .custom-import textarea,
+[data-theme="dark"] .custom-config-grid select,
+[data-theme="dark"] .custom-config-grid input,
+[data-theme="dark"] .feature-field select{background:#10232b;color:#e2ecef;border-color:var(--line)}
+[data-theme="dark"] .custom-table td,[data-theme="dark"] .custom-table th{border-color:var(--line)}
