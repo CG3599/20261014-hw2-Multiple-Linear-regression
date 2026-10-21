@@ -1,659 +1,1972 @@
 const CARS_EXPERIMENT = {
-  "source": "https://raw.githubusercontent.com/uwdata/draco/master/data/cars.csv",
-  "data_sha256": "0634fe30dbdfc0d2d5589d55ff6da1ae56c7735446f8e54d5f4d2eae4e18fd96",
+  "source": "ToyotaCorolla.csv",
+  "data_sha256": "37148761bddd77c825933ae9106eb126e3f659b4c0821ce3198847f034d6d450",
   "seed": 42,
-  "raw_count": 387,
-  "valid_count": 387,
-  "train_count": 309,
-  "test_count": 78,
-  "input_count": 13,
-  "encoded_count": 48,
+  "raw_count": 1436,
+  "deduplicated_count": 1435,
+  "category_cap": 10,
+  "excluded_inputs": [
+    "model",
+    "cylinders",
+    "mfg_month",
+    "mfg_year"
+  ],
+  "clipped_specifications": [
+    "cc",
+    "weight",
+    "hp"
+  ],
+  "clip_quantiles": [
+    0.005,
+    0.995
+  ],
+  "price_policy": "Keep every positive price; no target-based outlier removal",
+  "valid_count": 1435,
+  "train_count": 1148,
+  "test_count": 287,
+  "input_count": 33,
+  "encoded_count": 42,
   "methods": [
     {
-      "method": "SFS",
-      "cv_rmse": 10512.411974801847,
-      "cv_std": 2086.963659992245,
-      "seconds": 17.11382649999996,
-      "count": 8,
+      "method": "Baseline",
+      "cv_rmse": 1191.0579729255774,
+      "cv_std": 27.53579613775815,
+      "seconds": 0.0687235000077635,
+      "count": 42,
       "features": [
-        "num__RWD",
-        "num__Horsepower(HP)",
-        "num__Highway Miles Per Gallon",
-        "cat__Brand_Jaguar",
-        "cat__Brand_Kia",
-        "cat__Brand_Mercedes-Benz",
-        "cat__Brand_Porsche",
-        "cat__Type_Sedan"
-      ]
-    },
-    {
-      "method": "EFS",
-      "cv_rmse": 25318.46772842846,
-      "cv_std": 18393.89224255086,
-      "seconds": 0.8863254000000325,
-      "count": 3,
-      "features": [
-        "num__Horsepower(HP)",
-        "num__Highway Miles Per Gallon",
-        "cat__Brand_Mercedes-Benz"
+        "num__age_08_04",
+        "num__km",
+        "num__hp",
+        "num__met_color",
+        "num__automatic",
+        "num__cc",
+        "num__doors",
+        "num__gears",
+        "num__quarterly_tax",
+        "num__weight",
+        "num__mfr_guarantee",
+        "num__bovag_guarantee",
+        "num__guarantee_period",
+        "num__abs",
+        "num__airbag_1",
+        "num__airbag_2",
+        "num__airco",
+        "num__automatic_airco",
+        "num__boardcomputer",
+        "num__cd_player",
+        "num__central_lock",
+        "num__powered_windows",
+        "num__power_steering",
+        "num__radio",
+        "num__mistlamps",
+        "num__sport_model",
+        "num__backseat_divider",
+        "num__metallic_rim",
+        "num__radio_cassette",
+        "num__parking_assistant",
+        "num__tow_bar",
+        "cat__fuel_type_Diesel",
+        "cat__fuel_type_Petrol",
+        "cat__color_Blue",
+        "cat__color_Green",
+        "cat__color_Grey",
+        "cat__color_Red",
+        "cat__color_Silver",
+        "cat__color_Violet",
+        "cat__color_White",
+        "cat__color_Yellow",
+        "cat__color_infrequent_sklearn"
       ]
     },
     {
       "method": "RFECV",
-      "cv_rmse": 31193.107381395657,
-      "cv_std": 28317.419191257795,
-      "seconds": 6.572868799999924,
-      "count": 3,
+      "cv_rmse": 1197.1189375524045,
+      "cv_std": 22.74319933436279,
+      "seconds": 0.19821799999044742,
+      "count": 42,
       "features": [
-        "num__Horsepower(HP)",
-        "num__Highway Miles Per Gallon",
-        "num__Weight"
-      ]
-    },
-    {
-      "method": "Backward",
-      "cv_rmse": 34371.709483757186,
-      "cv_std": 32778.405419134826,
-      "seconds": 0.10670690000006289,
-      "count": 14,
-      "features": [
-        "num__Horsepower(HP)",
-        "num__Highway Miles Per Gallon",
-        "num__Weight",
-        "num__Wheel Base",
-        "cat__Brand_Audi",
-        "cat__Brand_BMW",
-        "cat__Brand_Cadillac",
-        "cat__Brand_Infiniti",
-        "cat__Brand_Jaguar",
-        "cat__Brand_Land Rover",
-        "cat__Brand_Lexus",
-        "cat__Brand_Mercedes-Benz",
-        "cat__Brand_Porsche",
-        "cat__Type_SUV"
+        "num__age_08_04",
+        "num__km",
+        "num__hp",
+        "num__met_color",
+        "num__automatic",
+        "num__cc",
+        "num__doors",
+        "num__gears",
+        "num__quarterly_tax",
+        "num__weight",
+        "num__mfr_guarantee",
+        "num__bovag_guarantee",
+        "num__guarantee_period",
+        "num__abs",
+        "num__airbag_1",
+        "num__airbag_2",
+        "num__airco",
+        "num__automatic_airco",
+        "num__boardcomputer",
+        "num__cd_player",
+        "num__central_lock",
+        "num__powered_windows",
+        "num__power_steering",
+        "num__radio",
+        "num__mistlamps",
+        "num__sport_model",
+        "num__backseat_divider",
+        "num__metallic_rim",
+        "num__radio_cassette",
+        "num__parking_assistant",
+        "num__tow_bar",
+        "cat__fuel_type_Diesel",
+        "cat__fuel_type_Petrol",
+        "cat__color_Blue",
+        "cat__color_Green",
+        "cat__color_Grey",
+        "cat__color_Red",
+        "cat__color_Silver",
+        "cat__color_Violet",
+        "cat__color_White",
+        "cat__color_Yellow",
+        "cat__color_infrequent_sklearn"
       ]
     },
     {
       "method": "Lasso",
-      "cv_rmse": 39218.96469201533,
-      "cv_std": 39401.80328761469,
-      "seconds": 0.15090090000012424,
+      "cv_rmse": 1199.5505730334783,
+      "cv_std": 35.74932150597951,
+      "seconds": 0.09618079999927431,
       "count": 40,
       "features": [
-        "num__AWD",
-        "num__RWD",
-        "num__Cyl",
-        "num__Horsepower(HP)",
-        "num__City Miles Per Gallon",
-        "num__Highway Miles Per Gallon",
-        "num__Weight",
-        "num__Wheel Base",
-        "num__Width",
-        "cat__Brand_Audi",
-        "cat__Brand_BMW",
-        "cat__Brand_Cadillac",
-        "cat__Brand_Chevrolet",
-        "cat__Brand_Ford",
-        "cat__Brand_GMC",
-        "cat__Brand_Honda",
-        "cat__Brand_Infiniti",
-        "cat__Brand_Jaguar",
-        "cat__Brand_Jeep",
-        "cat__Brand_Land Rover",
-        "cat__Brand_Lexus",
-        "cat__Brand_Lincoln",
-        "cat__Brand_Mazda",
-        "cat__Brand_Mercedes-Benz",
-        "cat__Brand_Mercury",
-        "cat__Brand_Mitsubishi",
-        "cat__Brand_Nissan",
-        "cat__Brand_Pontiac",
-        "cat__Brand_Porsche",
-        "cat__Brand_Saab",
-        "cat__Brand_Saturn",
-        "cat__Brand_Subaru",
-        "cat__Brand_Suzuki",
-        "cat__Brand_Toyota",
-        "cat__Brand_Volkswagen",
-        "cat__Brand_Volvo",
-        "cat__Brand_infrequent_sklearn",
-        "cat__Type_SUV",
-        "cat__Type_Sports Car",
-        "cat__Type_Wagon"
+        "num__age_08_04",
+        "num__km",
+        "num__hp",
+        "num__met_color",
+        "num__automatic",
+        "num__cc",
+        "num__gears",
+        "num__quarterly_tax",
+        "num__weight",
+        "num__mfr_guarantee",
+        "num__bovag_guarantee",
+        "num__guarantee_period",
+        "num__abs",
+        "num__airbag_1",
+        "num__airbag_2",
+        "num__airco",
+        "num__automatic_airco",
+        "num__boardcomputer",
+        "num__cd_player",
+        "num__central_lock",
+        "num__powered_windows",
+        "num__power_steering",
+        "num__mistlamps",
+        "num__sport_model",
+        "num__backseat_divider",
+        "num__metallic_rim",
+        "num__radio_cassette",
+        "num__parking_assistant",
+        "num__tow_bar",
+        "cat__fuel_type_Diesel",
+        "cat__fuel_type_Petrol",
+        "cat__color_Blue",
+        "cat__color_Green",
+        "cat__color_Grey",
+        "cat__color_Red",
+        "cat__color_Silver",
+        "cat__color_Violet",
+        "cat__color_White",
+        "cat__color_Yellow",
+        "cat__color_infrequent_sklearn"
       ]
     },
     {
-      "method": "Baseline",
-      "cv_rmse": 43169.67530767388,
-      "cv_std": 44713.08638690333,
-      "seconds": 0.06293499999992491,
-      "count": 48,
+      "method": "Backward",
+      "cv_rmse": 1211.203867967921,
+      "cv_std": 34.89800994195177,
+      "seconds": 0.09229829999094363,
+      "count": 21,
       "features": [
-        "num__AWD",
-        "num__RWD",
-        "num__Engine Size (l)",
-        "num__Cyl",
-        "num__Horsepower(HP)",
-        "num__City Miles Per Gallon",
-        "num__Highway Miles Per Gallon",
-        "num__Weight",
-        "num__Wheel Base",
-        "num__Len",
-        "num__Width",
-        "cat__Brand_Audi",
-        "cat__Brand_BMW",
-        "cat__Brand_Buick",
-        "cat__Brand_Cadillac",
-        "cat__Brand_Chevrolet",
-        "cat__Brand_Chrysler",
-        "cat__Brand_Dodge",
-        "cat__Brand_Ford",
-        "cat__Brand_GMC",
-        "cat__Brand_Honda",
-        "cat__Brand_Hyundai",
-        "cat__Brand_Infiniti",
-        "cat__Brand_Jaguar",
-        "cat__Brand_Jeep",
-        "cat__Brand_Kia",
-        "cat__Brand_Land Rover",
-        "cat__Brand_Lexus",
-        "cat__Brand_Lincoln",
-        "cat__Brand_Mazda",
-        "cat__Brand_Mercedes-Benz",
-        "cat__Brand_Mercury",
-        "cat__Brand_Mitsubishi",
-        "cat__Brand_Nissan",
-        "cat__Brand_Pontiac",
-        "cat__Brand_Porsche",
-        "cat__Brand_Saab",
-        "cat__Brand_Saturn",
-        "cat__Brand_Subaru",
-        "cat__Brand_Suzuki",
-        "cat__Brand_Toyota",
-        "cat__Brand_Volkswagen",
-        "cat__Brand_Volvo",
-        "cat__Brand_infrequent_sklearn",
-        "cat__Type_SUV",
-        "cat__Type_Sedan",
-        "cat__Type_Sports Car",
-        "cat__Type_Wagon"
+        "num__age_08_04",
+        "num__km",
+        "num__hp",
+        "num__cc",
+        "num__quarterly_tax",
+        "num__weight",
+        "num__mfr_guarantee",
+        "num__bovag_guarantee",
+        "num__guarantee_period",
+        "num__abs",
+        "num__airco",
+        "num__automatic_airco",
+        "num__boardcomputer",
+        "num__cd_player",
+        "num__powered_windows",
+        "num__radio_cassette",
+        "cat__fuel_type_Diesel",
+        "cat__fuel_type_Petrol",
+        "cat__color_Green",
+        "cat__color_Red",
+        "cat__color_White"
+      ]
+    },
+    {
+      "method": "SFS",
+      "cv_rmse": 1269.2401815933463,
+      "cv_std": 5.903199598286362,
+      "seconds": 0.9135653999983333,
+      "count": 8,
+      "features": [
+        "num__age_08_04",
+        "num__km",
+        "num__hp",
+        "num__weight",
+        "num__mfr_guarantee",
+        "num__abs",
+        "num__automatic_airco",
+        "num__powered_windows"
+      ]
+    },
+    {
+      "method": "EFS",
+      "cv_rmse": 1433.0148758158114,
+      "cv_std": 23.166612319898974,
+      "seconds": 0.9132438999949954,
+      "count": 3,
+      "features": [
+        "num__age_08_04",
+        "num__km",
+        "num__weight"
       ]
     }
   ],
-  "best_method": "SFS",
+  "best_method": "Baseline",
   "test": {
-    "mae": 12078.460591140001,
-    "rmse": 51791.213259576165,
-    "r2": -9.815927797493316
+    "mae": 792.7204556572035,
+    "rmse": 1088.7892382674772,
+    "r2": 0.9011878980500453
   },
   "predictions": [
     {
-      "name": "Saturn lon3 4dr",
-      "actual": 15825.0,
-      "predicted": 17124.4449241343,
-      "residual": -1299.444924134299
+      "name": "TOYOTA Corolla 1.6 16V HATCHB G6 2/3-Doors",
+      "actual": 9950.0,
+      "predicted": 10607.437244537943,
+      "residual": -657.4372445379431
     },
     {
-      "name": "Hyundai Elantra GLS 4dr",
-      "actual": 13839.0,
-      "predicted": 16286.203824710781,
-      "residual": -2447.203824710781
+      "name": "TOYOTA Corolla 1.6 16V LIFTB LINEA LUNA 4/5-Doors",
+      "actual": 7995.0,
+      "predicted": 10062.545807812749,
+      "residual": -2067.5458078127485
     },
     {
-      "name": "Chrysler Pacifica",
-      "actual": 31230.0,
-      "predicted": 39135.73330553413,
-      "residual": -7905.73330553413
+      "name": "TOYOTA Corolla 2.0D XL Sedan 4/5-Doors",
+      "actual": 7500.0,
+      "predicted": 9397.060477126732,
+      "residual": -1897.0604771267317
     },
     {
-      "name": "Mitsubishi Montero XLS",
-      "actual": 33112.0,
-      "predicted": 27929.951570716832,
-      "residual": 5182.048429283168
+      "name": "TOYOTA Corolla 1.6 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 9950.0,
+      "predicted": 9145.330133842986,
+      "residual": 804.6698661570135
     },
     {
-      "name": "Lexus RX 330",
-      "actual": 39195.0,
-      "predicted": 33217.33742340843,
-      "residual": 5977.662576591567
+      "name": "TOYOTA Corolla 1.3 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 8950.0,
+      "predicted": 8583.089503997591,
+      "residual": 366.91049600240876
     },
     {
-      "name": "Porsche 911 Targa coupe 2dr",
-      "actual": 76765.0,
-      "predicted": 88273.24006746235,
-      "residual": -11508.24006746235
+      "name": "TOYOTA Corolla 1.3 16V WAGON LINEA TERRA Stationwagen",
+      "actual": 8995.0,
+      "predicted": 8712.072425790016,
+      "residual": 282.9275742099835
     },
     {
-      "name": "Chevrolet Monte Carlo SS 2dr",
-      "actual": 24225.0,
-      "predicted": 27480.22649066518,
-      "residual": -3255.22649066518
+      "name": "TOYOTA Corolla 1.3 Linea Terra Comfort 4/5-Doors",
+      "actual": 9450.0,
+      "predicted": 9451.467384610887,
+      "residual": -1.4673846108871658
     },
     {
-      "name": "Dodge Durango SLT",
-      "actual": 32235.0,
-      "predicted": 32018.03055182671,
-      "residual": 216.9694481732913
+      "name": "TOYOTA Corolla 1.6 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 6750.0,
+      "predicted": 7769.015322218457,
+      "residual": -1019.0153222184572
     },
     {
-      "name": "Oldsmobile Alero GX 2dr",
-      "actual": 18825.0,
-      "predicted": 15925.138052552575,
-      "residual": 2899.8619474474253
+      "name": "TOYOTA Corolla 1.4 16V VVT I HATCHB TERRA 2/3-Doors",
+      "actual": 11950.0,
+      "predicted": 11117.994762170523,
+      "residual": 832.0052378294768
     },
     {
-      "name": "BMW 330i 4dr",
-      "actual": 35495.0,
-      "predicted": 35694.10959994662,
-      "residual": -199.1095999466197
+      "name": "TOYOTA Corolla 1.4 16V VVT I HATCHB TERRA 2/3-Doors",
+      "actual": 10950.0,
+      "predicted": 11894.423000440915,
+      "residual": -944.4230004409146
     },
     {
-      "name": "Chevrolet Malibu 4dr",
-      "actual": 18995.0,
-      "predicted": 17820.85632251441,
-      "residual": 1174.1436774855902
+      "name": "TOYOTA Corolla 1.6 16V WAGON LINEA LUNA Stationwagen",
+      "actual": 9900.0,
+      "predicted": 10066.646289261242,
+      "residual": -166.6462892612417
     },
     {
-      "name": "Chrvsler PT Cruiser GT 4dr",
-      "actual": 25955.0,
-      "predicted": 31465.17895576735,
-      "residual": -5510.178955767351
+      "name": "TOYOTA Corolla 1.6 16V HATCHB LINEA LUNA 2/3-Doors",
+      "actual": 9750.0,
+      "predicted": 9553.71714715927,
+      "residual": 196.2828528407299
     },
     {
-      "name": "Mercedes-Benz C32 AMG 4dr",
-      "actual": 52120.0,
-      "predicted": 77209.63797030997,
-      "residual": -25089.637970309966
+      "name": "TOYOTA Corolla 1.6 16V VVT I WAGON TERRA Stationwagen",
+      "actual": 11480.0,
+      "predicted": 12133.50258147949,
+      "residual": -653.5025814794899
     },
     {
-      "name": "BMW X3 3.0i",
-      "actual": 37000.0,
-      "predicted": 31721.388110640506,
-      "residual": 5278.611889359494
+      "name": "TOYOTA Corolla 1.4 16V VVT I HATCHB TERRA 2/3-Doors",
+      "actual": 11950.0,
+      "predicted": 11868.139918659046,
+      "residual": 81.86008134095391
     },
     {
-      "name": "Toyota Sienna XLE Limited",
-      "actual": 28800.0,
-      "predicted": 34416.64429499016,
-      "residual": -5616.644294990161
+      "name": "TOYOTA Corolla 1.6 LL HB 4/5-Doors",
+      "actual": 8750.0,
+      "predicted": 7862.55762862427,
+      "residual": 887.4423713757296
     },
     {
-      "name": "Mercury Sable GS",
-      "actual": 22595.0,
-      "predicted": 17574.17000418595,
-      "residual": 5020.829995814049
+      "name": "TOYOTA Corolla 1.4 16V VVT I LIFTB TERRA 4/5-Doors",
+      "actual": 10995.0,
+      "predicted": 11559.899785231792,
+      "residual": -564.8997852317916
     },
     {
-      "name": "Suzuki Aeno S 4dr",
-      "actual": 12884.0,
-      "predicted": 18813.910162080723,
-      "residual": -5929.910162080723
+      "name": "TOYOTA Corolla 1.4 16V VVT I LIFTB TERRA 4/5-Doors",
+      "actual": 13950.0,
+      "predicted": 12182.997915196604,
+      "residual": 1767.0020848033964
     },
     {
-      "name": "Chevrolet Impala SS 4dr",
-      "actual": 27995.0,
-      "predicted": 36249.66933525734,
-      "residual": -8254.669335257342
+      "name": "TOYOTA Corolla 2.0 D4D 90 5DR TERRA COMFORT 4/5-Doors",
+      "actual": 16950.0,
+      "predicted": 17696.143408918117,
+      "residual": -746.1434089181166
     },
     {
-      "name": "Mercedes-Benz SLK230 convertible 2dr",
-      "actual": 40320.0,
-      "predicted": 46746.83109091177,
-      "residual": -6426.831090911772
+      "name": "TOYOTA Corolla 1.6 Lin.Terra Aut. 4/5-Doors",
+      "actual": 7950.0,
+      "predicted": 9100.33689306952,
+      "residual": -1150.3368930695196
     },
     {
-      "name": "Toyota 4Runner SR5 V6",
-      "actual": 27710.0,
-      "predicted": 35306.57161854877,
-      "residual": -7596.571618548769
+      "name": "TOYOTA Corolla 1.4 16V VVT I HATCHB TERRA 2/3-Doors",
+      "actual": 9950.0,
+      "predicted": 11043.184552282204,
+      "residual": -1093.184552282204
     },
     {
-      "name": "Cadillac Deville 4dr",
-      "actual": 45445.0,
-      "predicted": 43123.393909887665,
-      "residual": 2321.6060901123346
+      "name": "TOYOTA Corolla 1.4 VVTI L.Terra HB 4/5-Doors",
+      "actual": 12750.0,
+      "predicted": 11625.599102696631,
+      "residual": 1124.4008973033688
     },
     {
-      "name": "Jaguar S-Type R 4dr",
-      "actual": 63120.0,
-      "predicted": 80580.33206362894,
-      "residual": -17460.332063628943
+      "name": "TOYOTA Corolla 1.4 16V VVT I 5DR TERRA COMFORT 4/5-Doors",
+      "actual": 17650.0,
+      "predicted": 17815.582876796692,
+      "residual": -165.5828767966923
     },
     {
-      "name": "Mercedes-Benz C320 4dr",
-      "actual": 37630.0,
-      "predicted": 49830.84922689577,
-      "residual": -12200.84922689577
+      "name": "TOYOTA Corolla 1.6 GL LB 4/5-Doors",
+      "actual": 8250.0,
+      "predicted": 9988.545271970532,
+      "residual": -1738.5452719705318
     },
     {
-      "name": "Audi A4 3.0 convertible 2dr",
-      "actual": 42490.0,
-      "predicted": 31465.17895576735,
-      "residual": 11024.821044232649
+      "name": "TOYOTA Corolla 1.4 16V VVT I HATCHB TERRA 2/3-Doors",
+      "actual": 10750.0,
+      "predicted": 10333.857821585056,
+      "residual": 416.1421784149443
     },
     {
-      "name": "Lincoln LS V6 Luxury 4dr",
-      "actual": 32495.0,
-      "predicted": 35629.68626897461,
-      "residual": -3134.686268974612
+      "name": "TOYOTA Corolla 1.3 16V LIFTB LINEA TERRA 4/5-Doors",
+      "actual": 8950.0,
+      "predicted": 7443.8674349570965,
+      "residual": 1506.1325650429035
     },
     {
-      "name": "Audi A6 3.0 4dr",
-      "actual": 36640.0,
-      "predicted": 31465.17895576735,
-      "residual": 5174.821044232649
+      "name": "TOYOTA Corolla 1.6 16V VVT I 5DR TERRA 4/5-Doors",
+      "actual": 16895.0,
+      "predicted": 15926.678296103142,
+      "residual": 968.3217038968578
     },
     {
-      "name": "Subaru Impreza WRX 4dr",
-      "actual": 25045.0,
-      "predicted": 33758.93608164575,
-      "residual": -8713.936081645748
+      "name": "TOYOTA Corolla 1.3 16V LIFTB LINEA TERRA 4/5-Doors",
+      "actual": 8250.0,
+      "predicted": 7442.2118393062265,
+      "residual": 807.7881606937735
     },
     {
-      "name": "Hyundai Santa Fe GLS",
-      "actual": 21589.0,
-      "predicted": -428619.42651608837,
-      "residual": 450208.42651608837
+      "name": "TOYOTA Corolla 2.0 DSL HATCHB LINEA LUNA 2/3-Doors",
+      "actual": 8950.0,
+      "predicted": 8494.710929069943,
+      "residual": 455.2890709300573
     },
     {
-      "name": "Oldsmobile Silhouette GL",
-      "actual": 28790.0,
-      "predicted": 24151.252137630072,
-      "residual": 4638.747862369928
+      "name": "TOYOTA Corolla 1.4 16V VVT I 5DR TERRA 4/5-Doors",
+      "actual": 15950.0,
+      "predicted": 15934.655312525381,
+      "residual": 15.344687474618695
     },
     {
-      "name": "Acura 3.5 RL 4dr",
-      "actual": 43755.0,
-      "predicted": 31362.052439759645,
-      "residual": 12392.947560240355
+      "name": "TOYOTA Corolla 1.6 16V VVT I HATCHB G6 4/5-Doors",
+      "actual": 14950.0,
+      "predicted": 13990.635318344606,
+      "residual": 959.3646816553937
     },
     {
-      "name": "Volvo S60 2.5 4dr",
-      "actual": 31745.0,
-      "predicted": 28834.346102389703,
-      "residual": 2910.6538976102966
+      "name": "TOYOTA Corolla 1.6 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 7950.0,
+      "predicted": 8207.454415362434,
+      "residual": -257.4544153624338
     },
     {
-      "name": "Chevrolet Malibu Maxx LS",
-      "actual": 22225.0,
-      "predicted": 29038.869033127765,
-      "residual": -6813.869033127765
+      "name": "TOYOTA Corolla 2.0 DSL LIFTB LINEA TERRA 4/5-Doors",
+      "actual": 10950.0,
+      "predicted": 10235.441321859775,
+      "residual": 714.5586781402253
     },
     {
-      "name": "Audi TT 3.2 coupe 2dr (convertible)",
-      "actual": 40590.0,
-      "predicted": 39600.90363167405,
-      "residual": 989.096368325947
+      "name": "TOYOTA Corolla 1.6 16v Liftback Linea Terra 4/5-Doors",
+      "actual": 10950.0,
+      "predicted": 11015.338117993435,
+      "residual": -65.33811799343493
     },
     {
-      "name": "Ford Taurus LX 4dr",
-      "actual": 20320.0,
-      "predicted": 17214.83433330509,
-      "residual": 3105.1656666949093
+      "name": "TOYOTA Corolla 1.6 16V HATCHB S 2/3-Doors",
+      "actual": 9450.0,
+      "predicted": 9602.335653348147,
+      "residual": -152.3356533481474
     },
     {
-      "name": "Ford Taurus SES Duratec 4dr",
-      "actual": 22735.0,
-      "predicted": 26899.924647392167,
-      "residual": -4164.924647392167
+      "name": "TOYOTA Corolla 1.6 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 10450.0,
+      "predicted": 9409.045920800936,
+      "residual": 1040.954079199064
     },
     {
-      "name": "Toyota Camry LE 4dr",
-      "actual": 19560.0,
-      "predicted": 20051.92021869815,
-      "residual": -491.92021869814926
+      "name": "TOYOTA Corolla 1.6 16V LIFTB LINEA LUNA 4/5-Doors",
+      "actual": 8250.0,
+      "predicted": 8609.058710489722,
+      "residual": -359.0587104897222
     },
     {
-      "name": "Cadillac Deville DTS 4dr",
-      "actual": 50595.0,
-      "predicted": 48604.29568775777,
-      "residual": 1990.7043122422328
+      "name": "TOYOTA Corolla 1.6 16V SEDAN LINEA TERRA 4/5-Doors",
+      "actual": 8250.0,
+      "predicted": 8231.927205186452,
+      "residual": 18.07279481354817
     },
     {
-      "name": "Ford Focus ZTW",
-      "actual": 17475.0,
-      "predicted": 14891.650926673206,
-      "residual": 2583.3490733267936
+      "name": "TOYOTA Corolla 1.6 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 8950.0,
+      "predicted": 9234.361880751225,
+      "residual": -284.3618807512248
     },
     {
-      "name": "Subaru Outback H-6 VDC 4dr",
-      "actual": 31545.0,
-      "predicted": 29311.52142965501,
-      "residual": 2233.478570344989
+      "name": "TOYOTA Corolla 1.4 16V VVT I 5DR TERRA COMFORT 4/5-Doors",
+      "actual": 14950.0,
+      "predicted": 16329.674271531549,
+      "residual": -1379.6742715315486
     },
     {
-      "name": "Suzuki Aerio SX",
-      "actual": 16497.0,
-      "predicted": 18773.476875767672,
-      "residual": -2276.476875767672
+      "name": "TOYOTA Corolla 1.6 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 8950.0,
+      "predicted": 10141.52810667715,
+      "residual": -1191.5281066771495
     },
     {
-      "name": "BMW 745Li 4dr",
-      "actual": 73195.0,
-      "predicted": 56018.640882651394,
-      "residual": 17176.359117348606
+      "name": "TOYOTA Corolla 1.3 16V LIFTB LINEA LUNA 4/5-Doors",
+      "actual": 9750.0,
+      "predicted": 9912.878306060908,
+      "residual": -162.87830606090756
     },
     {
-      "name": "Buick Century Custom 4dr",
-      "actual": 22180.0,
-      "predicted": 22798.862627182894,
-      "residual": -618.8626271828944
+      "name": "TOYOTA Corolla 1.6i Linea Terra HB 2/3-Doors",
+      "actual": 8950.0,
+      "predicted": 8886.362092861886,
+      "residual": 63.637907138114315
     },
     {
-      "name": "Volvo XC70",
-      "actual": 35145.0,
-      "predicted": 29593.450730464472,
-      "residual": 5551.549269535528
+      "name": "TOYOTA Corolla 1.6 16V HATCHB G6 R 2/3-Doors",
+      "actual": 12950.0,
+      "predicted": 10081.006268853433,
+      "residual": 2868.9937311465674
     },
     {
-      "name": "Porsche Boxster S convertible 2dr",
-      "actual": 52365.0,
-      "predicted": 75776.78401391851,
-      "residual": -23411.784013918514
+      "name": "TOYOTA Corolla 1.6 Linea Terra HB 2/3-Doors",
+      "actual": 8500.0,
+      "predicted": 8272.130001886477,
+      "residual": 227.86999811352325
     },
     {
-      "name": "Ford Focus SE 4dr",
-      "actual": 15460.0,
-      "predicted": 14132.546298598441,
-      "residual": 1327.4537014015586
+      "name": "TOYOTA Corolla 1.6 16V LIFTB LINEA LUNA 4/5-Doors",
+      "actual": 9950.0,
+      "predicted": 10839.700822645184,
+      "residual": -889.7008226451835
     },
     {
-      "name": "Ford Explorer XLT V6",
-      "actual": 29670.0,
-      "predicted": 27233.54017233672,
-      "residual": 2436.4598276632787
+      "name": "TOYOTA Corolla 1.6 16V VVT I 5DR SOL 4/5-Doors",
+      "actual": 16950.0,
+      "predicted": 18905.478747652727,
+      "residual": -1955.4787476527272
     },
     {
-      "name": "Volkswagen Golf GLS 4dr",
-      "actual": 18715.0,
-      "predicted": 10044.467317488568,
-      "residual": 8670.532682511432
+      "name": "TOYOTA Corolla 1.3 16V HATCHB LINEA TERRA AUT3 2/3-Doors",
+      "actual": 10750.0,
+      "predicted": 10274.457151223067,
+      "residual": 475.54284877693317
     },
     {
-      "name": "Cadillac CTS VVT 4dr",
-      "actual": 30835.0,
-      "predicted": 40272.346947421196,
-      "residual": -9437.346947421196
+      "name": "TOYOTA Corolla 1.6 16V HATCHB LINEA TERRA AUT4 2/3-Doors",
+      "actual": 8750.0,
+      "predicted": 8538.250531549686,
+      "residual": 211.74946845031445
     },
     {
-      "name": "Audi S4 Quattro 4dr",
-      "actual": 48040.0,
-      "predicted": 54975.12478918648,
-      "residual": -6935.124789186477
+      "name": "TOYOTA Corolla 1.6 GTSi HB 4/5-Doors",
+      "actual": 10750.0,
+      "predicted": 11189.494341999354,
+      "residual": -439.4943419993542
     },
     {
-      "name": "BMW 330Ci 2dr",
-      "actual": 36995.0,
-      "predicted": 35694.10959994662,
-      "residual": 1300.8904000533803
+      "name": "TOYOTA Corolla 1.6 VVTi Terra Comfort 4/5-Doors",
+      "actual": 14350.0,
+      "predicted": 12811.006151714897,
+      "residual": 1538.993848285103
     },
     {
-      "name": "Mazda Tribute DX 2.0",
-      "actual": 21087.0,
-      "predicted": 11693.499269121941,
-      "residual": 9393.500730878059
+      "name": "TOYOTA Corolla 1.4 16V VVT I LIFTB LUNA 4/5-Doors",
+      "actual": 11950.0,
+      "predicted": 13330.87502401575,
+      "residual": -1380.8750240157497
     },
     {
-      "name": "Hyundai Elantra GT 4dr",
-      "actual": 15389.0,
-      "predicted": 16286.203824710781,
-      "residual": -897.2038247107812
+      "name": "TOYOTA Corolla 1.3 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 6750.0,
+      "predicted": 6856.092823645446,
+      "residual": -106.0928236454456
     },
     {
-      "name": "Chrysler Sebring 4dr",
-      "actual": 19090.0,
-      "predicted": 17317.960849312796,
-      "residual": 1772.0391506872038
+      "name": "TOYOTA Corolla 1.4 16V VVT I 5DR TERRA 4/5-Doors",
+      "actual": 15750.0,
+      "predicted": 15017.915221356085,
+      "residual": 732.0847786439153
     },
     {
-      "name": "Mercury Grand Marquis GS 4dr",
-      "actual": 24695.0,
-      "predicted": 33476.028742862276,
-      "residual": -8781.028742862276
+      "name": "TOYOTA Corolla 1.6 16V VVT I 3DR SOL 2/3-Doors",
+      "actual": 17950.0,
+      "predicted": 17948.706824488218,
+      "residual": 1.293175511782465
     },
     {
-      "name": "BMW 325xi Sport",
-      "actual": 32845.0,
-      "predicted": 23932.016066515265,
-      "residual": 8912.983933484735
+      "name": "TOYOTA Corolla 1.3 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 7950.0,
+      "predicted": 6462.222386165415,
+      "residual": 1487.7776138345853
     },
     {
-      "name": "Suzuki Verona LX 4dr",
-      "actual": 17262.0,
-      "predicted": 17214.83433330509,
-      "residual": 47.165666694909305
+      "name": "TOYOTA Corolla 2.0 DSL SEDAN LINEA TERRA 4/5-Doors",
+      "actual": 9950.0,
+      "predicted": 7970.954392982534,
+      "residual": 1979.045607017466
     },
     {
-      "name": "Lexus GX 470",
-      "actual": 45700.0,
-      "predicted": 32314.67299301291,
-      "residual": 13385.327006987089
+      "name": "TOYOTA Corolla 1.6 16V VVT I LIFTB SOL 4/5-Doors",
+      "actual": 11450.0,
+      "predicted": 11094.917562453058,
+      "residual": 355.08243754694195
     },
     {
-      "name": "Pontiac Montana EWB",
-      "actual": 31370.0,
-      "predicted": 23351.714223242252,
-      "residual": 8018.285776757748
+      "name": "TOYOTA Corolla 1.4 16V VVT I LIFTB SOL 4/5-Doors",
+      "actual": 10750.0,
+      "predicted": 12008.570890047065,
+      "residual": -1258.5708900470654
     },
     {
-      "name": "Mercury Monterey Luxury",
-      "actual": 33995.0,
-      "predicted": 26459.72240388521,
-      "residual": 7535.277596114789
+      "name": "TOYOTA Corolla 1.6 16V VVT I 5DR SOL 4/5-Doors",
+      "actual": 18750.0,
+      "predicted": 17968.636881417653,
+      "residual": 781.3631185823469
     },
     {
-      "name": "Nissan 350Z coupe 2dr",
-      "actual": 26910.0,
-      "predicted": 48446.774808363596,
-      "residual": -21536.774808363596
+      "name": "TOYOTA Corolla 1.8 16V VVTLI 5DR T SPORT 4/5-Doors",
+      "actual": 21950.0,
+      "predicted": 21238.48351205679,
+      "residual": 711.5164879432086
     },
     {
-      "name": "Saturn L300 2",
-      "actual": 23560.0,
-      "predicted": 17483.78059501516,
-      "residual": 6076.21940498484
+      "name": "TOYOTA Corolla 1.6 16V VVT I LIFTB SOL 4/5-Doors",
+      "actual": 11950.0,
+      "predicted": 13033.444367468146,
+      "residual": -1083.444367468146
     },
     {
-      "name": "Volvo S80 T6 4dr",
-      "actual": 45210.0,
-      "predicted": 41588.74141208403,
-      "residual": 3621.258587915967
+      "name": "TOYOTA Corolla 2.0 DSL HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 7350.0,
+      "predicted": 7615.487317113216,
+      "residual": -265.4873171132158
     },
     {
-      "name": "Honda Civic Si 2dr hatch",
-      "actual": 19490.0,
-      "predicted": 19510.321560460834,
-      "residual": -20.321560460834007
+      "name": "TOYOTA Corolla 1.6 LB LINEA TERRA 4/5-Doors",
+      "actual": 7500.0,
+      "predicted": 7834.813383417792,
+      "residual": -334.81338341779156
     },
     {
-      "name": "Jaguar XKR coupe 2dr",
-      "actual": 81995.0,
-      "predicted": 80939.66773450981,
-      "residual": 1055.3322654901858
+      "name": "TOYOTA Corolla 1.6 16V VVT I LIFTB LUNA 4/5-Doors",
+      "actual": 12950.0,
+      "predicted": 13039.616609504215,
+      "residual": -89.61660950421538
     },
     {
-      "name": "Acura TL 4dr",
-      "actual": 33195.0,
-      "predicted": 42826.75146870146,
-      "residual": -9631.751468701463
+      "name": "TOYOTA Corolla 1.6 Linea Terra Sedan 4/5-Doors",
+      "actual": 13500.0,
+      "predicted": 12374.096942055927,
+      "residual": 1125.9030579440732
     },
     {
-      "name": "BMW Z4 convertible 3.0i 2dr",
-      "actual": 41045.0,
-      "predicted": 36053.44527082748,
-      "residual": 4991.554729172523
+      "name": "TOYOTA Corolla 1.3 HB LINEA TERRA 2/3-Doors",
+      "actual": 8750.0,
+      "predicted": 6496.088706044997,
+      "residual": 2253.911293955003
     },
     {
-      "name": "Dodge Stratus SXT 4dr",
-      "actual": 18820.0,
-      "predicted": 16518.42293492498,
-      "residual": 2301.57706507502
+      "name": "TOYOTA Corolla 1.6 16V VVT I LIFTB SOL AUT4 4/5-Doors",
+      "actual": 13950.0,
+      "predicted": 13155.875634851032,
+      "residual": 794.1243651489676
     },
     {
-      "name": "Toyota RAV4",
-      "actual": 20290.0,
-      "predicted": 19289.35538806868,
-      "residual": 1000.6446119313187
+      "name": "TOYOTA Corolla 1.6 16V HATCHB S 2/3-Doors",
+      "actual": 8450.0,
+      "predicted": 7815.84462359358,
+      "residual": 634.1553764064201
     },
     {
-      "name": "Chrysler Sebring convertible 2dr",
-      "actual": 25215.0,
-      "predicted": 17317.960849312796,
-      "residual": 7897.039150687204
+      "name": "TOYOTA Corolla 1.6 16V HATCHB LINEA LUNA 2/3-Doors",
+      "actual": 7950.0,
+      "predicted": 8734.266756359877,
+      "residual": -784.266756359877
     },
     {
-      "name": "Toyota MR2 Spyder convertible 2dr",
-      "actual": 25130.0,
-      "predicted": 18179.21395542125,
-      "residual": 6950.786044578748
+      "name": "TOYOTA Corolla 1.3 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 8250.0,
+      "predicted": 7143.272431725729,
+      "residual": 1106.727568274271
     },
     {
-      "name": "Chevrolet Monte Carlo LS 2dr",
-      "actual": 21825.0,
-      "predicted": 24694.580897144733,
-      "residual": -2869.580897144733
+      "name": "TOYOTA Corolla 1.8 16V VVTLI 3DR T SPORT 2/3-Doors",
+      "actual": 22000.0,
+      "predicted": 21964.341203593398,
+      "residual": 35.65879640660205
     },
     {
-      "name": "Ford Expedition 4.6 XLT",
-      "actual": 34560.0,
-      "predicted": 31656.964779668502,
-      "residual": 2903.035220331498
+      "name": "TOYOTA Corolla 1.6 HB SOL 2/3-Doors",
+      "actual": 10900.0,
+      "predicted": 10844.771412580494,
+      "residual": 55.22858741950586
     },
     {
-      "name": "Acura NSX coupe 2dr manual S",
-      "actual": 89765.0,
-      "predicted": 48304.94510732019,
-      "residual": 41460.05489267981
+      "name": "TOYOTA Corolla 1.6 16V VVT I LIFTB LUNA 4/5-Doors",
+      "actual": 13750.0,
+      "predicted": 13194.655339175006,
+      "residual": 555.3446608249942
     },
     {
-      "name": "Audi A6 4.2 Quattro 4dr",
-      "actual": 49690.0,
-      "predicted": 47804.75777336995,
-      "residual": 1885.2422266300491
+      "name": "TOYOTA Corolla 1.6 16V SEDAN LINEA TERRA 4/5-Doors",
+      "actual": 9000.0,
+      "predicted": 7565.52069480396,
+      "residual": 1434.4793051960396
     },
     {
-      "name": "Honda Civic HX 2dr",
-      "actual": 14170.0,
-      "predicted": 15679.935903238984,
-      "residual": -1509.9359032389839
+      "name": "TOYOTA Corolla 1.4-16v VVT-i Linea Terra Comfort NIEUW AIRCO 4/5-Doors",
+      "actual": 17795.0,
+      "predicted": 18377.283338047353,
+      "residual": -582.283338047353
     },
     {
-      "name": "Nissan Altima SE 4dr",
-      "actual": 23290.0,
-      "predicted": 36546.311776443545,
-      "residual": -13256.311776443545
+      "name": "TOYOTA Corolla 1.4 16V VVT I HATCHB SOL 2/3-Doors",
+      "actual": 11950.0,
+      "predicted": 11853.50287156859,
+      "residual": 96.4971284314106
     },
     {
-      "name": "Toyota Corolla CE 4dr",
-      "actual": 14085.0,
-      "predicted": 16930.9289989558,
-      "residual": -2845.9289989557983
+      "name": "TOYOTA Corolla 1.6 16V SEDAN LINEA TERRA 4/5-Doors",
+      "actual": 8250.0,
+      "predicted": 7339.8566571473275,
+      "residual": 910.1433428526725
     },
     {
-      "name": "Chevrolet Aveo 4dr",
-      "actual": 11690.0,
-      "predicted": 8612.941335692638,
-      "residual": 3077.058664307362
+      "name": "TOYOTA Corolla 1.6 16V LIFTB LINEA TERRA 4/5-Doors",
+      "actual": 6650.0,
+      "predicted": 7454.572622397512,
+      "residual": -804.5726223975116
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V SEDAN LINEA TERRA AUT4 4/5-Doors",
+      "actual": 8500.0,
+      "predicted": 9568.318863458262,
+      "residual": -1068.318863458262
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 8250.0,
+      "predicted": 9303.23779739602,
+      "residual": -1053.2377973960192
+    },
+    {
+      "name": "TOYOTA Corolla LIFTBACK 1.6 Linea terra 4/5-Doors",
+      "actual": 8250.0,
+      "predicted": 8425.512873486115,
+      "residual": -175.5128734861155
+    },
+    {
+      "name": "TOYOTA Corolla 2/3-Doors",
+      "actual": 10250.0,
+      "predicted": 10956.121980280344,
+      "residual": -706.1219802803444
+    },
+    {
+      "name": "TOYOTA Corolla 1.9 D LIFTB TERRA 4/5-Doors",
+      "actual": 8950.0,
+      "predicted": 11039.826804088223,
+      "residual": -2089.826804088223
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I LIFTB SOL 4/5-Doors",
+      "actual": 11250.0,
+      "predicted": 10891.817576935837,
+      "residual": 358.18242306416323
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V SEDAN LINEA TERRA 4/5-Doors",
+      "actual": 8950.0,
+      "predicted": 7735.502307115741,
+      "residual": 1214.4976928842589
+    },
+    {
+      "name": "TOYOTA Corolla 2.0 DSL HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 7950.0,
+      "predicted": 7104.73554002867,
+      "residual": 845.2644599713303
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V HATCHB G6 2/3-Doors",
+      "actual": 9750.0,
+      "predicted": 9148.4064597752,
+      "residual": 601.5935402247997
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I HATCHB TERRA 2/3-Doors",
+      "actual": 12500.0,
+      "predicted": 12513.52297276202,
+      "residual": -13.5229727620208
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 8250.0,
+      "predicted": 8768.315565764939,
+      "residual": -518.3155657649386
+    },
+    {
+      "name": "TOYOTA Corolla 2.0 DSL HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 11450.0,
+      "predicted": 10408.644998552069,
+      "residual": 1041.3550014479315
+    },
+    {
+      "name": "TOYOTA Corolla 2.0 DSL HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 7250.0,
+      "predicted": 6995.644473639116,
+      "residual": 254.35552636088414
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V HATCHB LINEA LUNA 2/3-Doors",
+      "actual": 9250.0,
+      "predicted": 8429.206432198167,
+      "residual": 820.793567801833
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 VVTi Linea terra 2/3-Doors",
+      "actual": 7950.0,
+      "predicted": 7809.035953023584,
+      "residual": 140.96404697641628
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V WAGON LINEA LUNA Stationwagen",
+      "actual": 11250.0,
+      "predicted": 11183.74739889886,
+      "residual": 66.25260110113959
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V LIFTB LINEA TERRA 4/5-Doors",
+      "actual": 9500.0,
+      "predicted": 9553.345795879912,
+      "residual": -53.34579587991175
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V SEDAN LINEA TERRA 4/5-Doors",
+      "actual": 8990.0,
+      "predicted": 7878.32485028732,
+      "residual": 1111.6751497126797
+    },
+    {
+      "name": "TOYOTA Corolla 2.0 D4D 90 5DR SOL 4/5-Doors",
+      "actual": 21950.0,
+      "predicted": 23051.6970670993,
+      "residual": -1101.6970670992996
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V LIFTB LINEA LUNA AUT4 4/5-Doors",
+      "actual": 10350.0,
+      "predicted": 11600.374412607169,
+      "residual": -1250.3744126071688
+    },
+    {
+      "name": "TOYOTA Corolla 1.4 16V VVT I LIFTB LUNA 4/5-Doors",
+      "actual": 11750.0,
+      "predicted": 13725.464981982319,
+      "residual": -1975.464981982319
+    },
+    {
+      "name": "TOYOTA Corolla 1.4 16V VVT I HATCHB TERRA 2/3-Doors",
+      "actual": 8950.0,
+      "predicted": 10984.577824132473,
+      "residual": -2034.5778241324733
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V HATCHB S 2/3-Doors",
+      "actual": 10900.0,
+      "predicted": 10216.34404612087,
+      "residual": 683.6559538791298
+    },
+    {
+      "name": "TOYOTA Corolla LIFTBACK 1.3i Linea Luna Liftback 4/5-Doors",
+      "actual": 9950.0,
+      "predicted": 10081.654196816435,
+      "residual": -131.6541968164347
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 10500.0,
+      "predicted": 10546.436774152187,
+      "residual": -46.436774152187354
+    },
+    {
+      "name": "TOYOTA Corolla 1.4 16V VVT I 3DR TERRA COMFORT 2/3-Doors",
+      "actual": 16250.0,
+      "predicted": 16340.156532960806,
+      "residual": -90.15653296080563
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V SEDAN LINEA TERRA 4/5-Doors",
+      "actual": 10750.0,
+      "predicted": 9676.93875030554,
+      "residual": 1073.0612496944595
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V HATCHB S 2/3-Doors",
+      "actual": 7950.0,
+      "predicted": 7647.511753864068,
+      "residual": 302.48824613593206
+    },
+    {
+      "name": "TOYOTA Corolla 2.0 D4D 90 5DR TERRA COMFORT 4/5-Doors",
+      "actual": 16950.0,
+      "predicted": 16994.749745599285,
+      "residual": -44.749745599285234
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 7750.0,
+      "predicted": 8096.975209385311,
+      "residual": -346.97520938531125
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I HATCHB TERRA AUT4 2/3-Doors",
+      "actual": 11250.0,
+      "predicted": 11588.760413756332,
+      "residual": -338.7604137563321
+    },
+    {
+      "name": "TOYOTA Corolla 2.0 DSL SEDAN LINEA TERRA 4/5-Doors",
+      "actual": 8500.0,
+      "predicted": 8254.139474760661,
+      "residual": 245.86052523933904
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 HB LINEA TERRA 2/3-Doors",
+      "actual": 18950.0,
+      "predicted": 13665.387497980588,
+      "residual": 5284.612502019412
+    },
+    {
+      "name": "TOYOTA Corolla 1.9 D LIFTB TERRA 4/5-Doors",
+      "actual": 11750.0,
+      "predicted": 11055.59693075137,
+      "residual": 694.4030692486303
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V LIFTBACK LINEA LUNA 4/5-Doors",
+      "actual": 7995.0,
+      "predicted": 9110.47768111773,
+      "residual": -1115.4776811177308
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I LIFTB LUNA 4/5-Doors",
+      "actual": 12900.0,
+      "predicted": 13943.831576363827,
+      "residual": -1043.8315763638275
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16v Liftback Linea Terra 4/5-Doors",
+      "actual": 8250.0,
+      "predicted": 8944.321030148665,
+      "residual": -694.3210301486652
+    },
+    {
+      "name": "TOYOTA Corolla 2.0 DSL WAGON LINEA TERRA Stationwagen",
+      "actual": 9950.0,
+      "predicted": 9218.558906281447,
+      "residual": 731.441093718553
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 6495.0,
+      "predicted": 6742.48313289508,
+      "residual": -247.48313289508042
+    },
+    {
+      "name": "TOYOTA Corolla Liftback 1.6 VVTI 4/5-Doors",
+      "actual": 11900.0,
+      "predicted": 13497.498921997263,
+      "residual": -1597.498921997263
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I HATCHB SOL AUT4 2/3-Doors",
+      "actual": 12950.0,
+      "predicted": 12424.908057647615,
+      "residual": 525.0919423523846
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I LIFTB LUNA 4/5-Doors",
+      "actual": 13500.0,
+      "predicted": 12933.317991615146,
+      "residual": 566.6820083848543
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V LIFTB LINEA TERRA 4/5-Doors",
+      "actual": 7450.0,
+      "predicted": 8443.835387070381,
+      "residual": -993.8353870703813
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V HATCHB G6 2/3-Doors",
+      "actual": 9950.0,
+      "predicted": 10582.257506384361,
+      "residual": -632.2575063843615
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V HATCHB G6 2/3-Doors",
+      "actual": 10950.0,
+      "predicted": 10643.505189918716,
+      "residual": 306.4948100812835
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 VVT-I 5DR LINEA SOL 4/5-Doors",
+      "actual": 16950.0,
+      "predicted": 16905.58687794333,
+      "residual": 44.413122056670545
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16v VVTi Terra Comfort 2/3-Doors",
+      "actual": 13500.0,
+      "predicted": 12157.819193141226,
+      "residual": 1342.1808068587743
+    },
+    {
+      "name": "TOYOTA Corolla 1.3i-16v Linea Terra 5d 4/5-Doors",
+      "actual": 8500.0,
+      "predicted": 7246.877401893074,
+      "residual": 1253.1225981069256
+    },
+    {
+      "name": "TOYOTA Corolla 1.9 D HATCHB SOL 2/3-Doors",
+      "actual": 6500.0,
+      "predicted": 7553.5349678004895,
+      "residual": -1053.5349678004895
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 LB LINEA LUNA 4/5-Doors",
+      "actual": 8950.0,
+      "predicted": 9056.220515035055,
+      "residual": -106.22051503505463
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V HATCHB LINEA LUNA 2/3-Doors",
+      "actual": 8450.0,
+      "predicted": 8957.933868976595,
+      "residual": -507.9338689765955
+    },
+    {
+      "name": "TOYOTA Corolla 19D LB Linea Terra 4/5-Doors",
+      "actual": 12950.0,
+      "predicted": 11170.601053107874,
+      "residual": 1779.3989468921263
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I HATCHB SOL 2/3-Doors",
+      "actual": 11450.0,
+      "predicted": 10999.151425805536,
+      "residual": 450.84857419446416
+    },
+    {
+      "name": "TOYOTA Corolla 1.4 16V VVT I 3DR TERRA COMFORT 2/3-Doors",
+      "actual": 15950.0,
+      "predicted": 15579.382272170627,
+      "residual": 370.6177278293726
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 Linea Terra Comfort 4/5-Doors",
+      "actual": 7950.0,
+      "predicted": 7708.221087014518,
+      "residual": 241.77891298548184
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 VVTi Linea terra 2/3-Doors",
+      "actual": 8500.0,
+      "predicted": 7699.599829562004,
+      "residual": 800.4001704379962
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V LB Linea Luna 4/5-Doors",
+      "actual": 8750.0,
+      "predicted": 7021.846385457271,
+      "residual": 1728.153614542729
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 LB LINEA TERRA 4/5-Doors",
+      "actual": 7450.0,
+      "predicted": 8817.434096860661,
+      "residual": -1367.4340968606612
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V HATCHB LINEA LUNA 2/3-Doors",
+      "actual": 6900.0,
+      "predicted": 7875.132157401866,
+      "residual": -975.1321574018657
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V WAGON LINEA TERRA Stationwagen",
+      "actual": 10950.0,
+      "predicted": 11847.304051886771,
+      "residual": -897.304051886771
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V LIFTB LINEA TERRA AUT4 4/5-Doors",
+      "actual": 9500.0,
+      "predicted": 10114.830468763264,
+      "residual": -614.8304687632644
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V HATCHB LINEA TERRA AUT3 2/3-Doors",
+      "actual": 8950.0,
+      "predicted": 8216.243686148577,
+      "residual": 733.7563138514233
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I LIFTB TERRA 4/5-Doors",
+      "actual": 10950.0,
+      "predicted": 11141.805161643968,
+      "residual": -191.80516164396795
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 7750.0,
+      "predicted": 7929.005678472091,
+      "residual": -179.00567847209095
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 HB LINEA SOL 4/5-Doors",
+      "actual": 12450.0,
+      "predicted": 17892.826335841117,
+      "residual": -5442.826335841117
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V WAGON LINEA TERRA Stationwagen",
+      "actual": 7750.0,
+      "predicted": 7663.1039316975475,
+      "residual": 86.89606830245248
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V LIFTB LINEA TERRA 4/5-Doors",
+      "actual": 10750.0,
+      "predicted": 10606.49509096536,
+      "residual": 143.50490903464015
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V LIFTB LINEA LUNA 4/5-Doors",
+      "actual": 10950.0,
+      "predicted": 11126.611607301877,
+      "residual": -176.61160730187657
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V LIFTB LINEA TERRA 4/5-Doors",
+      "actual": 8750.0,
+      "predicted": 8237.849255685107,
+      "residual": 512.150744314893
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V WAGON LINEA TERRA Stationwagen",
+      "actual": 8500.0,
+      "predicted": 8429.771763053974,
+      "residual": 70.2282369460263
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V WAGON LINEA TERRA Stationwagen",
+      "actual": 8950.0,
+      "predicted": 8405.455084701389,
+      "residual": 544.5449152986112
+    },
+    {
+      "name": "TOYOTA Corolla 1.4 16V VVT I HATCHB TERRA 2/3-Doors",
+      "actual": 10600.0,
+      "predicted": 10790.441291699424,
+      "residual": -190.44129169942426
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V SEDAN LINEA TERRA 4/5-Doors",
+      "actual": 7450.0,
+      "predicted": 7446.7892783925945,
+      "residual": 3.210721607405503
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I 5DR SOL 4/5-Doors",
+      "actual": 17950.0,
+      "predicted": 17510.46726996329,
+      "residual": 439.53273003670984
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V LIFTB LINEA TERRA 4/5-Doors",
+      "actual": 9750.0,
+      "predicted": 9774.144786994133,
+      "residual": -24.144786994133028
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 8750.0,
+      "predicted": 7509.527357387224,
+      "residual": 1240.4726426127763
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I WAGON TERRA Stationwagen",
+      "actual": 11895.0,
+      "predicted": 11120.88104531643,
+      "residual": 774.1189546835703
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V LIFTB LINEA TERRA 4/5-Doors",
+      "actual": 9950.0,
+      "predicted": 10414.97959677846,
+      "residual": -464.9795967784594
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V LIFTB LINEA LUNA 4/5-Doors",
+      "actual": 9500.0,
+      "predicted": 8872.38464866356,
+      "residual": 627.6153513364407
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I HATCHB G6 2/3-Doors",
+      "actual": 12450.0,
+      "predicted": 13062.247739132014,
+      "residual": -612.2477391320135
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V WAGON LINEA TERRA Stationwagen",
+      "actual": 7600.0,
+      "predicted": 6784.417505012305,
+      "residual": 815.5824949876951
+    },
+    {
+      "name": "TOYOTA Corolla 1.6-16v VVT-i Linea Terra Comfort NIEUW AIRCO 5drs 4/5-Doors",
+      "actual": 18245.0,
+      "predicted": 19179.56812647714,
+      "residual": -934.568126477141
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I SEDAN TERRA 4/5-Doors",
+      "actual": 11950.0,
+      "predicted": 10476.610671127466,
+      "residual": 1473.389328872534
+    },
+    {
+      "name": "TOYOTA Corolla 1.4 VVTI Linea Terra 2/3-Doors",
+      "actual": 12950.0,
+      "predicted": 15097.061898690725,
+      "residual": -2147.061898690725
+    },
+    {
+      "name": "TOYOTA Corolla 1.4 16V VVT I 5DR TERRA 4/5-Doors",
+      "actual": 15250.0,
+      "predicted": 15311.85602816807,
+      "residual": -61.856028168069315
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 LB LINEA LUNA 4/5-Doors",
+      "actual": 6950.0,
+      "predicted": 7741.132987299803,
+      "residual": -791.1329872998031
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 7250.0,
+      "predicted": 6154.258454201044,
+      "residual": 1095.7415457989564
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I LIFTB SOL 4/5-Doors",
+      "actual": 13750.0,
+      "predicted": 13374.866197689142,
+      "residual": 375.1338023108583
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 9850.0,
+      "predicted": 8352.775440337162,
+      "residual": 1497.2245596628381
+    },
+    {
+      "name": "TOYOTA Corolla 1.9 D HATCHB TERRA 2/3-Doors",
+      "actual": 13500.0,
+      "predicted": 12822.728860273537,
+      "residual": 677.2711397264629
+    },
+    {
+      "name": "TOYOTA Corolla 2.0 DSL LIFTB LINEA TERRA 4/5-Doors",
+      "actual": 8950.0,
+      "predicted": 7922.996332604586,
+      "residual": 1027.0036673954137
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 5950.0,
+      "predicted": 8727.183930495656,
+      "residual": -2777.1839304956557
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V HATCHB S 2/3-Doors",
+      "actual": 7800.0,
+      "predicted": 9100.328960678571,
+      "residual": -1300.328960678571
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V WAGON LINEA TERRA Stationwagen",
+      "actual": 13500.0,
+      "predicted": 12467.150247895337,
+      "residual": 1032.849752104663
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 9950.0,
+      "predicted": 9054.117309162177,
+      "residual": 895.8826908378232
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V HATCHB S 2/3-Doors",
+      "actual": 8250.0,
+      "predicted": 7785.475000352155,
+      "residual": 464.5249996478451
+    },
+    {
+      "name": "TOYOTA Corolla 1.4 HB Terra 2/3-Doors",
+      "actual": 8950.0,
+      "predicted": 9949.360204378212,
+      "residual": -999.3602043782121
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V HATCHB LINEA TERRA AUT3 2/3-Doors",
+      "actual": 8950.0,
+      "predicted": 9254.675597295498,
+      "residual": -304.67559729549794
+    },
+    {
+      "name": "TOYOTA Corolla 1.4 16V VVT I 3DR TERRA COMFORT 2/3-Doors",
+      "actual": 17450.0,
+      "predicted": 17056.724795122485,
+      "residual": 393.2752048775146
+    },
+    {
+      "name": "TOYOTA Corolla 1.4 16V VVT I HATCHB SOL 2/3-Doors",
+      "actual": 10950.0,
+      "predicted": 10957.622485829006,
+      "residual": -7.622485829006109
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V LIFTB LINEA LUNA 4/5-Doors",
+      "actual": 10950.0,
+      "predicted": 9793.043524029043,
+      "residual": 1156.9564759709574
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I LIFTB TERRA 4/5-Doors",
+      "actual": 11950.0,
+      "predicted": 12201.315603107396,
+      "residual": -251.31560310739587
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 HB Terra 4/5-Doors",
+      "actual": 7900.0,
+      "predicted": 6630.971491016343,
+      "residual": 1269.028508983657
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V SEDAN LINEA LUNA AUT4 4/5-Doors",
+      "actual": 9950.0,
+      "predicted": 10145.924018586662,
+      "residual": -195.924018586662
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I LIFTB TERRA 4/5-Doors",
+      "actual": 11950.0,
+      "predicted": 11879.705791135804,
+      "residual": 70.29420886419575
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V LIFTB LINEA TERRA AUT4 4/5-Doors",
+      "actual": 6500.0,
+      "predicted": 8146.888126537134,
+      "residual": -1646.8881265371338
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 7950.0,
+      "predicted": 9329.19781108889,
+      "residual": -1379.1978110888904
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I LIFTB TERRA 4/5-Doors",
+      "actual": 11500.0,
+      "predicted": 12490.094443635171,
+      "residual": -990.094443635171
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 8250.0,
+      "predicted": 6363.266675227315,
+      "residual": 1886.7333247726847
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 7995.0,
+      "predicted": 8494.068940118403,
+      "residual": -499.0689401184027
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 9750.0,
+      "predicted": 8877.764748092583,
+      "residual": 872.2352519074175
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V LIFTB G6 4/5-Doors",
+      "actual": 8500.0,
+      "predicted": 8652.352078971144,
+      "residual": -152.35207897114378
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V LIFTB LINEA TERRA 4/5-Doors",
+      "actual": 7900.0,
+      "predicted": 8732.686095168825,
+      "residual": -832.686095168825
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V HATCHB G6 2/3-Doors",
+      "actual": 8950.0,
+      "predicted": 9679.048881034461,
+      "residual": -729.0488810344614
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 3D Terra/Comf. 2/3-Doors",
+      "actual": 7950.0,
+      "predicted": 6579.695775861542,
+      "residual": 1370.3042241384583
+    },
+    {
+      "name": "TOYOTA Corolla 1.4 16V VVT I HATCHB SOL 2/3-Doors",
+      "actual": 12500.0,
+      "predicted": 11368.346343539904,
+      "residual": 1131.6536564600956
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V LIFTB LINEA TERRA 4/5-Doors",
+      "actual": 9950.0,
+      "predicted": 10025.635293879177,
+      "residual": -75.63529387917697
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I HATCHB TERRA AUT4 2/3-Doors",
+      "actual": 11950.0,
+      "predicted": 11641.923786965597,
+      "residual": 308.0762130344028
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V LIFTB LINEA LUNA 4/5-Doors",
+      "actual": 9950.0,
+      "predicted": 9813.18400134375,
+      "residual": 136.81599865624958
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V LIFTB LINEA LUNA 4/5-Doors",
+      "actual": 10950.0,
+      "predicted": 9557.121531049988,
+      "residual": 1392.8784689500117
+    },
+    {
+      "name": "TOYOTA Corolla 1.4 HB LINEA TERRA 2/3-Doors",
+      "actual": 10750.0,
+      "predicted": 11221.652189592447,
+      "residual": -471.65218959244703
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I 5DR SOL AUT4 4/5-Doors",
+      "actual": 18950.0,
+      "predicted": 19822.724167091983,
+      "residual": -872.724167091983
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V WAGON LINEA TERRA Stationwagen",
+      "actual": 9950.0,
+      "predicted": 9626.642376037295,
+      "residual": 323.3576239627055
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V L. TERRA COMFORT 2/3-Doors",
+      "actual": 6950.0,
+      "predicted": 7800.885553513397,
+      "residual": -850.8855535133971
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V HATCHB LINEA LUNA 2/3-Doors",
+      "actual": 9750.0,
+      "predicted": 9804.024782961345,
+      "residual": -54.02478296134541
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V LIFTB LINEA LUNA 4/5-Doors",
+      "actual": 11500.0,
+      "predicted": 10633.766438947601,
+      "residual": 866.2335610523987
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I 3DR SOL 2/3-Doors",
+      "actual": 16950.0,
+      "predicted": 18008.6224684307,
+      "residual": -1058.6224684307017
+    },
+    {
+      "name": "TOYOTA Corolla 1.4 16V VVT I 3DR 2/3-Doors",
+      "actual": 17450.0,
+      "predicted": 17241.762609929945,
+      "residual": 208.23739007005497
+    },
+    {
+      "name": "TOYOTA Corolla 2.0 DSL HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 9950.0,
+      "predicted": 10304.31102352416,
+      "residual": -354.3110235241602
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 Terra HB 2/3-Doors",
+      "actual": 10450.0,
+      "predicted": 8819.840501407745,
+      "residual": 1630.1594985922547
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V LIFTB LINEA TERRA 4/5-Doors",
+      "actual": 8950.0,
+      "predicted": 9339.611717743404,
+      "residual": -389.61171774340437
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V WAGON LINEA TERRA Stationwagen",
+      "actual": 9950.0,
+      "predicted": 8218.511817913408,
+      "residual": 1731.4881820865921
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V HATCHB G6 2/3-Doors",
+      "actual": 9500.0,
+      "predicted": 10587.308726826794,
+      "residual": -1087.3087268267936
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 I lb luna 4/5-Doors",
+      "actual": 10500.0,
+      "predicted": 11306.72725158392,
+      "residual": -806.7272515839195
+    },
+    {
+      "name": "TOYOTA Corolla LIFTBACK 1.6-16v Linea Luna 2/3-Doors",
+      "actual": 8950.0,
+      "predicted": 9483.440991316194,
+      "residual": -533.4409913161944
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 LL HB 4/5-Doors",
+      "actual": 9950.0,
+      "predicted": 11057.108917726933,
+      "residual": -1107.1089177269332
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 Linea Terra wagon Stationwagen",
+      "actual": 8450.0,
+      "predicted": 7654.719800112686,
+      "residual": 795.2801998873138
+    },
+    {
+      "name": "TOYOTA Corolla 1.4 16V VVT I HATCHB TERRA 2/3-Doors",
+      "actual": 9950.0,
+      "predicted": 10287.624471437433,
+      "residual": -337.6244714374334
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V LIFTB LINEA TERRA 4/5-Doors",
+      "actual": 8450.0,
+      "predicted": 8336.22415423888,
+      "residual": 113.77584576111985
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V HATCHB G6 R 2/3-Doors",
+      "actual": 9650.0,
+      "predicted": 9662.01605907125,
+      "residual": -12.016059071249401
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 7500.0,
+      "predicted": 7252.185296905179,
+      "residual": 247.8147030948212
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I HATCHB TERRA AUT4 2/3-Doors",
+      "actual": 11290.0,
+      "predicted": 10893.749898468957,
+      "residual": 396.2501015310427
+    },
+    {
+      "name": "TOYOTA Corolla 2.0 DSL SEDAN LINEA TERRA 4/5-Doors",
+      "actual": 7750.0,
+      "predicted": 8037.771336862286,
+      "residual": -287.77133686228626
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I HATCHB SOL 2/3-Doors",
+      "actual": 11250.0,
+      "predicted": 10357.690907879567,
+      "residual": 892.309092120433
+    },
+    {
+      "name": "TOYOTA Corolla 2.0 D4D LIFTB SOL 4/5-Doors",
+      "actual": 14750.0,
+      "predicted": 14108.233295043792,
+      "residual": 641.7667049562078
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I LIFTB SOL 4/5-Doors",
+      "actual": 9000.0,
+      "predicted": 10968.20349058428,
+      "residual": -1968.2034905842793
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 vvt-i nw model comfort airco 5drs 4/5-Doors",
+      "actual": 15850.0,
+      "predicted": 14937.91389993883,
+      "residual": 912.0861000611694
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 6750.0,
+      "predicted": 7147.5700537104185,
+      "residual": -397.5700537104185
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I 5DR TERRA 4/5-Doors",
+      "actual": 17250.0,
+      "predicted": 15856.621752120125,
+      "residual": 1393.3782478798748
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V Linea Terra Liftb 4/5-Doors",
+      "actual": 7950.0,
+      "predicted": 8116.002093492905,
+      "residual": -166.00209349290526
+    },
+    {
+      "name": "TOYOTA Corolla 1.4 16V VVT I LIFTB TERRA 4/5-Doors",
+      "actual": 9950.0,
+      "predicted": 12233.732188577022,
+      "residual": -2283.7321885770216
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V LIFTB LINEA TERRA 4/5-Doors",
+      "actual": 7250.0,
+      "predicted": 7462.351827667041,
+      "residual": -212.3518276670411
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I LIFTB TERRA 4/5-Doors",
+      "actual": 11900.0,
+      "predicted": 12058.983490645374,
+      "residual": -158.98349064537433
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 VVTi Linea terra 2/3-Doors",
+      "actual": 6950.0,
+      "predicted": 8732.186033711394,
+      "residual": -1782.186033711394
+    },
+    {
+      "name": "TOYOTA Corolla VERSO 2.0 D4D SOL (7) MPV",
+      "actual": 31275.0,
+      "predicted": 25906.126497281602,
+      "residual": 5368.8735027183975
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V LIFTB LINEA TERRA 4/5-Doors",
+      "actual": 8250.0,
+      "predicted": 7366.4974737601015,
+      "residual": 883.5025262398985
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 8490.0,
+      "predicted": 8788.787289351925,
+      "residual": -298.7872893519252
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 7500.0,
+      "predicted": 8910.485164076203,
+      "residual": -1410.4851640762026
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I HATCHB TERRA 2/3-Doors",
+      "actual": 11750.0,
+      "predicted": 12165.913472387763,
+      "residual": -415.91347238776325
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I LIFTB TERRA 4/5-Doors",
+      "actual": 10950.0,
+      "predicted": 12575.579289508622,
+      "residual": -1625.5792895086215
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V LIFTB LINEA TERRA 4/5-Doors",
+      "actual": 7750.0,
+      "predicted": 8568.720076654989,
+      "residual": -818.7200766549886
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V LIFTB LINEA TERRA 4/5-Doors",
+      "actual": 9750.0,
+      "predicted": 9456.27231022765,
+      "residual": 293.72768977234955
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I HATCHB TERRA 2/3-Doors",
+      "actual": 11250.0,
+      "predicted": 11103.790738722657,
+      "residual": 146.2092612773431
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I 5DR TERRA COMFORT 4/5-Doors",
+      "actual": 18950.0,
+      "predicted": 18076.729092187088,
+      "residual": 873.2709078129119
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I WAGON TERRA Stationwagen",
+      "actual": 12950.0,
+      "predicted": 12747.18361372948,
+      "residual": 202.81638627052052
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V LIFTB LINEA TERRA 4/5-Doors",
+      "actual": 9950.0,
+      "predicted": 9541.665518221977,
+      "residual": 408.3344817780235
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I 5DR SOL 4/5-Doors",
+      "actual": 19950.0,
+      "predicted": 20135.35205217862,
+      "residual": -185.3520521786195
+    },
+    {
+      "name": "TOYOTA Corolla 1.4 16V VVT I HATCHB TERRA 2/3-Doors",
+      "actual": 9950.0,
+      "predicted": 10059.733326181691,
+      "residual": -109.73332618169115
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V LIFTB LINEA LUNA 4/5-Doors",
+      "actual": 9950.0,
+      "predicted": 9268.110206697096,
+      "residual": 681.8897933029039
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V HATCHB G6 2/3-Doors",
+      "actual": 9950.0,
+      "predicted": 10053.25640136332,
+      "residual": -103.25640136332004
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V HATCHB LINEA LUNA 2/3-Doors",
+      "actual": 10500.0,
+      "predicted": 9773.545742831076,
+      "residual": 726.4542571689235
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V HATCHB LINEA TERRA AUT3 2/3-Doors",
+      "actual": 8950.0,
+      "predicted": 9413.162053094724,
+      "residual": -463.1620530947239
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V SEDAN LINEA TERRA 4/5-Doors",
+      "actual": 8450.0,
+      "predicted": 8734.938041517937,
+      "residual": -284.93804151793665
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 7750.0,
+      "predicted": 8308.491230967169,
+      "residual": -558.491230967169
+    },
+    {
+      "name": "TOYOTA Corolla 2.0 DSL LIFTB LINEA TERRA 4/5-Doors",
+      "actual": 8950.0,
+      "predicted": 8026.605382502613,
+      "residual": 923.3946174973871
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V LIFTB LINEA TERRA AUT3 4/5-Doors",
+      "actual": 8450.0,
+      "predicted": 8856.8780607314,
+      "residual": -406.8780607314002
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V LIFTB LINEA LUNA 4/5-Doors",
+      "actual": 8950.0,
+      "predicted": 10320.619555207653,
+      "residual": -1370.6195552076533
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I WAGON TERRA Stationwagen",
+      "actual": 12950.0,
+      "predicted": 11455.266157049013,
+      "residual": 1494.7338429509873
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 Linea Terra sedan 4/5-Doors",
+      "actual": 7950.0,
+      "predicted": 8099.388635106951,
+      "residual": -149.38863510695137
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V LIFTB LINEA TERRA 4/5-Doors",
+      "actual": 5950.0,
+      "predicted": 7987.580857986144,
+      "residual": -2037.580857986144
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I HATCHB SOL 2/3-Doors",
+      "actual": 14950.0,
+      "predicted": 11907.981945980042,
+      "residual": 3042.018054019958
+    },
+    {
+      "name": "TOYOTA Corolla 1.4 16V VVT I HATCHB TERRA 2/3-Doors",
+      "actual": 8950.0,
+      "predicted": 9088.870535520156,
+      "residual": -138.8705355201564
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I LIFTB TERRA 4/5-Doors",
+      "actual": 12450.0,
+      "predicted": 13639.299498562883,
+      "residual": -1189.299498562883
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V HATCHBACK LINEA LUNA 2/3-Doors",
+      "actual": 7950.0,
+      "predicted": 8564.213930565846,
+      "residual": -614.2139305658457
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 6950.0,
+      "predicted": 6668.117106947646,
+      "residual": 281.8828930523541
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V HATCHB G6 2/3-Doors",
+      "actual": 8750.0,
+      "predicted": 9366.730894024182,
+      "residual": -616.7308940241819
+    },
+    {
+      "name": "TOYOTA Corolla 2.0 DSL LIFTB LINEA TERRA 4/5-Doors",
+      "actual": 8950.0,
+      "predicted": 8630.781461606113,
+      "residual": 319.2185383938868
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V SEDAN LINEA TERRA 4/5-Doors",
+      "actual": 8950.0,
+      "predicted": 7978.039509927378,
+      "residual": 971.9604900726217
+    },
+    {
+      "name": "TOYOTA Corolla 1.6-16v Linea Terra LB 4/5-Doors",
+      "actual": 12900.0,
+      "predicted": 13447.892913747703,
+      "residual": -547.8929137477026
+    },
+    {
+      "name": "TOYOTA Corolla 2.0 DSL SEDAN LINEA TERRA 4/5-Doors",
+      "actual": 6750.0,
+      "predicted": 5573.505754026324,
+      "residual": 1176.4942459736758
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V HATCHB G6 2/3-Doors",
+      "actual": 8250.0,
+      "predicted": 8812.34674166665,
+      "residual": -562.3467416666499
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 8450.0,
+      "predicted": 8878.885671169593,
+      "residual": -428.8856711695935
+    },
+    {
+      "name": "TOYOTA Corolla 1.4 16V VVT I LIFTB LUNA 4/5-Doors",
+      "actual": 13450.0,
+      "predicted": 13018.554909436187,
+      "residual": 431.4450905638132
+    },
+    {
+      "name": "TOYOTA Corolla 1.4 VVTI  (Nw type) 4/5-Doors",
+      "actual": 14900.0,
+      "predicted": 15282.233477543417,
+      "residual": -382.2334775434174
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 6900.0,
+      "predicted": 8468.556641348016,
+      "residual": -1568.5566413480155
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I LIFTB SOL 4/5-Doors",
+      "actual": 12495.0,
+      "predicted": 12681.229264445685,
+      "residual": -186.22926444568475
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V HATCHB LINEA TERRA AUT3 2/3-Doors",
+      "actual": 8500.0,
+      "predicted": 8217.34840197713,
+      "residual": 282.65159802287053
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V HATCHB GTSI 2/3-Doors",
+      "actual": 8950.0,
+      "predicted": 7406.801532345665,
+      "residual": 1543.1984676543352
+    },
+    {
+      "name": "TOYOTA Corolla 2.0 DSL HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 8600.0,
+      "predicted": 7265.423626046662,
+      "residual": 1334.5763739533377
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16v Liftback Linea Terra 4/5-Doors",
+      "actual": 7250.0,
+      "predicted": 6747.009079468718,
+      "residual": 502.9909205312824
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 8450.0,
+      "predicted": 7578.1017480080345,
+      "residual": 871.8982519919655
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I LIFTB LUNA 4/5-Doors",
+      "actual": 11950.0,
+      "predicted": 12907.80451181185,
+      "residual": -957.8045118118498
+    },
+    {
+      "name": "TOYOTA Corolla 2.0 D4D 116 5DR LUNA 4/5-Doors",
+      "actual": 22950.0,
+      "predicted": 22373.41692054647,
+      "residual": 576.5830794535286
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I HATCHB G6 2/3-Doors",
+      "actual": 10500.0,
+      "predicted": 10793.04131046376,
+      "residual": -293.04131046375915
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V SEDAN LINEA TERRA 4/5-Doors",
+      "actual": 5750.0,
+      "predicted": 6813.4664460098065,
+      "residual": -1063.4664460098065
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I 5DR SOL 4/5-Doors",
+      "actual": 19950.0,
+      "predicted": 20878.40091072017,
+      "residual": -928.4009107201709
+    },
+    {
+      "name": "TOYOTA Corolla 1.3 16V HATCHB LINEA TERRA 2/3-Doors",
+      "actual": 8450.0,
+      "predicted": 7495.403007396342,
+      "residual": 954.5969926036578
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V VVT I LIFTB LUNA 4/5-Doors",
+      "actual": 13995.0,
+      "predicted": 13979.014724488705,
+      "residual": 15.985275511295185
+    },
+    {
+      "name": "TOYOTA Corolla 1.6 16V SEDAN LINEA TERRA 4/5-Doors",
+      "actual": 6800.0,
+      "predicted": 6921.76105192489,
+      "residual": -121.76105192489013
     }
-  ]
+  ],
+  "currency": "EUR"
 };

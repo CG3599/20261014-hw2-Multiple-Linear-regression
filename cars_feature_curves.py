@@ -78,7 +78,7 @@ class FixedCountSelector(TransformerMixin, BaseEstimator):
         return self.support_
 
 
-def export_feature_curves(make_pipeline, X_train, y_train, cv, output_dir):
+def export_feature_curves(make_pipeline, X_train, y_train, cv, output_dir, dataset_label="Cars"):
     notes = {
         "EFS": "先以訓練資料 F 分數篩出 8 個候選特徵，再以內層交叉驗證窮舉各固定數量的組合。",
         "RFECV": "固定數量曲線採用 RFE 逐一遞迴刪除；原本 RFECV 自動選取數量的實驗保留不變。",
@@ -121,7 +121,7 @@ def export_feature_curves(make_pipeline, X_train, y_train, cv, output_dir):
             ax.plot(frame["Number of Features"], frame[metric], marker="o")
             ax.set(title=f"{metric} by Number of Features",
                    xlabel="Number of Features", ylabel=metric, xticks=range(1, 6))
-        fig.suptitle(f"Cars | {method} | Mean training cross-validation scores")
+        fig.suptitle(f"{dataset_label} | {method} | Mean training cross-validation scores")
         fig.tight_layout()
         fig.savefig(output_dir / f"{prefix}_metrics.png", dpi=180)
         plt.close(fig)
@@ -158,7 +158,7 @@ def export_feature_curves(make_pipeline, X_train, y_train, cv, output_dir):
         ax.set(title=f"{metric} by Number of Features", xlabel="Number of Features",
                ylabel=metric, xticks=range(1, 6))
         ax.legend()
-    fig.suptitle("Cars | All five schemes | Mean training cross-validation scores")
+    fig.suptitle(f"{dataset_label} | All five schemes | Mean training cross-validation scores")
     fig.tight_layout()
     fig.savefig(output_dir / "cars_feature_count_metrics.png", dpi=180)
     plt.close(fig)
@@ -172,6 +172,6 @@ tbody tr:nth-child(odd){background:#f5f5f5}img{width:100%;height:auto}p{line-hei
 表格列出完整訓練集選出的特徵，各折特徵可能不同。此比較不使用測試集、不改變原本模型選擇。
 固定數量版本的差異註明於各方法下方。RMSE 越低越好，R² 越高越好，負值會如實保留。</p>
 <nav>''' + " | ".join(f'<a href="#{m}">{m}</a>' for m in notes)
-        + '</nav><img src="cars_feature_count_metrics.png" alt="五種方法總覽">'
+        + f'</nav><p>資料集：{dataset_label}</p><img src="cars_feature_count_metrics.png" alt="五種方法總覽">'
         + "".join(sections) + '</html>', encoding="utf-8")
     print("Exported all five schemes: 25 rows, 5 tables, 5 chart pairs and combined report.")

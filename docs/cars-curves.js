@@ -69,7 +69,7 @@
         const td = document.createElement('td'); td.textContent = value; tr.append(td);
       }
       interactive(tr, method, k); $('curve-rows').append(tr);
-      if (k === count) $('curve-selection').textContent = `${method} · ${k} 個特徵 · CV RMSE $${fmt(row.RMSE)} · CV R² ${fmt(row['R-squared'], 6)}`;
+      if (k === count) $('curve-selection').textContent = `${method} · ${k} 個特徵 · CV RMSE €${fmt(row.RMSE)} · CV R² ${fmt(row['R-squared'], 6)}`;
     }
     chart('curve-rmse', 'RMSE'); chart('curve-r2', 'R-squared');
     const url = new URL(location.href); url.searchParams.set('curve', method); url.searchParams.set('k', count); url.searchParams.set('compare', $('curve-compare').checked ? '1' : '0'); history.replaceState(null, '', url);

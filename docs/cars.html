@@ -9,23 +9,23 @@
 document.documentElement.dataset.theme = ['light', 'dark'].includes(theme) ? theme : (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); })();
 </script>
 <link rel="stylesheet" href="style.css?v=2"><link rel="stylesheet" href="theme.css?v=2"><link rel="stylesheet" href="pages.css?v=3">
-<script src="pages.js?v=6" defer></script><script src="cars-data.js?v=4" defer></script><script src="cars.js?v=5" defer></script>
-<script src="cars-curves-data.js?v=4" defer></script><script src="cars-curves.js?v=4" defer></script>
+<script src="pages.js?v=6" defer></script><script src="cars-data.js?v=7" defer></script><script src="cars.js?v=7" defer></script>
+<script src="cars-curves-data.js?v=7" defer></script><script src="cars-curves.js?v=7" defer></script>
 </head>
 <body>
 <aside><a class="brand" href="./"><span class="brand-icon">ƒ</span> Feature Lab</a><span class="aside-label">AIoT / DATA ANALYTICS</span>
 <div class="side-title">特徵選擇實驗室</div><p>用更少的特徵，<br>理解模型的表現。</p>
 <nav aria-label="頁面導覽"><a class="active" href="#analysis">◈ &nbsp; 實驗結果</a><a href="#feature-curves">↗ &nbsp; 特徵數曲線</a><a href="#results">▦ &nbsp; 特徵組合</a><a href="#methodology">◎ &nbsp; 實驗方法</a></nav>
-<div class="side-foot"><span class="status-dot"></span> Cars dataset<br><small>Multiple Linear Regression<br>EXPERIMENT 02</small></div></aside>
+<div class="side-foot"><span class="status-dot"></span> Toyota Corolla dataset<br><small>Multiple Linear Regression<br>EXPERIMENT 02</small></div></aside>
 <main id="analysis">
 <header><span>HOME / EXPERIMENT 02</span><div class="header-actions"><button id="theme-toggle" class="theme-toggle" type="button" aria-label="切換黑暗模式" aria-pressed="false">☾ 黑暗模式</button><a href="https://github.com/CG3599/20261014-hw2-Multiple-Linear-regression" target="_blank" rel="noopener">GitHub ↗</a></div></header>
-<div class="intro"><div><span class="eyebrow">CARS / MULTIPLE LINEAR REGRESSION</span><h1>每個規格，如何影響車價？</h1><p>從品牌、動力到車身尺寸，比較五種特徵選擇方法與完整模型。</p></div><button id="download" class="download" type="button">↓ &nbsp; 下載 CSV</button></div>
+<div class="intro"><div><span class="eyebrow">CARS / MULTIPLE LINEAR REGRESSION</span><h1>每個規格，如何影響車價？</h1><p>以 Toyota Corolla 的車齡、里程與配備，比較五種特徵選擇方法與完整模型。</p></div><button id="download" class="download" type="button">↓ &nbsp; 下載 CSV</button></div>
 <div class="stats cars-stats"><article><span>有效資料筆數</span><strong id="sample-stat">—</strong><p id="split-stat">計算結果載入中</p></article><article><span>比較方法</span><strong>6 <small>models</small></strong><p>Baseline + 五種特徵選擇方法</p></article><article><span>最佳方法 · Test RMSE ↓</span><strong id="rmse-stat">—</strong><p id="best-stat">依訓練 CV RMSE 選擇</p></article><article><span>最佳方法 · Test R² ↑</span><strong id="r2-stat">—</strong><p id="mae-stat">—</p></article></div>
 <section class="workspace" id="feature-curves">
 <div class="section-heading cars-section-heading"><div><span class="eyebrow">FEATURE COUNT / CROSS-VALIDATION</span><h2>增加特徵，模型會更好嗎？</h2></div><span class="pill">5 methods · 1–5 features</span></div>
 <p class="method-note">比較五種方法選取 1–5 個特徵時的訓練三折 CV 平均 RMSE 與 R²。點選曲線或表格，查看每組特徵。</p>
 <div class="tabs" id="curve-tabs" role="group" aria-label="固定特徵數方法"></div>
-<div class="controls"><label class="range-control" for="curve-count">特徵數 <strong id="curve-count-value">1</strong> <input id="curve-count" type="range" min="1" max="5" value="1" step="1"></label><label><input id="curve-compare" type="checkbox"> 同時比較五種方法</label><a class="download" href="cars_feature_count_comparison.csv?v=4" download>↓ 下載 25 組 CSV</a></div>
+<div class="controls"><label class="range-control" for="curve-count">特徵數 <strong id="curve-count-value">1</strong> <input id="curve-count" type="range" min="1" max="5" value="1" step="1"></label><label><input id="curve-compare" type="checkbox"> 同時比較五種方法</label><a class="download" href="cars_feature_count_comparison.csv?v=7" download>↓ 下載 25 組 CSV</a></div>
 <p id="curve-note" class="method-note"></p>
 <div class="charts"><article class="chart-card"><div class="chart-heading"><h3>CV RMSE</h3><span>LOWER IS BETTER ↓</span></div><div id="curve-rmse"></div></article><article class="chart-card"><div class="chart-heading"><h3>CV R²</h3><span>HIGHER IS BETTER ↑</span></div><div id="curve-r2"></div></article></div>
 <p class="chart-hint">橫軸為特徵數。各折重新選取特徵；表格列出完整訓練集選出的組合。負 R² 如實保留，此比較不使用測試集。</p>
@@ -36,9 +36,9 @@ document.documentElement.dataset.theme = ['light', 'dark'].includes(theme) ? the
 <div class="table-scroll"><table class="cars-table"><thead><tr><th>Method</th><th>Features</th><th>CV RMSE ↓</th><th>CV STD</th><th>CV time (s)</th></tr></thead><tbody id="result-rows"></tbody></table></div>
 <div class="cars-details" aria-live="polite"><h3 id="feature-title"></h3><p id="selection-detail"></p><div class="cars-features" id="feature-tags"></div></div></section>
 <section id="methodology" class="methodology"><span class="eyebrow">BEHIND THE EXPERIMENT</span><h2>如何閱讀這份結果？</h2>
-<div class="method-grid"><article><span>01 / CRISP-DM</span><h3>從規格預測售價</h3><p>預測目標為 Retail Price，排除 Dealer Cost。由 Name 擷取品牌、修正品牌名稱；11 個數值欄位搭配 Brand、Type。無效的零值轉為缺值，AWD 與 RWD 除外。</p></article><article><span>02 / TRAINING PIPELINE</span><h3>在訓練折內前處理</h3><p>每個外層訓練折重新擬合中位數／眾數補值、One-hot 編碼、StandardScaler 與特徵選擇。低頻類別依 min_frequency = 3 合併，編碼移除首個類別。</p></article><article><span>03 / FEATURE COUNT</span><h3>比較特徵數與驗證表現</h3><p>80% 訓練、20% 測試，random_state = 42。曲線比較五種方法各自選取 1–5 個特徵時，訓練資料外層三折 CV 的平均 RMSE 與 R²；不使用測試集。RMSE 越低越好，R² 越高越好。表格特徵來自完整訓練集，各折實際選取的特徵可能不同。</p></article></div>
-<p class="caveat">固定特徵數曲線採用 cars_feature_curves.py：EFS 從 8 個候選窮舉，SFS 從 15 個候選向前選取；RFECV 的固定數量版本使用 RFE，Lasso 依係數排名（同分以 OLS 係數排序），Backward 刪除至指定數量。所有組合最後均以 LinearRegression 擬合。內層選擇使用已前處理的資料，內層分數可能偏樂觀；外層 CV 會重新擬合整條 pipeline。負 R² 如實保留。</p>
-<p class="chart-hint">「方法比較與選取特徵」保留原始設定的六方法比較，其特徵數由各方法自動或既定規則決定，與上方固定 1–5 個特徵的曲線不同。頂部 Test RMSE／R² 為原始訓練 CV 選出 SFS 後的保留測試集結果；固定特徵數比較不改變該模型選擇。點選六方法表格可查看其特徵明細。</p>
-<p class="chart-hint">資料來源：<a href="https://github.com/uwdata/draco/blob/master/data/cars.csv" target="_blank" rel="noopener">uwdata/draco · cars.csv</a>。網站展示已計算結果；Python 模型於離線執行，不在瀏覽器內訓練。</p></section>
+<div class="method-grid"><article><span>01 / CRISP-DM</span><h3>從規格預測售價</h3><p>預測 Toyota Corolla 的 price（歐元）。原始 1,436 筆資料去重後為 1,435 筆；排除 model、cylinders、mfg_month、mfg_year，使用 31 個數值欄位及 fuel_type、color，共 33 個原始輸入。保留所有正價格。</p></article><article><span>02 / TRAINING PIPELINE</span><h3>在訓練折內前處理</h3><p>每個外層訓練折重新擬合中位數／眾數補值、One-hot 編碼、StandardScaler 與特徵選擇。cc、weight、hp 依訓練折的 0.5%–99.5% 分位數截尾；低頻類別依 min_frequency = 3 合併，max_categories = 10，編碼移除首個類別。曲線的特徵數指編碼後欄位。</p></article><article><span>03 / FEATURE COUNT</span><h3>比較特徵數與驗證表現</h3><p>80% 訓練、20% 測試，random_state = 42。曲線比較五種方法各自選取 1–5 個特徵時，訓練資料外層三折 CV 的平均 RMSE 與 R²；不使用測試集。RMSE 越低越好，R² 越高越好。表格特徵來自完整訓練集，各折實際選取的特徵可能不同。</p></article></div>
+<p class="caveat">固定特徵數曲線由 main5.py 執行並匯出：EFS 從 8 個候選窮舉，SFS 從 15 個候選向前選取；RFECV 的固定數量版本使用 RFE，Lasso 依係數排名（同分以 OLS 係數排序），Backward 刪除至指定數量。所有組合最後均以 LinearRegression 擬合。內層選擇使用已前處理的資料，內層分數可能偏樂觀；外層 CV 會重新擬合整條 pipeline。負 R² 如實保留。</p>
+<p class="chart-hint">「方法比較與選取特徵」保留原始設定的六方法比較，其特徵數由各方法自動或既定規則決定，與上方固定 1–5 個特徵的曲線不同。頂部 Test RMSE／R² 為main5.py 訓練 CV 選出 Baseline 後的保留測試集結果；固定特徵數比較不改變該模型選擇。點選六方法表格可查看其特徵明細。</p>
+<p class="chart-hint">資料來源：ToyotaCorolla.csv（main5.py）。網站展示已計算結果；Python 模型於離線執行，不在瀏覽器內訓練。</p></section>
 <footer><span>Feature Lab / Cars</span><span>Built for exploration. Grounded in data.</span></footer>
 </main></body></html>

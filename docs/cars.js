@@ -32,7 +32,7 @@ function choose(name) { selected = name; renderSelection(); }
 function renderSelection() {
   const row = data.methods.find(item => item.method === selected);
   $('feature-title').textContent = `${selected} · ${row.count} 個特徵`;
-  $('selection-detail').textContent = `CV RMSE $${fmt(row.cv_rmse)} ± ${fmt(row.cv_std)}${selected === data.best_method ? ' · 訓練 CV 最佳方法' : ''}`;
+  $('selection-detail').textContent = `CV RMSE €${fmt(row.cv_rmse)} ± ${fmt(row.cv_std)}${selected === data.best_method ? ' · 訓練 CV 最佳方法' : ''}`;
   $('feature-tags').replaceChildren(...row.features.map(name => {
     const tag = document.createElement('span'); tag.className='feature-tag'; tag.textContent=name.replace(/^(num|cat)__/, ''); return tag;
   }));
@@ -46,10 +46,10 @@ for (const row of data.methods) {
 }
 $('sample-stat').textContent=`${data.valid_count} cars`;
 $('split-stat').textContent=`${data.train_count} 筆訓練 / ${data.test_count} 筆測試`;
-$('rmse-stat').textContent=`$${fmt(data.test.rmse)}`;
+$('rmse-stat').textContent=`€${fmt(data.test.rmse)}`;
 $('r2-stat').textContent=fmt(data.test.r2,4);
 $('best-stat').textContent=`${data.best_method} · 依訓練 CV RMSE 選擇`;
-$('mae-stat').textContent=`Test MAE $${fmt(data.test.mae)}`;
+$('mae-stat').textContent=`Test MAE €${fmt(data.test.mae)}`;
 $('download').addEventListener('click',()=>{
   const escape=value=>'"'+String(value).replaceAll('"','""')+'"';
   const rows=[['Method','Selected_Count','CV_RMSE','CV_STD','Seconds','Selected_Features'],...data.methods.map(r=>[r.method,r.count,r.cv_rmse,r.cv_std,r.seconds,r.features.join('; ')])];

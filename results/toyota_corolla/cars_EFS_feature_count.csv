@@ -1,0 +1,6 @@
+﻿Number of Features,Selected Features,RMSE,R-squared
+1,[age_08_04],1761.4185282831677,0.7646551375081628
+2,"[age_08_04, automatic_airco]",1550.963178844465,0.816703431375803
+3,"[age_08_04, km, weight]",1433.0148758158114,0.8430809365889188
+4,"[age_08_04, km, weight, automatic_airco]",1318.8760074861132,0.8670070152749269
+5,"[age_08_04, km, weight, automatic_airco, powered_windows]",1289.5200836386864,0.8727177335746653

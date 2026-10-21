@@ -1,26 +1,26 @@
 ﻿Number of Features,Selected Features,RMSE,R-squared,Method
-1,[Horsepower(HP)],11435.860273402584,0.6840094776977387,EFS
-2,"[Horsepower(HP), Brand_Mercedes-Benz]",11847.393262986525,0.6606018960487087,EFS
-3,"[Horsepower(HP), Highway Miles Per Gallon, Brand_Mercedes-Benz]",25318.46772842846,-1.8385392407027892,EFS
-4,"[RWD, Horsepower(HP), Highway Miles Per Gallon, Brand_Mercedes-Benz]",29689.682277421507,-3.302716413096567,EFS
-5,"[RWD, Horsepower(HP), Highway Miles Per Gallon, Weight, Brand_Mercedes-Benz]",27861.85270640032,-2.638423094767284,EFS
-1,[Horsepower(HP)],11435.860273402584,0.6840094776977387,RFECV
-2,"[Horsepower(HP), Brand_Mercedes-Benz]",12284.892636667675,0.6326143115778411,RFECV
-3,"[Horsepower(HP), Brand_Mercedes-Benz, Brand_Porsche]",11899.555346108677,0.6542022565567936,RFECV
-4,"[Engine Size (l), Horsepower(HP), Brand_Mercedes-Benz, Brand_Porsche]",24459.74719127466,-1.49283226893995,RFECV
-5,"[Engine Size (l), Cyl, Horsepower(HP), Brand_Mercedes-Benz, Brand_Porsche]",32191.289265793,-4.289341135563763,RFECV
-1,[Horsepower(HP)],11435.860273402584,0.6840094776977387,Lasso
-2,"[Horsepower(HP), Brand_Mercedes-Benz]",11860.82078829119,0.6597933147884346,Lasso
-3,"[Horsepower(HP), Weight, Brand_Mercedes-Benz]",11943.846821841404,0.6519376267416477,Lasso
-4,"[Horsepower(HP), Weight, Brand_Mercedes-Benz, Brand_Porsche]",24485.50053104246,-1.4946710545242283,Lasso
-5,"[Horsepower(HP), Highway Miles Per Gallon, Weight, Brand_Mercedes-Benz, Brand_Porsche]",32035.58848556761,-4.278728555139717,Lasso
-1,[Horsepower(HP)],11435.860273402584,0.6840094776977387,Backward
-2,"[Horsepower(HP), Brand_Mercedes-Benz]",11847.393262986525,0.6606018960487087,Backward
-3,"[Horsepower(HP), Brand_Mercedes-Benz, Brand_Porsche]",11047.768848612164,0.7067232807307251,Backward
-4,"[Horsepower(HP), Highway Miles Per Gallon, Brand_Mercedes-Benz, Brand_Porsche]",10853.603182285173,0.714889857703548,Backward
-5,"[Horsepower(HP), Highway Miles Per Gallon, Wheel Base, Brand_Mercedes-Benz, Brand_Porsche]",23038.441074885344,-1.2696696854819365,Backward
-1,[Horsepower(HP)],11435.860273402584,0.6840094776977387,SFS
-2,"[Horsepower(HP), Brand_Mercedes-Benz]",11847.393262986525,0.6606018960487087,SFS
-3,"[Horsepower(HP), Highway Miles Per Gallon, Brand_Mercedes-Benz]",10927.72103290206,0.7128608898268761,SFS
-4,"[Horsepower(HP), Highway Miles Per Gallon, Brand_Mercedes-Benz, Brand_Porsche]",10807.039193735936,0.7194778751050701,SFS
-5,"[Horsepower(HP), Highway Miles Per Gallon, Brand_Jaguar, Brand_Mercedes-Benz, Brand_Porsche]",11038.26546965804,0.7070144255491311,SFS
+1,[age_08_04],1761.4185282831677,0.7646551375081628,EFS
+2,"[age_08_04, automatic_airco]",1550.963178844465,0.816703431375803,EFS
+3,"[age_08_04, km, weight]",1433.0148758158114,0.8430809365889188,EFS
+4,"[age_08_04, km, weight, automatic_airco]",1318.8760074861132,0.8670070152749269,EFS
+5,"[age_08_04, km, weight, automatic_airco, powered_windows]",1289.5200836386864,0.8727177335746653,EFS
+1,[age_08_04],1761.4185282831677,0.7646551375081628,RFECV
+2,"[age_08_04, weight]",1637.6466233316144,0.7961167777657024,RFECV
+3,"[age_08_04, km, weight]",1475.776420312234,0.8349589499911724,RFECV
+4,"[age_08_04, km, cc, weight]",1417.6221316994415,0.8467338737715545,RFECV
+5,"[age_08_04, km, hp, cc, weight]",1392.5404601954333,0.851737583292952,RFECV
+1,[age_08_04],1761.4185282831677,0.7646551375081628,Lasso
+2,"[age_08_04, weight]",1637.6466233316144,0.7961167777657024,Lasso
+3,"[age_08_04, weight, fuel_type_Petrol]",1529.9681233047304,0.820808346517409,Lasso
+4,"[age_08_04, weight, fuel_type_Diesel, fuel_type_Petrol]",1473.2260317940672,0.8346894211340746,Lasso
+5,"[age_08_04, cc, weight, fuel_type_Diesel, fuel_type_Petrol]",1373.1594441685438,0.856373723844047,Lasso
+1,[age_08_04],1761.4185282831677,0.7646551375081628,Backward
+2,"[age_08_04, weight]",1637.6466233316144,0.7961167777657024,Backward
+3,"[age_08_04, km, weight]",1433.0148758158114,0.8430809365889188,Backward
+4,"[age_08_04, km, weight, automatic_airco]",1318.8760074861132,0.8670070152749269,Backward
+5,"[age_08_04, km, hp, weight, automatic_airco]",1274.516495783718,0.876281566019498,Backward
+1,[age_08_04],1761.4185282831677,0.7646551375081628,SFS
+2,"[age_08_04, automatic_airco]",1612.587178205046,0.8024213949687051,SFS
+3,"[age_08_04, hp, automatic_airco]",1490.1727498806774,0.8310993380378715,SFS
+4,"[age_08_04, hp, weight, automatic_airco]",1372.537736717037,0.8566985149320668,SFS
+5,"[age_08_04, km, hp, weight, automatic_airco]",1274.463885987397,0.8762343454604734,SFS
