@@ -1,7 +1,7 @@
 'use strict';
 (() => {
 const $ = id => document.getElementById(id);
-let dataset=null,fields=[],results=[];
+let dataset=null,fields=[],results=[],analysisOutput=null,selectedMethod='EFS';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const missing=s=>s==null||String(s).trim()===''||['na','null','n/a'].includes(String(s).trim().toLowerCase());
 function status(message,error=false,where='upload-status'){const el=$(where);el.textContent=message;el.classList.toggle('error',error);}
@@ -17,17 +17,55 @@ $('feature-guidance').textContent='原始輸入特徵 '+chosen.length+' 個：'+
 }
 function renderFields(){if(!dataset)return;const target=$('target-select').value;const container=$('feature-fields');container.textContent='';
 for(const f of fields){const div=document.createElement('label');div.className='feature-field';const checkbox=document.createElement('input');checkbox.type='checkbox';checkbox.checked=f.use&&f.name!==target;checkbox.disabled=f.name===target;checkbox.addEventListener('change',()=>{f.use=checkbox.checked;estimate();hideResults();});const info=document.createElement('span');const bold=document.createElement('strong');bold.textContent=f.name;const small=document.createElement('small');small.textContent=f.name===target?'Target（不列入 Features）':f.type==='numeric'?'Numerical':'Categorical';info.append(bold,small);const sel=document.createElement('select');for(const [name,label] of [['numeric','數值'],['category','類別']]){const opt=document.createElement('option');opt.value=name;opt.textContent=label;sel.add(opt);}sel.value=f.type;sel.disabled=f.name===target;sel.addEventListener('change',()=>{f.type=sel.value;small.textContent=f.type==='numeric'?'Numerical':'Categorical';estimate();hideResults();});div.append(checkbox,info,sel);container.append(div);}estimate();}
-function hideResults(){$('analysis-results').hidden=true;results=[];}
-function selectDiagnostic(method){
-  const selected=results.find(item=>item.method===method);
-  if(!selected)return;
-  $('diagnostic-method').value=method;
+function hideResults(){
+  $('analysis-results').hidden=true;
+  results=[];analysisOutput=null;
+}
+function activeRow(method,k){
+  if(!analysisOutput)return null;
+  return method==='Baseline'?analysisOutput.baseline:
+    analysisOutput.curves.find(row=>row.method===method&&row.count===k);
+}
+function setView(k,method){
+  if(!analysisOutput)return;
+  const maxK=analysisOutput.maxK;
+  const count=Math.min(maxK,Math.max(1,Number(k)||1));
+  $('feature-k').value=String(count);
+  selectedMethod=method||selectedMethod;
+  const available=['Baseline',...window.FeatureLabCurves.methods];
+  if(!available.includes(selectedMethod))selectedMethod='EFS';
+  results=[analysisOutput.baseline,...analysisOutput.curves.filter(row=>row.count===count)];
+  const select=$('diagnostic-method');
+  if(![...select.options].some(option=>option.value===selectedMethod))selectedMethod='EFS';
+  select.value=selectedMethod;
+  window.FeatureLabCharts.renderScores(results);
+  window.FeatureLabCurves.render(analysisOutput.curves,count,$('curve-metric').value,selectedMethod);
+  const diagnostic=activeRow(selectedMethod,count)||analysisOutput.baseline;
+  window.FeatureLabCharts.renderDiagnostics(diagnostic);
   for(const tr of $('model-results').querySelectorAll('tr[data-method]')){
-    const active=tr.dataset.method===method;
+    const active=tr.dataset.method===selectedMethod&&(selectedMethod==='Baseline'||Number(tr.dataset.k)===count);
     tr.classList.toggle('selected',active);
     tr.setAttribute('aria-selected',String(active));
   }
-  window.FeatureLabCharts.renderDiagnostics(selected);
+}
+function selectDiagnostic(method){setView($('feature-k').value,method);}
+function renderMethodTable(){
+  const tbody=$('model-results');tbody.textContent='';
+  const all=[analysisOutput.baseline,...analysisOutput.curves];
+  for(const r of all){
+    const tr=document.createElement('tr');
+    tr.dataset.method=r.method;
+    tr.dataset.k=String(r.count);
+    tr.tabIndex=0;tr.setAttribute('role','button');
+    tr.setAttribute('aria-label','查看 '+r.method+' 在 '+r.count+' 個特徵時的診斷圖');
+    for(const v of [r.method,r.count,Number.isFinite(r.cvRmse)?r.cvRmse.toFixed(3):'—',r.testRmse.toFixed(3),r.r2===null?'N/A':r.r2.toFixed(4),r.features.join('、')]){
+      const td=document.createElement('td');td.textContent=String(v);tr.append(td);
+    }
+    const choose=()=>setView(r.method==='Baseline'?$('feature-k').value:r.count,r.method);
+    tr.addEventListener('click',choose);
+    tr.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();choose();}});
+    tbody.append(tr);
+  }
 }
 function importMatrix(matrix,name){const value=normalize(matrix);if(value.rows.length<2)throw Error('資料列數不足。');dataset=value;const {headers,rows}=value;$('preview').hidden=false;$('config').hidden=false;hideResults();
 let target=headers.find(v=>/^(price|profit|saleprice|target|y|charges)$/i.test(v.trim()))||headers[headers.length-1];const targets=dataset.rows.map(r=>r[headers.indexOf(target)]).filter(v=>!missing(v));if(targets.filter(v=>Number.isFinite(Number(v))).length<targets.length*.8){const numeric=headers.filter((h,i)=>infer(rows.map(row=>row[i]))==='numeric');target=numeric[numeric.length-1]||target;}
@@ -48,39 +86,37 @@ $('load-startups').addEventListener('click',async()=>{try{status('載入原始 5
 $('target-select').addEventListener('change',()=>{const target=$('target-select').value;for(const f of fields){if(f.name===target)f.use=false;}renderFields();hideResults();});
 function csvCell(v){let s=String(v??'');if(/^\s*[=+@]/.test(s)||(/^\s*-/.test(s)&&!Number.isFinite(Number(s))))s="'"+s;return /[",\r\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
 function download(text,filename){const url=URL.createObjectURL(new Blob(['\uFEFF',text],{type:'text/csv;charset=utf-8;'}));const a=document.createElement('a');a.href=url;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),1500);}
-$('run-analysis').addEventListener('click',async()=>{const btn=$('run-analysis');try{hideResults();if(!dataset)throw Error('請先匯入 Dataset。');const methods=[...document.querySelectorAll('#selector-list input:checked')].map(el=>el.value);const seed=Number($('random-seed').value);if(!Number.isInteger(seed)||seed<0||seed>999999)throw Error('隨機種子請填入 0–999999 的整數。');const input={...dataset,target:$('target-select').value,fields,split:Number($('train-split').value),seed,methods,k:Number($('feature-k').value)};btn.disabled=true;status('正在執行多元線性迴歸、交叉驗證與特徵選擇…',false,'analysis-status');await new Promise(resolve=>setTimeout(resolve,70));
-if(!window.FeatureLabModel)throw Error('分析程式未載入，請重新整理。');const output=window.FeatureLabModel.analyze(input);results=output.results;
+$('run-analysis').addEventListener('click',async()=>{const btn=$('run-analysis');try{hideResults();if(!dataset)throw Error('請先匯入 Dataset。');const methods=['EFS','RFECV','LassoCV','Backward','SFS'];const seed=Number($('random-seed').value);if(!Number.isInteger(seed)||seed<0||seed>999999)throw Error('隨機種子請填入 0–999999 的整數。');const input={...dataset,target:$('target-select').value,fields,split:Number($('train-split').value),seed,methods,k:Number($('feature-k').value)};btn.disabled=true;status('正在執行多元線性迴歸、交叉驗證與特徵選擇…',false,'analysis-status');await new Promise(resolve=>setTimeout(resolve,70));
+if(!window.FeatureLabModel||!window.FeatureLabCharts||!window.FeatureLabCurves)throw Error('分析或圖表程式未載入，請重新整理。');const output=window.FeatureLabModel.analyze(input);analysisOutput=output;results=output.results;
 const summary=$('model-summary');summary.textContent='';for(const [label,value] of [['有效筆數',output.data.valid],['訓練 / 測試',output.data.train+' / '+output.data.test],['原始 Features',output.data.raw],['編碼後 Features',output.data.encoded]]){const node=document.createElement('div'),s=document.createElement('span'),v=document.createElement('strong');s.textContent=label;v.textContent=value;node.append(s,v);summary.append(node);}
-const tbody=$('model-results');tbody.textContent='';for(const r of results){
-  const tr=document.createElement('tr');
-  tr.dataset.method=r.method;
-  tr.tabIndex=0;
-  tr.setAttribute('role','button');
-  tr.setAttribute('aria-label','查看 '+r.method+' 模型的診斷圖');
-  for(const v of [r.method,r.count,Number.isFinite(r.cvRmse)?r.cvRmse.toFixed(3):'—',r.testRmse.toFixed(3),r.r2===null?'N/A':r.r2.toFixed(4),r.features.join('、')]){
-    const td=document.createElement('td');td.textContent=String(v);tr.append(td);
-  }
-  tr.addEventListener('click',()=>selectDiagnostic(r.method));
-  tr.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();selectDiagnostic(r.method);}});
-  tbody.append(tr);
-}
-if(!window.FeatureLabCharts)throw Error('圖表程式未載入，請重新整理。');
+renderMethodTable();
 const diagnostic=$('diagnostic-method');diagnostic.textContent='';
-for(const result of results){
-  const opt=document.createElement('option');opt.value=result.method;
-  opt.textContent=result.method;diagnostic.append(opt);
+for(const method of ['Baseline',...window.FeatureLabCurves.methods]){
+  const opt=document.createElement('option');opt.value=method;opt.textContent=method;diagnostic.append(opt);
 }
-window.FeatureLabCharts.renderScores(results);
-// Default selection is based on training CV, never the held-out test set.
-const selected=results.filter(r=>Number.isFinite(r.cvRmse)).sort((a,b)=>a.cvRmse-b.cvRmse)[0]||results[0];
-selectDiagnostic(selected.method);
-$('analysis-results').hidden=false;status('分析完成，共 '+results.length+' 個模型（含 Baseline）。',false,'analysis-status');$('analysis-results').scrollIntoView({behavior:'smooth',block:'start'});
+// Choose the default method by training-CV RMSE, never by held-out test scores.
+const selected=results.filter(row=>Number.isFinite(row.cvRmse)).sort((a,b)=>a.cvRmse-b.cvRmse)[0]||results[0];
+setView(output.selectedK,selected.method);
+$('analysis-results').hidden=false;status('分析完成：五種方法 × '+output.maxK+' 個特徵數 = '+output.curves.length+' 組曲線結果，加上 Baseline。',false,'analysis-status');$('analysis-results').scrollIntoView({behavior:'smooth',block:'start'});
 }catch(e){status('分析失敗：'+e.message,true,'analysis-status');}finally{btn.disabled=false;}});
 $('diagnostic-method').addEventListener('change',e=>selectDiagnostic(e.target.value));
-for(const el of [...document.querySelectorAll('#config input:not([type="checkbox"]),#config select'),...document.querySelectorAll('#selector-list input')]){
+$('curve-metric').addEventListener('change',()=>{if(analysisOutput)setView($('feature-k').value,selectedMethod);});
+$('feature-k').addEventListener('change',e=>{if(analysisOutput)setView(e.target.value,selectedMethod);});
+$('five-curve-grid').addEventListener('click',event=>{
+  const point=event.target.closest('[data-k][data-method]');
+  if(point){setView(point.dataset.k,point.dataset.method);return;}
+  const btn=event.target.closest('[data-choose-method]');
+  if(btn)setView($('feature-k').value,btn.dataset.chooseMethod);
+});
+$('five-curve-grid').addEventListener('keydown',event=>{
+  if(event.key!=='Enter'&&event.key!==' ')return;
+  const point=event.target.closest('[data-k][data-method]');
+  if(point){event.preventDefault();setView(point.dataset.k,point.dataset.method);}
+});
+for(const el of document.querySelectorAll('#config input:not([type="checkbox"]),#config select:not(#feature-k)')){
   el.addEventListener('change',hideResults);
 }
-$('export-results').addEventListener('click',()=>{if(!results.length)return;const cols=['Method','Features','CV RMSE','Test RMSE','Test R2','Selected Features'],lines=[cols.map(csvCell).join(',')];for(const r of results)lines.push([r.method,r.count,r.cvRmse,r.testRmse,r.r2??'',r.features.join(' | ')].map(csvCell).join(','));download(lines.join('\r\n'),'feature_lab_custom_results.csv');});
+$('export-results').addEventListener('click',()=>{if(!analysisOutput)return;const cols=['Method','Features','CV RMSE','Test RMSE','Test R2','Selected Features'],lines=[cols.map(csvCell).join(',')];for(const r of [analysisOutput.baseline,...analysisOutput.curves])lines.push([r.method,r.count,r.cvRmse,r.testRmse,r.r2??'',r.features.join(' | ')].map(csvCell).join(','));download(lines.join('\r\n'),'feature_lab_all_methods_k1_to_k5.csv');});
 const toggle=$('theme-toggle');function drawTheme(){const dark=document.documentElement.dataset.theme==='dark';toggle.textContent=dark?'☀ 淺色模式':'☾ 黑暗模式';toggle.setAttribute('aria-pressed',String(dark));}
 toggle.addEventListener('click',()=>{const next=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=next;try{localStorage.setItem('feature-lab-theme',next);}catch{}drawTheme();});drawTheme();
 })();
