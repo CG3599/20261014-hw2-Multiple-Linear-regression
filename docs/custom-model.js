@@ -34,14 +34,14 @@ window.FeatureLabModel = (() => {
   function lasso(X,y,k,seed){const alphaBase=Math.sqrt(mean(y.map(v=>(v-mean(y))**2)))||1,alphas=[.001,.01,.05,.12].map(v=>v*alphaBase);let best=null,score=Infinity;for(const alpha of alphas){const coef=lassoCoefficients(X,y,alpha),indices=coef.map((v,j)=>({j,v:Math.abs(v)})).sort((a,b)=>b.v-a.v).slice(0,k).map(o=>o.j),v=cv(X,y,indices,seed);if(v<score){score=v;best=indices;}}return best;}
   const isMissing=v=>v==null||String(v).trim()===''||String(v).trim().toLowerCase()==='na'||String(v).trim().toLowerCase()==='null';
   function prepare(rows,headers,target,fields){const ti=headers.indexOf(target),filtered=rows.map(row=>({row,target:Number(String(row[ti]??'').replace(/,/g,''))})).filter(o=>!isMissing(o.row[ti])&&Number.isFinite(o.target));if(filtered.length<15)throw Error('可用數值 Target 至少需要 15 筆資料。');if(filtered.length>3000)throw Error('為保護瀏覽器，最多可分析 3,000 筆有效資料；請先抽樣。');
-    const index=fields.filter(f=>f.use&&f.name!==target).map(f=>({...f,pos:headers.indexOf(f.name)}));if(!index.length)throw Error('請至少選擇一個 Feature。');if(index.length>39)throw Error('本作業要求最多 39 個原始輸入特徵。');
+    const index=fields.filter(f=>f.use&&f.name!==target).map(f=>({...f,pos:headers.indexOf(f.name)}));if(!index.length)throw Error('請至少選擇一個 Feature。');if(index.length>60)throw Error('最多可選擇 60 個原始輸入特徵，請取消部分欄位。');
     return {filtered,index};}
   function encode(prepared,split,seed){const {filtered,index}=prepared,order=shuffle(filtered.length,seed),trainCount=Math.max(10,Math.min(filtered.length-3,Math.floor(filtered.length*split))),trainRows=order.slice(0,trainCount).map(i=>filtered[i]),testRows=order.slice(trainCount).map(i=>filtered[i]),meta=[],colNames=[];
     for(const field of index){const vals=trainRows.map(o=>String(o.row[field.pos]??'').trim()).filter(v=>!isMissing(v));if(field.type==='numeric'){const nums=vals.map(Number).filter(Number.isFinite),impute=nums.length?mean(nums):0;let std=Math.sqrt(mean(nums.length?nums.map(v=>(v-impute)**2):[0]));if(std<1e-9)std=1;meta.push({pos:field.pos,type:'numeric',impute,std});colNames.push(field.name);}
     else {const counts=new Map();for(const v of vals)counts.set(v,(counts.get(v)||0)+1);const distinct=[...counts].sort((a,b)=>b[1]-a[1]);if(distinct.length>12)throw Error('類別欄位 '+field.name+' 有 '+distinct.length+' 種值（上限 12）；請排除欄位或改用其他特徵。');const most=distinct[0]?.[0]||'(missing)',classes=distinct.map(x=>x[0]).sort();meta.push({pos:field.pos,type:'category',classes,impute:most});for(const c of classes.slice(1))colNames.push(field.name+'='+c);}}
-    if(colNames.length<1)throw Error('編碼後沒有可用 Features。');if(colNames.length>40)throw Error('One-Hot 後有 '+colNames.length+' 個特徵，超過本頁 40 個特徵的運算上限。');
+    if(colNames.length<1)throw Error('編碼後沒有可用 Features。');if(colNames.length>80)throw Error('One-Hot 後有 '+colNames.length+' 個特徵，超過 80 個編碼特徵的運算上限。');const maxForTrain=trainCount-10;if(colNames.length>maxForTrain)throw Error('訓練資料 '+trainCount+' 筆，依訓練筆數減 10 的規則，最多可使用 '+Math.max(0,maxForTrain)+' 個編碼後特徵；目前為 '+colNames.length+' 個。請減少 Features 或增加有效資料筆數。');
     function convert(items){return items.map(o=>{let arr=[];for(const m of meta){let value=String(o.row[m.pos]??'').trim();if(isMissing(value))value=String(m.impute);if(m.type==='numeric'){let n=Number(value);if(!Number.isFinite(n))n=m.impute;arr.push((n-m.impute)/m.std);}else {for(const c of m.classes.slice(1))arr.push(Number(value===c));}}return arr;});}
-    return {X:convert(trainRows),y:trainRows.map(o=>o.target),Xt:convert(testRows),yt:testRows.map(o=>o.target),names:colNames,trainCount,testCount:testRows.length,valid:filtered.length};}
+    return {X:convert(trainRows),y:trainRows.map(o=>o.target),Xt:convert(testRows),yt:testRows.map(o=>o.target),names:colNames,trainCount,testCount:testRows.length,valid:filtered.length,overfitRisk:colNames.length>trainCount/3};}
   function analyze(payload){
     const {rows,headers,target,fields,split,seed,methods,k}=payload;
     const prepared=prepare(rows,headers,target,fields);
@@ -81,7 +81,7 @@ window.FeatureLabModel = (() => {
     const results=[baseline,...curves.filter(row=>row.requestedCount===chosenK)];
     return {
       results,curves,baseline,maxK,selectedK:chosenK,
-      data:{valid:data.valid,train:data.trainCount,test:data.testCount,raw:prepared.index.length,encoded:names.length}
+      data:{valid:data.valid,train:data.trainCount,test:data.testCount,raw:prepared.index.length,encoded:names.length,overfitRisk:data.overfitRisk,maxEncoded:Math.min(80,data.trainCount-10)}
     };
   }
   return {analyze};
