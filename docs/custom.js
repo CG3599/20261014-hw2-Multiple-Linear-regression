@@ -13,16 +13,18 @@ function estimate(){if(!dataset)return;const target=$('target-select').value,cho
 for(const f of chosen){if(f.type==='numeric')count++;else{const vals=new Set(dataset.rows.map(row=>row[dataset.headers.indexOf(f.name)]).filter(v=>!missing(v)));if(vals.size>12)invalid.push(f.name+' ('+vals.size+' 類)');count+=Math.max(0,vals.size-1);}}
 $('raw-feature-total').textContent=chosen.length;$('encoded-feature-total').textContent=count;
 const ok=chosen.length>13&&chosen.length<40;
-$('feature-guidance').textContent='原始輸入特徵 '+chosen.length+' 個：'+(ok?'符合':'不符合')+' HW2 的 14–39 個條件（這是作業提示，並非硬性最低欄數）。'+(invalid.length?' 需排除超過 12 類的欄位：'+invalid.join('、')+'。':'')+' 編碼數僅為整份資料估計，實際由訓練資料決定。';
+$('feature-guidance').textContent='原始輸入特徵 '+chosen.length+' 個：'+(ok?'符合':'不符合')+' HW2 的 14–39 個條件（僅作業提示）。網站上限為 60 個原始、80 個編碼後特徵，且編碼數不得超過訓練筆數減 10。'+(invalid.length?' 需排除超過 12 類的欄位：'+invalid.join('、')+'。':'')+' 此處編碼數為整份資料預估，實際以訓練資料為準。';
 updateAdvisor();
 }
 function updateAdvisor(){
   if(!dataset||!window.FeatureLabAdvisor)return;
-  advice=window.FeatureLabAdvisor.evaluate(dataset.headers,dataset.rows,fields,$('target-select').value);
+  advice=window.FeatureLabAdvisor.evaluate(dataset.headers,dataset.rows,fields,$('target-select').value,Number($('train-split').value));
   const summary=$('advisor-summary');summary.replaceChildren();
   const summaries=[
     ['目前選取',advice.currentRaw+' 個原始 / '+advice.currentEncoded+' 個編碼後'],
     ['建議設定',advice.recommendedRaw+' 個原始 / '+advice.recommendedEncoded+' 個編碼後'],
+    ['預估訓練筆數',advice.trainCount+' 筆'],
+    ['可用編碼特徵上限',advice.maxEncoded+' 個（60 原始 / 80 編碼硬上限）'],
     ['有效 Target',advice.validTargets+' / '+advice.totalRows+' 筆']
   ];
   for(const [name,value] of summaries){
@@ -277,12 +279,17 @@ $('run-analysis').addEventListener('click',async()=>{
     $('model-summary').textContent=out.data.valid+' 筆有效資料 / '+out.data.train+' 訓練 / '+out.data.test+
        ' 測試 · '+out.data.raw+' 個原始特徵 / '+out.data.encoded+' 個編碼後特徵';
     $('curve-heading').textContent=out.maxK===out.data.encoded?'從 1 個特徵，到完整模型':'從 1 個特徵，到 '+out.maxK+' 個特徵';
+    const risk=$('overfit-warning');
+    risk.hidden=!out.data.overfitRisk;
+    risk.textContent=out.data.overfitRisk?
+      '過擬合風險提醒：本次編碼後使用 '+out.data.encoded+' 個特徵，已超過 '+out.data.train+' 筆訓練資料的三分之一。建議查看較少特徵的曲線，並留意測試集表現。':'';
     initTabs();initCount();renderMethodology();renderView();
     $('analysis-results').hidden=false;
     status('分析完成：'+out.curves.length+' 組固定特徵數結果及 Baseline。',false,'analysis-status');
     $('analysis-results').scrollIntoView({behavior:'smooth',block:'start'});
   }catch(e){status('分析失敗：'+e.message,true,'analysis-status');}finally{btn.disabled=false;}
 });
+$('train-split').addEventListener('change',updateAdvisor);
 $('feature-count').addEventListener('input',e=>changeView(selectedMethod,Number(e.target.value)));
 $('compare').addEventListener('change',e=>{compare=e.target.checked;renderView();});
 for(const graphId of ['rmse-chart','r2-chart']){
