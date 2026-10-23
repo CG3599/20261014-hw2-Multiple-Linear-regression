@@ -63,3 +63,25 @@
  .crisp-method-row {grid-template-columns:24px minmax(0,1fr);}
  .crisp-method-row p {grid-column:2;}
 }
+
+/* Unified six-method comparison: same structure and information on all datasets. */
+.method-comparison-table{min-width:760px;width:100%;table-layout:auto}
+.method-comparison-table th,.method-comparison-table td{vertical-align:top;text-align:left;padding:14px 12px;line-height:1.7}
+.method-comparison-table th:nth-child(2),.method-comparison-table td:nth-child(2),
+.method-comparison-table th:nth-child(n+4),.method-comparison-table td:nth-child(n+4){text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.method-comparison-table td:first-child{white-space:nowrap;font-weight:650}
+.method-comparison-table .method-features{min-width:215px;text-align:left;white-space:normal;font-variant-numeric:normal}
+.method-feature-list{display:flex;flex-wrap:wrap;gap:3px;align-items:flex-start}
+.method-feature-list .feature-tag{margin:1px 2px 1px 0;overflow-wrap:anywhere;max-width:100%;white-space:normal}
+.method-feature-details{border:none;padding:0;margin:6px 0 0}
+.method-feature-details summary{font-size:11px;color:var(--teal);cursor:pointer;font-weight:600;user-select:none}
+.method-feature-details[open] .method-feature-list{margin-top:8px}
+.method-row-action{cursor:pointer}
+.method-row-action:hover{background:rgba(8,127,120,.07)}
+.method-row-action:focus-visible{outline:2px solid var(--teal);outline-offset:-2px}
+.method-comparison-note{font-size:11px;line-height:1.8;color:var(--muted);margin:13px 0 0}
+.method-comparison-section{scroll-margin-top:26px}
+.method-comparison-table tr.selected{background:rgba(8,127,120,.10)}
+[data-theme="dark"] .method-row-action:hover{background:rgba(74,174,155,.10)}
+[data-theme="dark"] .method-comparison-table tr.selected{background:rgba(74,174,155,.16)}
+@media(max-width:760px){.method-comparison-table{min-width:760px}.method-comparison-section{padding:19px 14px}.method-comparison-table th,.method-comparison-table td{padding:12px 8px}}
