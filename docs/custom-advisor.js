@@ -48,7 +48,6 @@ window.FeatureLabAdvisor=(()=>{
       return headers.indexOf(b.name)-headers.indexOf(a.name);
     });
     for(const c of candidates){
-      if(active.length-blocked.size<0)break; // No-op guard; active list updated below.
       const kept=active.filter(item=>!blocked.has(item.name));
       if(kept.length<=39&&encoded<=40)break;
       blocked.add(c.name);
