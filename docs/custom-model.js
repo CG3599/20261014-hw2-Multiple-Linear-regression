@@ -16,6 +16,18 @@ window.FeatureLabModel = (() => {
   function efs(X,y,k,rank,seed){const pool=rank.slice(0,8),kk=Math.min(k,pool.length);let best=[],err=Infinity;combinations(pool,kk,c=>{const v=cv(X,y,c,seed);if(v<err){err=v;best=c;}});return best;}
   function sfs(X,y,k,rank,seed){let selected=[];const pool=rank.slice(0,12);while(selected.length<Math.min(k,pool.length)){let best=null,err=Infinity;for(const j of pool){if(selected.includes(j))continue;const v=cv(X,y,[...selected,j],seed);if(v<err){err=v;best=j;}}selected.push(best);}return selected;}
   function rfePath(X,y,rank,k,seed){let pool=rank.slice(0,Math.min(15,rank.length)),snapshots=[];while(pool.length){if(pool.length<=k)snapshots.push(pool.slice());if(pool.length===1)break;const coeff=fit(X,y,pool);let worst=0;for(let i=1;i<pool.length;i++)if(Math.abs(coeff[i+1])<Math.abs(coeff[worst+1]))worst=i;pool.splice(worst,1);}let best=snapshots[0],err=Infinity;for(const selected of snapshots){const v=cv(X,y,selected,seed);if(v<err){err=v;best=selected;}}return best;}
+  // Fixed-feature-count diagnostic path corresponding to RFECV's underlying RFE.
+  // The original RFECV automatic feature count is a different experiment.
+  function rfeFixed(X,y,rank,k){
+    const pool=rank.slice(0,Math.min(15,rank.length));
+    while(pool.length>k){
+      const coeff=fit(X,y,pool);
+      let worst=0;
+      for(let i=1;i<pool.length;i++) if(Math.abs(coeff[i+1])<Math.abs(coeff[worst+1])) worst=i;
+      pool.splice(worst,1);
+    }
+    return pool;
+  }
   function backward(X,y,k,rank){let pool=rank.slice(0,Math.min(18,rank.length));while(pool.length>k){const coef=fit(X,y,pool);let worst=0;for(let i=1;i<pool.length;i++)if(Math.abs(coef[i+1])<Math.abs(coef[worst+1]))worst=i;pool.splice(worst,1);}return pool;}
   function lassoCoefficients(X,y,alpha){const n=X.length,p=X[0].length,center=mean(y),yy=y.map(v=>v-center),b=Array(p).fill(0),res=yy.slice(),norm=Array.from({length:p},(_,j)=>X.reduce((s,row)=>s+row[j]*row[j],0)/n||1);
     for(let iter=0;iter<170;iter++){let largest=0;for(let j=0;j<p;j++){let rho=0;for(let i=0;i<n;i++)rho+=X[i][j]*(res[i]+X[i][j]*b[j]);rho/=n;const mag=Math.max(0,Math.abs(rho)-alpha),next=(Math.sign(rho)*mag)/norm[j],delta=next-b[j];if(delta){for(let i=0;i<n;i++)res[i]-=X[i][j]*delta;}b[j]=next;largest=Math.max(largest,Math.abs(delta));}if(largest<1e-5)break;}return b;}
@@ -30,9 +42,47 @@ window.FeatureLabModel = (() => {
     if(colNames.length<1)throw Error('編碼後沒有可用 Features。');if(colNames.length>40)throw Error('One-Hot 後有 '+colNames.length+' 個特徵，超過本頁 40 個特徵的運算上限。');
     function convert(items){return items.map(o=>{let arr=[];for(const m of meta){let value=String(o.row[m.pos]??'').trim();if(isMissing(value))value=String(m.impute);if(m.type==='numeric'){let n=Number(value);if(!Number.isFinite(n))n=m.impute;arr.push((n-m.impute)/m.std);}else {for(const c of m.classes.slice(1))arr.push(Number(value===c));}}return arr;});}
     return {X:convert(trainRows),y:trainRows.map(o=>o.target),Xt:convert(testRows),yt:testRows.map(o=>o.target),names:colNames,trainCount,testCount:testRows.length,valid:filtered.length};}
-  function analyze(payload){const {rows,headers,target,fields,split,seed,methods,k}=payload;const prepared=prepare(rows,headers,target,fields),data=encode(prepared,split,seed),{X,y,Xt,yt,names}=data,rank=relevance(X,y),kk=Math.min(k,names.length),plans=[{name:'Baseline',selected:names.map((_,i)=>i)}];
-    for(const method of methods){let chosen;if(method==='EFS')chosen=efs(X,y,kk,rank,seed);else if(method==='RFECV')chosen=rfePath(X,y,rank,kk,seed);else if(method==='Lasso')chosen=lasso(X,y,kk,seed);else if(method==='Backward')chosen=backward(X,y,kk,rank);else if(method==='SFS')chosen=sfs(X,y,kk,rank,seed);else continue;plans.push({name:method,selected:chosen});}
-    const results=plans.map(plan=>{const beta=fit(X,y,plan.selected),prediction=predict(Xt,beta,plan.selected);return {method:plan.name,count:plan.selected.length,features:plan.selected.map(i=>names[i]),cvRmse:cv(X,y,plan.selected,seed),testRmse:rmse(yt,prediction),r2:r2(yt,prediction),testActual:yt.slice(),testPredicted:prediction};});
-    return {results,data:{valid:data.valid,train:data.trainCount,test:data.testCount,raw:prepared.index.length,encoded:names.length}};}
+  function analyze(payload){
+    const {rows,headers,target,fields,split,seed,methods,k}=payload;
+    const prepared=prepare(rows,headers,target,fields);
+    const data=encode(prepared,split,seed);
+    const {X,y,Xt,yt,names}=data;
+    const rank=relevance(X,y);
+    const maxK=Math.min(5,names.length);
+    const chosenK=Math.min(Math.max(1,Number(k)||1),maxK);
+    const requested=methods||['EFS','RFECV','LassoCV','Backward','SFS'];
+    const ordered=['EFS','RFECV','LassoCV','Backward','SFS'].filter(method=>requested.includes(method)||(method==='LassoCV'&&requested.includes('Lasso')));
+    const evaluate=(method,selected,count)=>{
+      const beta=fit(X,y,selected);
+      const prediction=predict(Xt,beta,selected);
+      return {
+        method,count: selected.length,requestedCount:count,
+        features:selected.map(i=>names[i]),
+        cvRmse:cv(X,y,selected,seed),
+        testRmse:rmse(yt,prediction),r2:r2(yt,prediction),
+        testActual:yt.slice(),testPredicted:prediction
+      };
+    };
+    const baseline=evaluate('Baseline',names.map((_,i)=>i),names.length);
+    // This computes all feature counts on one consistent train/test split, without
+    // selecting features using test scores. Curves remain browser JS approximations.
+    const curves=[];
+    for (const method of ordered){
+      for(let count=1;count<=maxK;count++){
+        let selected;
+        if(method==='EFS')selected=efs(X,y,count,rank,seed);
+        else if(method==='RFECV')selected=rfeFixed(X,y,rank,count);
+        else if(method==='LassoCV')selected=lasso(X,y,count,seed);
+        else if(method==='Backward')selected=backward(X,y,count,rank);
+        else if(method==='SFS')selected=sfs(X,y,count,rank,seed);
+        curves.push(evaluate(method,selected,count));
+      }
+    }
+    const results=[baseline,...curves.filter(row=>row.requestedCount===chosenK)];
+    return {
+      results,curves,baseline,maxK,selectedK:chosenK,
+      data:{valid:data.valid,train:data.trainCount,test:data.testCount,raw:prepared.index.length,encoded:names.length}
+    };
+  }
   return {analyze};
 })();
