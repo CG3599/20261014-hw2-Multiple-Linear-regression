@@ -36,14 +36,14 @@ function renderSelection() {
   $('feature-tags').replaceChildren(...row.features.map(name => {
     const tag = document.createElement('span'); tag.className='feature-tag'; tag.textContent=name.replace(/^(num|cat)__/, ''); return tag;
   }));
-  document.querySelectorAll('#result-rows tr').forEach(tr => {tr.classList.toggle('selected',tr.dataset.method===selected);tr.setAttribute('aria-selected',String(tr.dataset.method===selected));});
+  document.querySelectorAll('#result-rows tr').forEach(tr => {const active=tr.dataset.method===(selected==='Lasso'?'LassoCV':selected);tr.classList.toggle('selected',active);tr.setAttribute('aria-selected',String(active));});
   const url = new URL(location.href); url.searchParams.set('method',selected); history.replaceState(null,'',url);
 }
-for (const row of data.methods) {
-  const tr=document.createElement('tr'); tr.dataset.method=row.method; tr.tabIndex=0; tr.setAttribute('aria-label',`${row.method}, ${row.count} features`);
-  for (const value of [row.method,row.count,fmt(row.cv_rmse),fmt(row.cv_std),fmt(row.seconds)]) {const td=document.createElement('td');td.textContent=value;tr.append(td);}
-  activate(tr,row.method); $('result-rows').append(tr);
-}
+window.FeatureLabMethodComparison.render(
+  $('result-rows'),
+  window.FeatureLabMethodComparison.fromCars(data),
+  {selected:selected==='Lasso'?'LassoCV':selected,allowBaseline:true,onSelect:row=>choose(row.method==='LassoCV'?'Lasso':row.method)}
+);
 $('sample-stat').textContent=`${data.valid_count} cars`;
 $('split-stat').textContent=`${data.train_count} 筆訓練 / ${data.test_count} 筆測試`;
 $('rmse-stat').textContent=`€${fmt(data.test.rmse)}`;
