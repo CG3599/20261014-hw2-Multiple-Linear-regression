@@ -1,20 +1,73 @@
 'use strict';
 (() => {
 const $ = id => document.getElementById(id);
-let dataset=null,fields=[],results=[],analysisOutput=null,selectedMethod='Backward',selectedK=2,compare=false;
+let dataset=null,fields=[],results=[],analysisOutput=null,selectedMethod='Backward',selectedK=2,compare=false,advice=null;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const missing=s=>s==null||String(s).trim()===''||['na','null','n/a'].includes(String(s).trim().toLowerCase());
 function status(message,error=false,where='upload-status'){const el=$(where);el.textContent=message;el.classList.toggle('error',error);}
 function detectDelimiter(text){const line=(text.split(/\r?\n/).find(s=>s.trim())||'').slice(0,2000),options=[',','\t',';'];return options.map(d=>({d,n:line.split(d).length-1})).sort((a,b)=>b.n-a.n)[0].d;}
 function parseCSV(text){text=text.replace(/^\uFEFF/,'');const delim=detectDelimiter(text),table=[],row=[];let buf='',quoted=false;for(let i=0;i<text.length;i++){const c=text[i];if(c==='"'){if(quoted&&text[i+1]==='"'){buf+='"';i++;}else quoted=!quoted;}else if(c===delim&&!quoted){row.push(buf);buf='';}else if((c==='\n'||c==='\r')&&!quoted){if(c==='\r'&&text[i+1]==='\n')i++;row.push(buf);buf='';if(row.some(v=>String(v).trim()))table.push(row.slice());row.length=0;if(table.length>6002)throw Error('資料超過 6,000 列，請先縮減檔案。');}else buf+=c;}if(quoted)throw Error('CSV 格式錯誤：引號未關閉。');row.push(buf);if(row.some(v=>String(v).trim()))table.push(row);return table;}
-function normalize(matrix){if(!Array.isArray(matrix)||matrix.length<2)throw Error('資料至少需要標題列與一筆資料。');if(matrix[0].length>60)throw Error('原始欄位上限為 60。');const seen=new Set(),headers=matrix[0].map((v,i)=>{const base=String(v||'Column '+(i+1)).trim();let name=base,n=2;while(seen.has(name)){name=base+'_'+n++;}seen.add(name);return name;});if(headers.length<2)throw Error('至少需要兩個欄位（Feature + Target）。');const rows=matrix.slice(1).filter(row=>row.some(v=>!missing(v))).map(row=>headers.map((_,i)=>String(row[i]??'').trim()));return {headers,rows};}
+function normalize(matrix){if(!Array.isArray(matrix)||matrix.length<2)throw Error('資料至少需要標題列與一筆資料。');if(matrix[0].length>120)throw Error('原始欄位上限為 120 欄。');const seen=new Set(),headers=matrix[0].map((v,i)=>{const base=String(v||'Column '+(i+1)).trim();let name=base,n=2;while(seen.has(name)){name=base+'_'+n++;}seen.add(name);return name;});if(headers.length<2)throw Error('至少需要兩個欄位（Feature + Target）。');const rows=matrix.slice(1).filter(row=>row.some(v=>!missing(v))).map(row=>headers.map((_,i)=>String(row[i]??'').trim()));return {headers,rows};}
 function infer(values){const vals=values.filter(v=>!missing(v));return vals.length>0&&vals.filter(v=>Number.isFinite(Number(v))).length/vals.length>=.9?'numeric':'category';}
 function estimate(){if(!dataset)return;const target=$('target-select').value,chosen=fields.filter(f=>f.use&&f.name!==target);let count=0,invalid=[];
 for(const f of chosen){if(f.type==='numeric')count++;else{const vals=new Set(dataset.rows.map(row=>row[dataset.headers.indexOf(f.name)]).filter(v=>!missing(v)));if(vals.size>12)invalid.push(f.name+' ('+vals.size+' 類)');count+=Math.max(0,vals.size-1);}}
 $('raw-feature-total').textContent=chosen.length;$('encoded-feature-total').textContent=count;
 const ok=chosen.length>13&&chosen.length<40;
-$('feature-guidance').textContent='原始輸入特徵 '+chosen.length+' 個：'+(ok?'符合':'不符合')+' HW2 的 14–39 個條件（這是資料檢查提示，不阻止分析）。'+(invalid.length?' 超過 12 類，需排除的類別欄：'+invalid.join('、')+'。':'')+' 編碼數僅為整份資料預估，實際由訓練資料決定。';
+$('feature-guidance').textContent='原始輸入特徵 '+chosen.length+' 個：'+(ok?'符合':'不符合')+' HW2 的 14–39 個條件（這是作業提示，並非硬性最低欄數）。'+(invalid.length?' 需排除超過 12 類的欄位：'+invalid.join('、')+'。':'')+' 編碼數僅為整份資料估計，實際由訓練資料決定。';
+updateAdvisor();
 }
+function updateAdvisor(){
+  if(!dataset||!window.FeatureLabAdvisor)return;
+  advice=window.FeatureLabAdvisor.evaluate(dataset.headers,dataset.rows,fields,$('target-select').value);
+  const summary=$('advisor-summary');summary.replaceChildren();
+  const summaries=[
+    ['目前選取',advice.currentRaw+' 個原始 / '+advice.currentEncoded+' 個編碼後'],
+    ['建議設定',advice.recommendedRaw+' 個原始 / '+advice.recommendedEncoded+' 個編碼後'],
+    ['有效 Target',advice.validTargets+' / '+advice.totalRows+' 筆']
+  ];
+  for(const [name,value] of summaries){
+    const cell=document.createElement('div');cell.className='setup-advisor-stat';
+    const label=document.createElement('small');label.textContent=name;
+    const result=document.createElement('strong');result.textContent=value;
+    if(name==='建議設定')result.className='teal';
+    cell.append(label,result);summary.append(cell);
+  }
+  const warnings=$('advisor-warnings');warnings.replaceChildren();
+  for(const message of advice.warnings){
+    const line=document.createElement('p');line.textContent='需注意 · '+message;warnings.append(line);
+  }
+  const list=$('advisor-list');list.replaceChildren();
+  for(const note of advice.reasons.slice(0,30)){
+    const card=document.createElement('div');card.className='setup-advisor-item';
+    const mark=document.createElement('span');mark.className='advisor-mark';
+    mark.textContent=note.selected?'建議排除':'已排除';
+    const detail=document.createElement('div');
+    const title=document.createElement('strong');title.textContent=note.name;
+    const desc=document.createElement('p');desc.textContent=note.description;
+    detail.append(title,desc);card.append(mark,detail);list.append(card);
+  }
+  if(advice.reasons.length>30){
+    const more=document.createElement('p');more.className='setup-advisor-empty';
+    more.textContent='另有 '+(advice.reasons.length-30)+' 個欄位建議，請在輸入欄位清單檢查。';
+    list.append(more);
+  }
+  if(!advice.reasons.length){
+    const empty=document.createElement('p');empty.className='setup-advisor-empty';
+    empty.textContent='目前沒有偵測到明顯的 ID、高類別數或超額編碼欄位。';
+    list.append(empty);
+  }
+  const button=$('apply-advisor');
+  button.disabled=!advice.canApply;
+  button.textContent=advice.canApply?'套用建議排除 '+advice.toExclude.length+' 欄 ↗':'已符合欄位建議';
+  $('advisor-status').textContent='這些是資料格式與運算預算的啟發式建議，不保證能獲得最低 RMSE／最高 R²。'+
+    (advice.ready?'建議設定符合目前運算上限。':'請先確認 Target 與欄位設定能符合分析條件。');
+}
+$('apply-advisor').addEventListener('click',()=>{
+  if(!dataset||!advice||!advice.toExclude.length)return;
+  const drop=new Set(advice.toExclude);
+  for(const field of fields){if(drop.has(field.name))field.use=false;}
+  hideResults();renderFields();
+});
 function renderFields(){if(!dataset)return;const target=$('target-select').value;const container=$('feature-fields');container.textContent='';
 for(const f of fields){const div=document.createElement('label');div.className='feature-field';const checkbox=document.createElement('input');checkbox.type='checkbox';checkbox.checked=f.use&&f.name!==target;checkbox.disabled=f.name===target;checkbox.addEventListener('change',()=>{f.use=checkbox.checked;estimate();hideResults();});const info=document.createElement('span');const bold=document.createElement('strong');bold.textContent=f.name;const small=document.createElement('small');small.textContent=f.name===target?'Target（不列入 Features）':f.type==='numeric'?'Numerical':'Categorical';info.append(bold,small);const sel=document.createElement('select');for(const [name,label] of [['numeric','數值'],['category','類別']]){const opt=document.createElement('option');opt.value=name;opt.textContent=label;sel.add(opt);}sel.value=f.type;sel.disabled=f.name===target;sel.addEventListener('change',()=>{f.type=sel.value;small.textContent=f.type==='numeric'?'Numerical':'Categorical';estimate();hideResults();});div.append(checkbox,info,sel);container.append(div);}estimate();}
 const methodNotes={
@@ -173,7 +226,7 @@ function renderMethodology(){
 function importMatrix(matrix,name){const value=normalize(matrix);if(value.rows.length<2)throw Error('資料列數不足。');dataset=value;const {headers,rows}=value;$('preview').hidden=false;$('config').hidden=false;hideResults();
 let target=headers.find(v=>/^(price|profit|saleprice|target|y|charges)$/i.test(v.trim()))||headers[headers.length-1];const targets=dataset.rows.map(r=>r[headers.indexOf(target)]).filter(v=>!missing(v));if(targets.filter(v=>Number.isFinite(Number(v))).length<targets.length*.8){const numeric=headers.filter((h,i)=>infer(rows.map(row=>row[i]))==='numeric');target=numeric[numeric.length-1]||target;}
 const sel=$('target-select');sel.textContent='';for(const h of headers){const opt=document.createElement('option');opt.value=h;opt.textContent=h;sel.append(opt);}sel.value=target;
-fields=headers.map((name,i)=>{const type=infer(rows.map(row=>row[i]));const values=rows.map(row=>row[i]).filter(v=>!missing(v)),unique=new Set(values).size;return {name,type,use:name!==target&&!/^(id|index|unnamed:?\s*\d*|serial|row_?id)$/i.test(name)&&!(type==='category'&&unique>12)};});
+fields=headers.map((name,i)=>{const type=infer(rows.map(row=>row[i]));const values=rows.map(row=>row[i]).filter(v=>!missing(v)),unique=new Set(values).size;return {name,type,use:name!==target&&!window.FeatureLabAdvisor.idColumn(name)&&!(type==='category'&&unique>12)};});
 $('row-total').textContent=rows.length.toLocaleString();$('column-total').textContent=headers.length;$('data-source').textContent=name;$('preview-head').textContent='';$('preview-body').textContent='';
 const head=document.createElement('tr');for(const h of headers){const th=document.createElement('th');th.textContent=h;head.append(th);}$('preview-head').append(head);
 for(const row of rows.slice(0,5)){const tr=document.createElement('tr');for(const v of row){const td=document.createElement('td');td.textContent=v;tr.append(td);}$('preview-body').append(tr);}
@@ -184,7 +237,24 @@ for(const btn of document.querySelectorAll('[data-source]'))btn.addEventListener
 $('dataset-file').addEventListener('change',e=>handleFile(e.target.files[0]));
 const zone=$('dropzone');zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('dragover');});zone.addEventListener('dragleave',()=>zone.classList.remove('dragover'));zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('dragover');handleFile(e.dataTransfer.files[0]);});
 $('load-paste').addEventListener('click',()=>{try{const text=$('dataset-paste').value;if(text.length>5*1024*1024)throw Error('貼上資料超過 5MB。');importMatrix(parseCSV(text),'貼上資料');}catch(e){status(e.message,true);}});
-$('load-url').addEventListener('click',async()=>{try{const u=new URL($('dataset-url').value);if(!['https:','http:'].includes(u.protocol)||u.username||u.password)throw Error('請輸入有效的 HTTP(S) 檔案直接網址。');status('正在讀取公開網址…');const res=await fetch(u.href,{credentials:'omit',mode:'cors'});if(!res.ok)throw Error('遠端下載失敗（HTTP '+res.status+'）。');const length=Number(res.headers.get('content-length')||0);if(length>5*1024*1024)throw Error('遠端檔案過大（超過 5MB）。');const text=await res.text();if(text.length>5*1024*1024)throw Error('遠端檔案過大（超過 5MB）。');importMatrix(parseCSV(text),u.hostname);}catch(e){status('URL 匯入失敗：'+e.message+'。請檢查網址或 CORS，亦可改為下載 CSV 上傳。',true);}});
+$('load-url').addEventListener('click',async()=>{
+  let url;
+  try{
+    url=new URL($('dataset-url').value);
+    if(!['https:','http:'].includes(url.protocol)||url.username||url.password)throw Error('請輸入有效的 HTTP(S) CSV 直接網址。');
+  }catch(e){status('網址格式不正確：'+e.message,true);return;}
+  status('正在讀取公開 CSV 網址…');
+  let text;
+  try{
+    const res=await fetch(url.href,{credentials:'omit',mode:'cors'});
+    if(!res.ok)throw Error('HTTP '+res.status);
+    if(Number(res.headers.get('content-length')||0)>5*1024*1024)throw Error('檔案超過 5 MiB');
+    text=await res.text();
+    if(text.length>5*1024*1024)throw Error('檔案超過 5 MiB');
+  }catch(e){status('網址下載失敗：'+e.message+'。請確認原始 CSV 網址、網路或 CORS。',true);return;}
+  try{importMatrix(parseCSV(text),url.hostname);}
+  catch(e){status('Dataset 格式或匯入限制：'+e.message+' 請檢查欄位、列數及檔案內容。',true);}
+});
 $('load-startups').addEventListener('click',async()=>{try{status('載入原始 50 Startups CSV…');const res=await fetch('sample-startups.csv',{cache:'no-store'});if(!res.ok)throw Error('範例檔案不存在');importMatrix(parseCSV(await res.text()),'50 Startups');}catch(e){status(e.message,true);}});
 $('target-select').addEventListener('change',()=>{const target=$('target-select').value;for(const f of fields){if(f.name===target)f.use=false;}renderFields();hideResults();});
 function csvCell(v){let s=String(v??'');if(/^\s*[=+@]/.test(s)||(/^\s*-/.test(s)&&!Number.isFinite(Number(s))))s="'"+s;return /[",\r\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
