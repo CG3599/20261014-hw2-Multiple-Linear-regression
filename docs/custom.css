@@ -90,3 +90,30 @@
 [data-theme="dark"] #model-results tr.selected{background:#254744}
 @media(max-width:1150px){.custom-chart-grid{grid-template-columns:1fr}}
 @media(max-width:760px){.custom-result-heading{align-items:flex-start}.custom-chart-card{padding:14px 10px}.custom-svg{min-width:410px}.custom-diagnostic-heading label{width:100%;justify-content:space-between}.custom-diagnostic-heading select{flex:1;max-width:240px}}
+
+/* The five dedicated feature-selection curves use existing Feature Lab spacing/color tokens. */
+#selector-list span{font-size:12px;color:var(--teal);padding:8px 13px;border:1px solid var(--line);border-radius:7px;font-weight:650;background:var(--bg)}
+.custom-curve-heading{margin-top:26px}
+.custom-curve-heading p{max-width:700px;margin:7px 0 0}
+.custom-curve-heading label{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:10px;white-space:nowrap}
+.custom-curve-heading select{padding:9px 12px;font-size:12px;color:var(--ink);background:var(--panel,#fff);border:1px solid var(--line);border-radius:7px}
+.five-curve-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:14px 0 30px}
+.five-curve-card{padding:17px 17px 14px;border:1px solid var(--line);border-radius:10px;background:var(--panel,#fff);min-width:0;transition:border-color .12s ease}
+.five-curve-card.is-selected{border-color:var(--teal)}
+.five-curve-title{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.five-curve-title span{font-size:9px;letter-spacing:.12em;color:var(--teal);font-weight:700}
+.five-curve-title h4{font-size:17px;letter-spacing:-.035em;margin:4px 0 0}
+.five-curve-title button{background:none;border:0;color:var(--teal);font-size:11px;font-weight:650;cursor:pointer;padding:7px;white-space:nowrap}
+.five-curve-title button:hover{text-decoration:underline}
+.five-curve-plot{margin-top:7px;max-width:100%;overflow-x:auto}
+.feature-curve-svg{width:100%;min-width:320px}
+.feature-curve-svg .feature-curve-line{stroke:var(--teal);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.feature-curve-svg .feature-curve-point{fill:var(--panel,#fff);stroke:var(--teal);stroke-width:2.5;cursor:pointer}
+.feature-curve-svg .feature-curve-point:hover,
+.feature-curve-svg .feature-curve-point:focus{fill:var(--teal);stroke:var(--ink);outline:none}
+.feature-curve-svg .feature-curve-point.is-active{fill:var(--teal);stroke:var(--panel,#fff);stroke-width:3}
+.five-curve-summary{border-top:1px solid var(--line);padding-top:12px;margin:0;font-size:11px;line-height:1.85;color:var(--muted);overflow-wrap:anywhere}
+[data-theme="dark"] .five-curve-card{background:#192831}
+[data-theme="dark"] .custom-curve-heading select{background:#13252e}
+@media(max-width:1100px){.five-curve-grid{grid-template-columns:1fr}}
+@media(max-width:760px){.five-curve-card{padding:14px 12px}.feature-curve-svg{min-width:300px}.custom-curve-heading label{width:100%;justify-content:space-between;white-space:normal}.five-curve-title button{font-size:10px}}
