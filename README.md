@@ -75,6 +75,19 @@
 
 特徵選取只使用訓練資料；圖中 RMSE 與 R² 為 Test 指標。預設顯示 Backward 與 k=2；切換選取不會依測試集成績重新選擇最好的模型。自訂頁仍是受計算上限保護的 JavaScript 實作，與 sklearn 的同名方法不完全等價。
 
+### 三頁統一的六方法比較表
+
+三個頁面都在「特徵數曲線／特徵組合」之後、**CRISP-DM 六階段說明之前**放置「方法比較與選取特徵」表格。表格標題、順序與六欄完全一致：
+
+`Method | 特徵數 | Selected Features | CV RMSE ↓ | Test RMSE ↓ | Test R² ↑`
+
+- **Cars**：六種方法皆使用現有 Python 匯出選定的特徵與 CV RMSE；原始檔只有以訓練 CV 選出的 **Baseline** 儲存 Test RMSE／Test R²，其他五種方法顯示 `—`，絕不以 CV 代填測試分數。CV 標準差仍在選取方法的明細中。
+- **50 Startups**：把原先 CRISP-DM 折疊內的「原始自動選擇方法的比較」移到同一位置；六方法有 CV 與 Test 指標，選取特徵則依同方法、同特徵數、同 Test RMSE 的既有曲線資料對應。
+- **Custom Dataset**：Baseline 使用所有編碼特徵，其餘五方法各從 **k=1–5** 中選訓練 CV RMSE 最小的模型做摘要，**不是**原生 sklearn 自動特徵選擇；不以 Test RMSE／R² 選模型。上方的固定 k 曲線與每方法特徵組合表格仍保留。
+- 選取特徵過多時先顯示前四個，按「展開其餘 N 個特徵」查看完整清單。三頁共用 `docs/method-comparison.js` 與 `docs/pages.css` 的同一套表格渲染與版面。
+
+注意：**三份 Dataset 的目標變數、資料切分與 CV 設定不盡相同**，不同資料集的 RMSE 數值不可直接橫向排名。尚未提供的 Test 分數會標示為 `—`，避免誤導。
+
 ## 原有 Python 範例實驗
 
 ### Cars — Toyota Corolla
@@ -102,6 +115,7 @@ docs/
 ├── custom.html              # 自訂 Dataset UI
 ├── custom.css               # 自訂介面排版
 ├── custom.js                # 匯入 / 預覽 / 設定 / 匯出
+├── method-comparison.js     # 三頁共用六種方法的表格比較
 ├── custom-curves.js         # RMSE 與 R² 特徵數 SVG 曲線（支援五方法疊圖）
 ├── custom-model.js          # 瀏覽器端 OLS 和五方法特徵選擇
 ├── sample-startups.csv      # 可一鍵載入的原始範例
@@ -118,5 +132,7 @@ main5.py                     # Toyota Corolla Python
 GitHub Pages 使用 `main` 分支的 `/docs` 目錄；提交後需等 GitHub Pages 完成部署才能看到更新。
 
 ## 自動化檢查
+
+建議也執行 `node tests/method-comparison.test.cjs`，檢查三頁表格欄位、方法分數、特徵名稱、資料來源與區塊順序。
 
 若本機已安裝 Node.js，可從專案根目錄執行 `node tests/custom-model.test.cjs`，驗證 Baseline、五方法 × k=1–5、RMSE／R² 曲線及五方法疊圖；再執行 `node tests/custom-advisor.test.cjs`，檢查 120 欄上限、ID／高類別數判定、超額 One-Hot 的一鍵建議及 50 Startups 範例。
