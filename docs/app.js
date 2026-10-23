@@ -47,7 +47,11 @@ function render(){
 const tabs=document.querySelector('.tabs');methods.forEach((name,i)=>{const button=document.createElement('button');button.textContent=name;button.dataset.method=name;button.setAttribute('role','tab');button.setAttribute('aria-selected','false');button.addEventListener('click',()=>choose(name,count));button.addEventListener('keydown',event=>{if(['ArrowRight','ArrowLeft','Home','End'].includes(event.key)){event.preventDefault();const next=event.key==='Home'?0:event.key==='End'?4:(i+(event.key==='ArrowRight'?1:4))%5;choose(methods[next],count);tabs.children[next].focus();}});tabs.append(button);});
 $('feature-count').addEventListener('input',event=>{count=Number(event.target.value);render();});$('compare').addEventListener('change',event=>{compare=event.target.checked;render();});
 $('download').addEventListener('click',()=>{const header=['Method','Number of Features','Selected Features','RMSE','R-squared'];const escape=value=>'"'+String(value).replaceAll('"','""')+'"';const csv=[header,...EXPERIMENT.curves.map(r=>[r.method,r.count,'['+r.features.join(', ')+']',r.rmse,r.r2])].map(row=>row.map(escape).join(',')).join('\r\n');const url=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));const link=document.createElement('a');link.href=url;link.download='all_schemes_feature_count_results.csv';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
-$('auto-results').replaceChildren(...EXPERIMENT.automatic.map(row=>{const tr=document.createElement('tr');for(const value of [row.method,row.count,fmt(row.cv_rmse),fmt(row.test_rmse),fmt(row.test_r2,4)]){const td=document.createElement('td');td.textContent=value;tr.append(td);}return tr;}));
+window.FeatureLabMethodComparison.render(
+  $('auto-results'),
+  window.FeatureLabMethodComparison.fromStartups(EXPERIMENT),
+  {onSelect:row=>choose(row.method,Math.max(1,Math.min(5,row.count)))}
+);
 const params=new URLSearchParams(location.search);if(methods.includes(params.get('method')))method=params.get('method');const requested=Number(params.get('k'));if(Number.isInteger(requested)&&requested>=1&&requested<=5)count=requested;compare=params.get('compare')==='1';$('compare').checked=compare;render();
 
 function updateThemeToggle() {
