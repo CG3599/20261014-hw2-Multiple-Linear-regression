@@ -3,7 +3,7 @@
 <meta name="description" content="Feature Lab 自訂 Dataset：CSV、Excel 或網址匯入，設定特徵與 Target，在瀏覽器執行多元線性迴歸及特徵選擇。">
 <title>Custom Dataset · Feature Lab</title>
 <script>(()=>{let t;try{t=localStorage.getItem('feature-lab-theme')}catch{}document.documentElement.dataset.theme=['light','dark'].includes(t)?t:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')})();</script>
-<link rel="stylesheet" href="style.css?v=2"><link rel="stylesheet" href="theme.css?v=2"><link rel="stylesheet" href="pages.css?v=9"><link rel="stylesheet" href="custom.css?v=5">
+<link rel="stylesheet" href="style.css?v=2"><link rel="stylesheet" href="theme.css?v=2"><link rel="stylesheet" href="pages.css?v=9"><link rel="stylesheet" href="custom.css?v=6">
 <script src="pages.js?v=9" defer></script><script src="custom-model.js?v=3" defer></script><script src="custom-curves.js?v=2" defer></script><script src="custom.js?v=5" defer></script>
 </head><body>
 <aside><a class="brand" href="./"><span class="brand-icon">ƒ</span> Feature Lab</a><span class="aside-label">AIoT / DATA ANALYTICS</span>
@@ -57,7 +57,7 @@
   <p class="chart-hint">點選曲線上的圓點或下方表格，可查看該組合的特徵。重疊曲線代表結果相同。</p>
 </section>
 <section class="table-section custom-results-table" id="results">
-  <div class="section-heading"><div><span class="eyebrow">FEATURE COMBINATIONS</span><h2 id="table-title">Backward · 特徵組合與表現</h2></div><span id="table-badge" class="pill">5 combinations</span></div>
+  <div class="section-heading"><div><span class="eyebrow">FEATURE COMBINATIONS</span><h2 id="table-title">Backward · 特徵組合與表現</h2></div><div class="custom-table-actions"><span id="table-badge" class="pill">5 combinations</span><button id="export-results" class="download" type="button">↓ 下載所有方法 CSV</button></div></div>
   <div class="table-scroll"><table><thead><tr><th>Number of Features</th><th>Selected Features</th><th>Test RMSE ↓</th><th>Test R-squared ↑</th></tr></thead><tbody id="result-rows"></tbody></table></div>
   <div id="selection-detail" aria-live="polite"></div>
 </section>
