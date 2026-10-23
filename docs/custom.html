@@ -3,8 +3,8 @@
 <meta name="description" content="Feature Lab 自訂 Dataset：CSV、Excel 或網址匯入，設定特徵與 Target，在瀏覽器執行多元線性迴歸及特徵選擇。">
 <title>Custom Dataset · Feature Lab</title>
 <script>(()=>{let t;try{t=localStorage.getItem('feature-lab-theme')}catch{}document.documentElement.dataset.theme=['light','dark'].includes(t)?t:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')})();</script>
-<link rel="stylesheet" href="style.css?v=2"><link rel="stylesheet" href="theme.css?v=2"><link rel="stylesheet" href="pages.css?v=9"><link rel="stylesheet" href="custom.css?v=6">
-<script src="pages.js?v=9" defer></script><script src="custom-model.js?v=3" defer></script><script src="custom-curves.js?v=2" defer></script><script src="custom.js?v=5" defer></script>
+<link rel="stylesheet" href="style.css?v=2"><link rel="stylesheet" href="theme.css?v=2"><link rel="stylesheet" href="pages.css?v=9"><link rel="stylesheet" href="custom.css?v=7">
+<script src="pages.js?v=9" defer></script><script src="custom-model.js?v=3" defer></script><script src="custom-curves.js?v=2" defer></script><script src="custom-advisor.js?v=1" defer></script><script src="custom.js?v=6" defer></script>
 </head><body>
 <aside><a class="brand" href="./"><span class="brand-icon">ƒ</span> Feature Lab</a><span class="aside-label">AIoT / DATA ANALYTICS</span>
 <div class="side-title">特徵選擇實驗室</div><p>用更少的特徵，<br>理解模型的表現。</p>
@@ -15,8 +15,8 @@
 <section class="custom-panel" aria-labelledby="source-heading">
 <div class="section-heading"><div><span class="eyebrow">01 / IMPORT DATA</span><h2 id="source-heading">匯入 Dataset</h2></div><span class="pill">本機處理 · 不上傳伺服器</span></div>
 <div class="custom-tabs" role="group" aria-label="資料輸入方式"><button type="button" data-source="file" class="active" aria-pressed="true">↑ &nbsp; 上傳檔案</button><button type="button" data-source="url" aria-pressed="false">↗ &nbsp; URL 匯入</button><button type="button" data-source="paste" aria-pressed="false">▣ &nbsp; 貼上資料</button></div>
-<div id="import-file" class="custom-import"><label for="dataset-file" class="dropzone" id="dropzone"><span class="drop-icon">↑</span><strong>選擇或拖曳 Dataset 檔案</strong><small>CSV、TSV、XLSX、XLS · 建議 5 MB 以下</small></label><input id="dataset-file" type="file" accept=".csv,.tsv,.txt,.xlsx,.xls" hidden><p class="custom-note">Excel 解析需要載入 SheetJS 函式庫；第一次使用需有網路連線。</p></div>
-<div id="import-url" class="custom-import" hidden><label for="dataset-url">公開 CSV / TSV 檔案直接網址</label><div class="custom-input-row"><input id="dataset-url" type="url" placeholder="https://raw.githubusercontent.com/.../file.csv"><button id="load-url" class="primary-action" type="button">匯入網址</button></div><p class="custom-note">網址必須允許瀏覽器跨來源讀取（CORS）；Kaggle 頁面網址不是直接資料下載網址。</p></div>
+<div id="import-file" class="custom-import"><label for="dataset-file" class="dropzone" id="dropzone"><span class="drop-icon">↑</span><strong>選擇或拖曳 Dataset 檔案</strong><small>CSV、TSV、XLSX、XLS · 最多 120 欄 / 5 MiB</small></label><input id="dataset-file" type="file" accept=".csv,.tsv,.txt,.xlsx,.xls" hidden><p class="custom-note">Excel 解析需要載入 SheetJS 函式庫；第一次使用需有網路連線。</p></div>
+<div id="import-url" class="custom-import" hidden><label for="dataset-url">公開 CSV / TSV 檔案直接網址</label><div class="custom-input-row"><input id="dataset-url" type="url" placeholder="https://raw.githubusercontent.com/.../file.csv"><button id="load-url" class="primary-action" type="button">匯入網址</button></div><p class="custom-note">網址必須允許瀏覽器跨來源讀取（CORS）；Kaggle 頁面網址不是直接資料下載網址。原始欄位最多 120 欄。</p></div>
 <div id="import-paste" class="custom-import" hidden><label for="dataset-paste">貼上 CSV 或從 Excel 複製的表格（第一列為欄名）</label><textarea id="dataset-paste" rows="6" placeholder="age,km,price&#10;24,42000,16000&#10;60,100000,9400"></textarea><button id="load-paste" class="primary-action" type="button">解析貼上的資料</button></div>
 <div class="example-links"><span>保留的範例：</span><a href="./">Cars · 汽車售價 ↗</a><a href="startups.html">50 Startups · 創業獲利 ↗</a><button id="load-startups" type="button">載入 50 Startups 原始 CSV</button></div>
 <div id="upload-status" class="custom-status" role="status" aria-live="polite">尚未匯入資料。</div>
@@ -30,6 +30,16 @@
 <section class="custom-panel" id="config" hidden>
 <div class="section-heading"><div><span class="eyebrow">03 / PREPARATION + MODELING</span><h2>選擇 Target 與 Features</h2></div><span class="pill">Training only preprocessing</span></div>
 <div class="custom-config-grid"><label>預測目標（Target）<select id="target-select"></select></label><label>訓練資料比例<select id="train-split"><option value="0.7">70% 訓練 / 30% 測試</option><option value="0.8" selected>80% 訓練 / 20% 測試</option><option value="0.9">90% 訓練 / 10% 測試</option></select></label><label>隨機種子<input id="random-seed" type="number" min="0" max="999999" value="42"></label></div>
+<section id="setup-advisor" class="setup-advisor" aria-labelledby="setup-advisor-title">
+  <div class="setup-advisor-head">
+    <div><span class="eyebrow">SMART DATASET CHECK / SETUP SUGGESTIONS</span><h3 id="setup-advisor-title">建議分析設定</h3><p>依照目前 Dataset、Target 與 One-Hot 編碼需求，提供可以實際執行的欄位建議。</p></div>
+    <button id="apply-advisor" class="primary-action" type="button" disabled>套用建議排除欄位 ↗</button>
+  </div>
+  <div class="setup-advisor-stats" id="advisor-summary" aria-live="polite"></div>
+  <div id="advisor-warnings" class="setup-advisor-warnings" role="status"></div>
+  <div id="advisor-list" class="setup-advisor-list"></div>
+  <p class="setup-advisor-note" id="advisor-status">建議只根據欄位名稱、缺失與類別數、運算上限推估，並非使用測試集尋找最佳分數；套用前可自行檢查。</p>
+</section>
 <div class="custom-columns-header"><h3>輸入欄位</h3><p>取消勾選 ID、序號、無意義字串等欄位；點選欄位型態可改為數值或類別。</p></div>
 <div id="feature-fields" class="feature-fields"></div>
 <div class="custom-columns-header"><h3>固定五種特徵選擇方法</h3><p>與 Cars、50 Startups 一致：一次計算每種方法的 k = 1–5，依實際編碼特徵數調整。</p></div>
