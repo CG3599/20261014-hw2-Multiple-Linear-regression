@@ -83,3 +83,27 @@
 .custom-table-actions{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:10px}
 .custom-table-actions .download{font-size:12px;padding:10px 14px}
 @media(max-width:760px){.custom-table-actions{justify-content:flex-start}.custom-table-actions .download{margin-top:0}}
+
+/* Dataset-aware, actionable suggestions — consistent with Feature Lab's understated teal. */
+.setup-advisor{margin:27px 0 4px;padding:22px 22px 18px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+.setup-advisor-head{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.setup-advisor-head h3{font-size:18px;margin:6px 0 4px;letter-spacing:-.025em;color:var(--ink)}
+.setup-advisor-head p{font-size:12px;line-height:1.7;color:var(--muted);margin:0}
+.setup-advisor-head .primary-action{font-size:12px;padding:11px 14px}
+.setup-advisor-stats{display:flex;flex-wrap:wrap;gap:10px 26px;margin:20px 0 14px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.setup-advisor-stat{display:flex;flex-direction:column;gap:6px}
+.setup-advisor-stat small{font-size:10px;color:var(--muted)}
+.setup-advisor-stat strong{font-size:14px;color:var(--ink);font-variant-numeric:tabular-nums}
+.setup-advisor-stat strong.teal{color:var(--teal)}
+.setup-advisor-warnings:empty{display:none}
+.setup-advisor-warnings{margin:8px 0 13px;color:#b56e3b;font-size:12px;line-height:1.8}
+.setup-advisor-warnings p{margin:4px 0}
+.setup-advisor-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 22px}
+.setup-advisor-item{padding:11px 0;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;gap:11px}
+.setup-advisor-item .advisor-mark{font-size:10px;color:var(--teal);font-weight:700;white-space:nowrap;margin-top:2px}
+.setup-advisor-item strong{display:block;color:var(--ink);font-size:12px;overflow-wrap:anywhere}
+.setup-advisor-item p{font-size:11px;line-height:1.75;color:var(--muted);margin:4px 0 0}
+.setup-advisor-empty{font-size:12px;color:var(--teal);margin:10px 0}
+.setup-advisor-note{font-size:11px;line-height:1.8;color:var(--muted);margin:16px 0 0}
+[data-theme="dark"] .setup-advisor{background:#14262d}
+@media(max-width:760px){.setup-advisor{padding:17px 14px}.setup-advisor-list{grid-template-columns:1fr}.setup-advisor-head .primary-action{width:100%}}
