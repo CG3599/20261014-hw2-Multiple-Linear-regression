@@ -25,7 +25,7 @@ window.FeatureLabMethodComparison=(()=>{
     }
     return td;
   }
-  function render(tbody,rows,{selected=null,onSelect=null}={}){
+  function render(tbody,rows,{selected=null,onSelect=null,allowBaseline=false}={}){
     tbody.replaceChildren();
     for(const row of rows){
       const tr=document.createElement('tr');tr.dataset.method=row.method;
@@ -38,7 +38,7 @@ window.FeatureLabMethodComparison=(()=>{
       add(numeric(row.testRmse));
       add(numeric(row.testR2,4));
       if(row.testRmse==null){tr.children[4].title='該方法未保存獨立測試集的評估結果';tr.children[5].title='該方法未保存獨立測試集的評估結果';}
-      if(typeof onSelect==='function'&&row.method!=='Baseline'){
+      if(typeof onSelect==='function'&&(row.method!=='Baseline'||allowBaseline)){
         tr.tabIndex=0;tr.setAttribute('aria-label',row.method+' · '+row.count+' 個特徵');
         tr.classList.add('method-row-action');
         const choose=()=>onSelect(row);
