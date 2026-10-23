@@ -3,8 +3,14 @@
  * ranking or held-out test scoring is used to recommend exclusions. */
 window.FeatureLabAdvisor=(()=>{
   const missing=v=>v==null||['','na','null','n/a'].includes(String(v).trim().toLowerCase());
-  const idColumn=name=>/^(?:id|index|index_\d+|unnamed:?\s*\d*|serial(?:number)?|row_?id|record_?id|.*[_-]id|.*id|.*identifier|(?:car|employee|customer|patient|order|transaction|record|invoice|product)[_-]?(?:number|no))$/i.test(String(name).replace(/\s+/g,''));
-  const emptyStats=()=>({unique:0,missingRate:1,type:'numeric'});
+  const idColumn=name=>{
+    const label=String(name).trim();
+    return /^(?:id|index(?:_\\d+)?|unnamed:?\\s*\\d*|serial(?:number)?|row[_\\s-]?id|record[_\\s-]?id)$/i.test(label)
+      || /(?:[_\\s-]id)$/i.test(label)
+      || /^[A-Za-z][A-Za-z0-9]*ID$/.test(label)
+      || /identifier$/i.test(label)
+      || /^(?:car|employee|customer|patient|order|transaction|record|invoice|product)[_\\s-]?(?:number|no)$/i.test(label);
+  };
   function stats(headers,rows,fields){
     return fields.map(f=>{
       const index=headers.indexOf(f.name),values=rows.map(row=>row[index]);
@@ -23,7 +29,6 @@ window.FeatureLabAdvisor=(()=>{
     const info=stats(headers,rows,fields);
     const targetIndex=headers.indexOf(target);
     const numericTargets=rows.map(row=>row[targetIndex]).filter(v=>!missing(v)&&Number.isFinite(Number(String(v).replace(/,/g,'')))).length;
-    const targetRate=rows.length?numericTargets/rows.length:0;
     const reasons=[],blocked=new Set();
     function suggest(item,description){
       if(blocked.has(item.name))return;
