@@ -1,7 +1,7 @@
 'use strict';
 (() => {
 const $ = id => document.getElementById(id);
-let dataset=null,fields=[],results=[],analysisOutput=null,selectedMethod='EFS';
+let dataset=null,fields=[],results=[],analysisOutput=null,selectedMethod='Backward',selectedK=2,compare=false;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const missing=s=>s==null||String(s).trim()===''||['na','null','n/a'].includes(String(s).trim().toLowerCase());
 function status(message,error=false,where='upload-status'){const el=$(where);el.textContent=message;el.classList.toggle('error',error);}
@@ -17,55 +17,158 @@ $('feature-guidance').textContent='原始輸入特徵 '+chosen.length+' 個：'+
 }
 function renderFields(){if(!dataset)return;const target=$('target-select').value;const container=$('feature-fields');container.textContent='';
 for(const f of fields){const div=document.createElement('label');div.className='feature-field';const checkbox=document.createElement('input');checkbox.type='checkbox';checkbox.checked=f.use&&f.name!==target;checkbox.disabled=f.name===target;checkbox.addEventListener('change',()=>{f.use=checkbox.checked;estimate();hideResults();});const info=document.createElement('span');const bold=document.createElement('strong');bold.textContent=f.name;const small=document.createElement('small');small.textContent=f.name===target?'Target（不列入 Features）':f.type==='numeric'?'Numerical':'Categorical';info.append(bold,small);const sel=document.createElement('select');for(const [name,label] of [['numeric','數值'],['category','類別']]){const opt=document.createElement('option');opt.value=name;opt.textContent=label;sel.add(opt);}sel.value=f.type;sel.disabled=f.name===target;sel.addEventListener('change',()=>{f.type=sel.value;small.textContent=f.type==='numeric'?'Numerical':'Categorical';estimate();hideResults();});div.append(checkbox,info,sel);container.append(div);}estimate();}
-function hideResults(){
-  $('analysis-results').hidden=true;
-  results=[];analysisOutput=null;
+const methodNotes={
+  EFS:'從訓練資料預選最多 8 個候選特徵，在每個 k 值窮舉組合，依訓練三折 CV RMSE 選取。',
+  RFECV:'固定 k 的 RFE 消除路徑：逐次移除 OLS 係數絕對值較低的特徵。此曲線不等於 RFECV 自動選取 k。',
+  LassoCV:'以 JavaScript 簡化版 L1 正則化比較係數，依排名選取 k 個特徵，再以線性迴歸重新擬合；非 sklearn 原生 LassoCV。',
+  Backward:'逐步移除 OLS 係數絕對值較小的特徵直到剩下指定數量；此瀏覽器版本不使用 p-value 或 0.05 停止條件。',
+  SFS:'從空集合開始，在最多 12 個預選候選中，每次依訓練三折 CV RMSE 加入下一個特徵。'
+};
+const fmt=(v,n=2)=>Number.isFinite(v)?v.toLocaleString('en-US',{minimumFractionDigits:n,maximumFractionDigits:n}):'N/A';
+function hideResults(){$('analysis-results').hidden=true;analysisOutput=null;results=[];}
+function currentRow(){
+  return analysisOutput?.curves.find(row=>row.method===selectedMethod&&row.count===selectedK);
 }
-function activeRow(method,k){
-  if(!analysisOutput)return null;
-  return method==='Baseline'?analysisOutput.baseline:
-    analysisOutput.curves.find(row=>row.method===method&&row.count===k);
-}
-function setView(k,method){
+function changeView(method,k){
   if(!analysisOutput)return;
-  const maxK=analysisOutput.maxK;
-  const count=Math.min(maxK,Math.max(1,Number(k)||1));
-  $('feature-k').value=String(count);
-  selectedMethod=method||selectedMethod;
-  const available=['Baseline',...window.FeatureLabCurves.methods];
-  if(!available.includes(selectedMethod))selectedMethod='EFS';
-  results=[analysisOutput.baseline,...analysisOutput.curves.filter(row=>row.count===count)];
-  const select=$('diagnostic-method');
-  if(![...select.options].some(option=>option.value===selectedMethod))selectedMethod='EFS';
-  select.value=selectedMethod;
-  window.FeatureLabCharts.renderScores(results);
-  window.FeatureLabCurves.render(analysisOutput.curves,count,$('curve-metric').value,selectedMethod);
-  const diagnostic=activeRow(selectedMethod,count)||analysisOutput.baseline;
-  window.FeatureLabCharts.renderDiagnostics(diagnostic);
-  for(const tr of $('model-results').querySelectorAll('tr[data-method]')){
-    const active=tr.dataset.method===selectedMethod&&(selectedMethod==='Baseline'||Number(tr.dataset.k)===count);
-    tr.classList.toggle('selected',active);
-    tr.setAttribute('aria-selected',String(active));
-  }
+  const methods=window.FeatureLabCurves.methods;
+  if(methods.includes(method))selectedMethod=method;
+  selectedK=Math.max(1,Math.min(analysisOutput.maxK,Number(k)||1));
+  renderView();
 }
-function selectDiagnostic(method){setView($('feature-k').value,method);}
-function renderMethodTable(){
-  const tbody=$('model-results');tbody.textContent='';
-  const all=[analysisOutput.baseline,...analysisOutput.curves];
-  for(const r of all){
-    const tr=document.createElement('tr');
-    tr.dataset.method=r.method;
-    tr.dataset.k=String(r.count);
-    tr.tabIndex=0;tr.setAttribute('role','button');
-    tr.setAttribute('aria-label','查看 '+r.method+' 在 '+r.count+' 個特徵時的診斷圖');
-    for(const v of [r.method,r.count,Number.isFinite(r.cvRmse)?r.cvRmse.toFixed(3):'—',r.testRmse.toFixed(3),r.r2===null?'N/A':r.r2.toFixed(4),r.features.join('、')]){
-      const td=document.createElement('td');td.textContent=String(v);tr.append(td);
-    }
-    const choose=()=>setView(r.method==='Baseline'?$('feature-k').value:r.count,r.method);
-    tr.addEventListener('click',choose);
-    tr.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();choose();}});
-    tbody.append(tr);
+function renderView(){
+  if(!analysisOutput)return;
+  const row=currentRow();
+  $('feature-count').value=String(selectedK);
+  $('count-label').textContent=selectedK+' / '+analysisOutput.maxK;
+  $('compare').checked=compare;
+  $('method-note').textContent=methodNotes[selectedMethod];
+  $('table-title').textContent=selectedMethod+' · 特徵組合與表現';
+  $('table-badge').textContent=analysisOutput.maxK+' combinations';
+  const tabs=$('method-tabs');
+  for(const button of tabs.querySelectorAll('[role="tab"]')){
+    const active=button.dataset.method===selectedMethod;
+    button.setAttribute('aria-selected',String(active));button.tabIndex=active?0:-1;
   }
+  const activeMethods=compare?window.FeatureLabCurves.methods:[selectedMethod];
+  const legend=$('legend');legend.replaceChildren();
+  for(const name of activeMethods){
+    const node=document.createElement('span'),swatch=document.createElement('i');
+    swatch.style.background=window.FeatureLabCurves.color(name,document.documentElement.dataset.theme==='dark');
+    node.append(swatch,document.createTextNode(name));legend.append(node);
+  }
+  window.FeatureLabCurves.render(analysisOutput.curves,selectedMethod,selectedK,compare,analysisOutput.maxK);
+  const table=$('result-rows');table.replaceChildren();
+  for(const result of analysisOutput.curves.filter(r=>r.method===selectedMethod)){
+    const tr=document.createElement('tr');
+    tr.tabIndex=0;tr.classList.toggle('selected',result.count===selectedK);
+    tr.setAttribute('aria-selected',String(result.count===selectedK));
+    tr.setAttribute('aria-label',selectedMethod+'，'+result.count+' 個特徵');
+    const count=document.createElement('td');count.textContent=String(result.count).padStart(2,'0');
+    const feature=document.createElement('td');
+    for(const name of result.features){const tag=document.createElement('span');tag.className='feature-tag';tag.textContent=name;feature.append(tag);}
+    const rmse=document.createElement('td');rmse.textContent=fmt(result.testRmse,4);
+    const r2=document.createElement('td');r2.textContent=fmt(result.r2,4);
+    tr.append(count,feature,rmse,r2);
+    tr.addEventListener('click',()=>changeView(selectedMethod,result.count));
+    tr.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();changeView(selectedMethod,result.count);}});
+    table.append(tr);
+  }
+  $('selection-detail').textContent=row
+    ?'目前查看：'+selectedMethod+' / '+selectedK+' 個特徵 / '+row.features.join(' + '):'';
+  const evalExample=$('crisp-evaluation-example');
+  if(evalExample&&row) evalExample.textContent=selectedMethod+' k='+selectedK+' 的 Test RMSE = '+fmt(row.testRmse,2)+'，Test R² = '+fmt(row.r2,4)+'；這是目前切分的結果，不代表所有 Dataset 或其他切分都相同。';
+}
+function initTabs(){
+  const tabs=$('method-tabs');
+  tabs.replaceChildren();
+  const names=window.FeatureLabCurves.methods;
+  names.forEach((name,i)=>{
+    const button=document.createElement('button');button.type='button';button.textContent=name;
+    button.dataset.method=name;button.setAttribute('role','tab');button.setAttribute('aria-selected','false');
+    button.addEventListener('click',()=>changeView(name,selectedK));
+    button.addEventListener('keydown',event=>{
+      if(!['ArrowRight','ArrowLeft','Home','End'].includes(event.key))return;
+      event.preventDefault();
+      const ix=event.key==='Home'?0:event.key==='End'?names.length-1:(i+(event.key==='ArrowRight'?1:names.length-1))%names.length;
+      changeView(names[ix],selectedK);tabs.children[ix].focus();
+    });
+    tabs.append(button);
+  });
+}
+function initCount(){
+  const max=analysisOutput.maxK,input=$('feature-count'),labels=$('range-labels');
+  input.max=String(max);input.value=String(Math.min(selectedK,max));
+  labels.replaceChildren();
+  for(let n=1;n<=max;n++){const label=document.createElement('span');label.textContent=n;labels.append(label);}
+}
+function renderMethodology(){
+  const root=$('crisp-timeline');root.replaceChildren();
+  const out=analysisOutput,d=out.data,target=$('target-select').value;
+  const inputs=fields.filter(field=>field.use&&field.name!==target);
+  const exampleNames=inputs.slice(0,3).map(f=>f.name);
+  const numeric=inputs.filter(f=>f.type==='numeric').map(f=>f.name);
+  const categorical=inputs.filter(f=>f.type==='category').map(f=>f.name);
+  const ds=$('data-source').textContent||'Dataset';
+  const efs=out.curves.find(row=>row.method==='EFS'&&row.count===1);
+  const methodDetails=[
+    ['EFS · Exhaustive Feature Selection','在最多 8 個候選特徵內，對每個 k 窮舉組合，以訓練 CV RMSE 比較。'],
+    ['RFECV · RFE 固定數量路徑','逐步依 OLS 係數絕對值移除特徵，輸出固定 k 的 RFE 路徑；非自動 RFECV。'],
+    ['LassoCV · L1 Regularization','使用簡化的 L1 正則化與參數比較選取係數較重要的 k 個特徵，再以 OLS 重訓。'],
+    ['Backward · Backward Elimination','每輪移除絕對係數最小的欄位，直到 k 個；此版本不是 p-value 刪除法。'],
+    ['SFS · Sequential Forward Selection','在最多 12 個候選中從空集合逐步加欄位，依訓練 CV RMSE 決定下一個。']
+  ];
+  const stage=[
+    {english:'Business Understanding',title:'定義問題',
+      desc:'這次實驗以「'+target+'」作為連續數值預測目標，利用 '+inputs.length+' 個原始輸入欄位建立多元線性迴歸，觀察減少特徵後的預測效果。',
+      label:'研究問題',example:exampleNames.length?'只使用 '+exampleNames[0]+'，或再加入 '+(exampleNames[1]||'其他欄位')+'，能否改善 '+target+' 的預測？':'如何從選取的欄位預測 '+target+'？'},
+    {english:'Data Understanding',title:'認識資料',
+      desc:'匯入 '+ds+'，共有 '+dataset.rows.length+' 筆資料、'+dataset.headers.length+' 個欄位；目標為 '+target+'，本次選取 '+inputs.length+' 個原始 Features。',
+      label:'欄位示例',example:'輸入欄位：'+(exampleNames.join('、')||'無')+'；數值欄 '+numeric.length+' 個，類別欄 '+categorical.length+' 個。'},
+    {english:'Data Preparation',title:'處理缺值與類別',
+      desc:'先剔除 Target 缺漏／無效的資料列；使用固定 random_state='+$('random-seed').value+' 切成 '+d.train+' 筆訓練、'+d.test+' 筆測試。數值缺值以訓練平均值補齊並標準化；類別缺值以眾數補齊，One-Hot 編碼後移除第一個類別。',
+      label:'實際轉換',example:'從 '+d.raw+' 個原始 Features 轉為 '+d.encoded+' 個編碼後 Features。'+(categorical.length?'類別欄位 '+categorical.slice(0,2).join('、')+' 轉為指示變數。':'本次沒有選用類別欄位。')},
+    {english:'Modeling',title:'訓練與特徵選擇',
+      desc:'以 OLS 線性迴歸作為 Baseline；分別比較 EFS、RFECV（固定 k 的 RFE）、LassoCV（簡化 L1）、Backward、SFS，在 k=1–'+out.maxK+' 個特徵下的預測表現。所有特徵選取只使用訓練資料。',
+      label:'實際操作',example:efs?'EFS k=1 依本次訓練資料選出 '+efs.features.join('、')+'；其他方法及數量可在上方曲線與表格切換。':'本次特徵選擇詳見上方曲線。',
+      methods:methodDetails},
+    {english:'Evaluation',title:'以共同測試集比較',
+      desc:'在訓練資料上計算三折 CV RMSE，特徵選擇不看測試集；所有 '+out.curves.length+' 組方法使用同一份保留測試集評估 Test RMSE 與 Test R²。RMSE 越低越好；R² 越高越好。',
+      label:'讀圖方式',example:'',exampleId:'crisp-evaluation-example'},
+    {english:'Deployment',title:'發佈可互動報告',
+      desc:'這個 Custom Dataset 在使用者瀏覽器中執行 JavaScript 分析，產生五方法曲線、特徵組合表格，並將 '+out.curves.length+' 組加上 Baseline 的結果匯出 CSV。',
+      label:'使用方式',example:'按方法分頁、拖動 k 滑桿或勾選「同時比較五種方法」檢視 '+target+' 的模型結果；切換視圖不會重新訓練。'}
+  ];
+  stage.forEach((item,i)=>{
+    const article=document.createElement('article');article.className='crisp-stage';
+    const number=document.createElement('div');number.className='crisp-step';
+    const no=document.createElement('span');no.textContent=String(i+1).padStart(2,'0');number.append(no);
+    const body=document.createElement('div');body.className='crisp-body';
+    const en=document.createElement('span');en.className='crisp-en';en.textContent=item.english;
+    const h=document.createElement('h3');h.textContent=item.title;
+    const p=document.createElement('p');p.textContent=item.desc;
+    const ex=document.createElement('div');ex.className='crisp-example';
+    const label=document.createElement('span');label.textContent=item.label;
+    const explanation=document.createElement('p');explanation.textContent=item.example;
+    if(item.exampleId)explanation.id=item.exampleId;
+    ex.append(label,explanation);body.append(en,h,p,ex);
+    if(item.methods){
+      const details=document.createElement('div');details.className='crisp-methods';
+      const header=document.createElement('div');header.className='crisp-methods-head';
+      const eyebrow=document.createElement('span');eyebrow.textContent='MODEL SELECTION / 05 SCHEMES';
+      const sub=document.createElement('h4');sub.textContent='五種特徵選擇，實際怎麼做？';
+      header.append(eyebrow,sub);details.append(header);
+      item.methods.forEach(([name,desc],j)=>{
+        const line=document.createElement('div');line.className='crisp-method-row';
+        const index=document.createElement('span');index.className='crisp-method-index';index.textContent=String(j+1).padStart(2,'0');
+        const title=document.createElement('strong');title.textContent=name;
+        const explanation=document.createElement('p');explanation.textContent=desc;
+        line.append(index,title,explanation);details.append(line);
+      });
+      body.append(details);
+    }
+    article.append(number,body);root.append(article);
+  });
 }
 function importMatrix(matrix,name){const value=normalize(matrix);if(value.rows.length<2)throw Error('資料列數不足。');dataset=value;const {headers,rows}=value;$('preview').hidden=false;$('config').hidden=false;hideResults();
 let target=headers.find(v=>/^(price|profit|saleprice|target|y|charges)$/i.test(v.trim()))||headers[headers.length-1];const targets=dataset.rows.map(r=>r[headers.indexOf(target)]).filter(v=>!missing(v));if(targets.filter(v=>Number.isFinite(Number(v))).length<targets.length*.8){const numeric=headers.filter((h,i)=>infer(rows.map(row=>row[i]))==='numeric');target=numeric[numeric.length-1]||target;}
@@ -86,37 +189,55 @@ $('load-startups').addEventListener('click',async()=>{try{status('載入原始 5
 $('target-select').addEventListener('change',()=>{const target=$('target-select').value;for(const f of fields){if(f.name===target)f.use=false;}renderFields();hideResults();});
 function csvCell(v){let s=String(v??'');if(/^\s*[=+@]/.test(s)||(/^\s*-/.test(s)&&!Number.isFinite(Number(s))))s="'"+s;return /[",\r\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
 function download(text,filename){const url=URL.createObjectURL(new Blob(['\uFEFF',text],{type:'text/csv;charset=utf-8;'}));const a=document.createElement('a');a.href=url;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),1500);}
-$('run-analysis').addEventListener('click',async()=>{const btn=$('run-analysis');try{hideResults();if(!dataset)throw Error('請先匯入 Dataset。');const methods=['EFS','RFECV','LassoCV','Backward','SFS'];const seed=Number($('random-seed').value);if(!Number.isInteger(seed)||seed<0||seed>999999)throw Error('隨機種子請填入 0–999999 的整數。');const input={...dataset,target:$('target-select').value,fields,split:Number($('train-split').value),seed,methods,k:Number($('feature-k').value)};btn.disabled=true;status('正在執行多元線性迴歸、交叉驗證與特徵選擇…',false,'analysis-status');await new Promise(resolve=>setTimeout(resolve,70));
-if(!window.FeatureLabModel||!window.FeatureLabCharts||!window.FeatureLabCurves)throw Error('分析或圖表程式未載入，請重新整理。');const output=window.FeatureLabModel.analyze(input);analysisOutput=output;results=output.results;
-const summary=$('model-summary');summary.textContent='';for(const [label,value] of [['有效筆數',output.data.valid],['訓練 / 測試',output.data.train+' / '+output.data.test],['原始 Features',output.data.raw],['編碼後 Features',output.data.encoded]]){const node=document.createElement('div'),s=document.createElement('span'),v=document.createElement('strong');s.textContent=label;v.textContent=value;node.append(s,v);summary.append(node);}
-renderMethodTable();
-const diagnostic=$('diagnostic-method');diagnostic.textContent='';
-for(const method of ['Baseline',...window.FeatureLabCurves.methods]){
-  const opt=document.createElement('option');opt.value=method;opt.textContent=method;diagnostic.append(opt);
+$('run-analysis').addEventListener('click',async()=>{
+  const btn=$('run-analysis');
+  try{
+    hideResults();
+    if(!dataset)throw Error('請先匯入 Dataset。');
+    const seed=Number($('random-seed').value);
+    if(!Number.isInteger(seed)||seed<0||seed>999999)throw Error('隨機種子請填入 0–999999 的整數。');
+    const payload={...dataset,target:$('target-select').value,fields,split:Number($('train-split').value),
+      seed,methods:['EFS','RFECV','LassoCV','Backward','SFS'],k:2};
+    btn.disabled=true;
+    status('正在計算五種方法 × 1–5 個特徵及 RMSE / R² 曲線…',false,'analysis-status');
+    await new Promise(resolve=>setTimeout(resolve,70));
+    if(!window.FeatureLabModel||!window.FeatureLabCurves)throw Error('迴歸或繪圖程式未載入，請重新整理。');
+    const out=window.FeatureLabModel.analyze(payload);
+    analysisOutput=out;results=out.curves;selectedK=Math.min(2,out.maxK);selectedMethod='Backward';compare=false;
+    $('model-summary').textContent=out.data.valid+' 筆有效資料 / '+out.data.train+' 訓練 / '+out.data.test+
+       ' 測試 · '+out.data.raw+' 個原始特徵 / '+out.data.encoded+' 個編碼後特徵';
+    initTabs();initCount();renderMethodology();renderView();
+    $('analysis-results').hidden=false;
+    status('分析完成：'+out.curves.length+' 組固定特徵數結果及 Baseline。',false,'analysis-status');
+    $('analysis-results').scrollIntoView({behavior:'smooth',block:'start'});
+  }catch(e){status('分析失敗：'+e.message,true,'analysis-status');}finally{btn.disabled=false;}
+});
+$('feature-count').addEventListener('input',e=>changeView(selectedMethod,Number(e.target.value)));
+$('compare').addEventListener('change',e=>{compare=e.target.checked;renderView();});
+for(const graphId of ['rmse-chart','r2-chart']){
+  const graph=$(graphId);
+  graph.addEventListener('click',e=>{
+    const point=e.target.closest('circle.chart-point');
+    if(point)changeView(point.dataset.method,Number(point.dataset.k));
+  });
+  graph.addEventListener('keydown',e=>{
+    if(e.key!=='Enter'&&e.key!==' ')return;
+    const point=e.target.closest('circle.chart-point');
+    if(point){e.preventDefault();changeView(point.dataset.method,Number(point.dataset.k));}
+  });
 }
-// Choose the default method by training-CV RMSE, never by held-out test scores.
-const selected=results.filter(row=>Number.isFinite(row.cvRmse)).sort((a,b)=>a.cvRmse-b.cvRmse)[0]||results[0];
-setView(output.selectedK,selected.method);
-$('analysis-results').hidden=false;status('分析完成：五種方法 × '+output.maxK+' 個特徵數 = '+output.curves.length+' 組曲線結果，加上 Baseline。',false,'analysis-status');$('analysis-results').scrollIntoView({behavior:'smooth',block:'start'});
-}catch(e){status('分析失敗：'+e.message,true,'analysis-status');}finally{btn.disabled=false;}});
-$('diagnostic-method').addEventListener('change',e=>selectDiagnostic(e.target.value));
-$('curve-metric').addEventListener('change',()=>{if(analysisOutput)setView($('feature-k').value,selectedMethod);});
-$('feature-k').addEventListener('change',e=>{if(analysisOutput)setView(e.target.value,selectedMethod);});
-$('five-curve-grid').addEventListener('click',event=>{
-  const point=event.target.closest('[data-k][data-method]');
-  if(point){setView(point.dataset.k,point.dataset.method);return;}
-  const btn=event.target.closest('[data-choose-method]');
-  if(btn)setView($('feature-k').value,btn.dataset.chooseMethod);
-});
-$('five-curve-grid').addEventListener('keydown',event=>{
-  if(event.key!=='Enter'&&event.key!==' ')return;
-  const point=event.target.closest('[data-k][data-method]');
-  if(point){event.preventDefault();setView(point.dataset.k,point.dataset.method);}
-});
-for(const el of document.querySelectorAll('#config input:not([type="checkbox"]),#config select:not(#feature-k)')){
+for(const el of document.querySelectorAll('#config input:not([type="checkbox"]),#config select')){
   el.addEventListener('change',hideResults);
 }
-$('export-results').addEventListener('click',()=>{if(!analysisOutput)return;const cols=['Method','Features','CV RMSE','Test RMSE','Test R2','Selected Features'],lines=[cols.map(csvCell).join(',')];for(const r of [analysisOutput.baseline,...analysisOutput.curves])lines.push([r.method,r.count,r.cvRmse,r.testRmse,r.r2??'',r.features.join(' | ')].map(csvCell).join(','));download(lines.join('\r\n'),'feature_lab_all_methods_k1_to_k5.csv');});
+$('export-results').addEventListener('click',()=>{
+  if(!analysisOutput)return;
+  const cols=['Method','Number of Features','Selected Features','Train CV RMSE','Test RMSE','Test R-squared'];
+  const lines=[cols.map(csvCell).join(',')];
+  for(const r of [analysisOutput.baseline,...analysisOutput.curves])
+    lines.push([r.method,r.count,r.features.join(' | '),r.cvRmse,r.testRmse,r.r2??''].map(csvCell).join(','));
+  download(lines.join('\r\n'),'feature_lab_all_five_schemes.csv');
+});
+
 const toggle=$('theme-toggle');function drawTheme(){const dark=document.documentElement.dataset.theme==='dark';toggle.textContent=dark?'☀ 淺色模式':'☾ 黑暗模式';toggle.setAttribute('aria-pressed',String(dark));}
 toggle.addEventListener('click',()=>{const next=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=next;try{localStorage.setItem('feature-lab-theme',next);}catch{}drawTheme();});drawTheme();
 })();
