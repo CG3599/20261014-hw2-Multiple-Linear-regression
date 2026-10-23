@@ -3,12 +3,12 @@
 <meta name="description" content="Feature Lab 自訂 Dataset：CSV、Excel 或網址匯入，設定特徵與 Target，在瀏覽器執行多元線性迴歸及特徵選擇。">
 <title>Custom Dataset · Feature Lab</title>
 <script>(()=>{let t;try{t=localStorage.getItem('feature-lab-theme')}catch{}document.documentElement.dataset.theme=['light','dark'].includes(t)?t:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')})();</script>
-<link rel="stylesheet" href="style.css?v=2"><link rel="stylesheet" href="theme.css?v=2"><link rel="stylesheet" href="pages.css?v=9"><link rel="stylesheet" href="custom.css?v=3">
-<script src="pages.js?v=9" defer></script><script src="custom-model.js?v=2" defer></script><script src="custom-charts.js?v=1" defer></script><script src="custom.js?v=3" defer></script>
+<link rel="stylesheet" href="style.css?v=2"><link rel="stylesheet" href="theme.css?v=2"><link rel="stylesheet" href="pages.css?v=9"><link rel="stylesheet" href="custom.css?v=4">
+<script src="pages.js?v=9" defer></script><script src="custom-model.js?v=3" defer></script><script src="custom-charts.js?v=2" defer></script><script src="custom-curves.js?v=1" defer></script><script src="custom.js?v=4" defer></script>
 </head><body>
 <aside><a class="brand" href="./"><span class="brand-icon">ƒ</span> Feature Lab</a><span class="aside-label">AIoT / DATA ANALYTICS</span>
 <div class="side-title">特徵選擇實驗室</div><p>用更少的特徵，<br>理解模型的表現。</p>
-<nav aria-label="頁面導覽"><a class="active" href="#import">◈ &nbsp; 匯入 Dataset</a><a href="#preview">▦ &nbsp; 資料預覽</a><a href="#config">◎ &nbsp; 模型設定</a><a href="#analysis-results">↗ &nbsp; 分析結果</a></nav>
+<nav aria-label="頁面導覽"><a class="active" href="#import">◈ &nbsp; 匯入 Dataset</a><a href="#preview">▦ &nbsp; 資料預覽</a><a href="#config">◎ &nbsp; 模型設定</a><a href="#feature-curves">↗ &nbsp; 特徵數曲線</a><a href="#analysis-results">▤ &nbsp; 分析結果</a></nav>
 <div class="side-foot"><span class="status-dot"></span> Custom Dataset<br><small>In-browser regression<br>EXPERIMENT 03</small></div></aside>
 <main id="import"><header><span>HOME / CUSTOM DATASET</span><div class="header-actions"><button id="theme-toggle" class="theme-toggle" type="button" aria-label="切換黑暗模式" aria-pressed="false">☾ 黑暗模式</button><a href="https://github.com/CG3599/20261014-hw2-Multiple-Linear-regression" target="_blank" rel="noopener">GitHub ↗</a></div></header>
 <div class="intro"><div><span class="eyebrow">IMPORT / PREPARE / MODEL / EVALUATE</span><h1>帶入你的資料，開始實驗。</h1><p>保留原有的 Cars、50 Startups 範例，或自行匯入 CSV / Excel；選擇 Target、Features 與方法後直接分析。</p></div></div>
@@ -29,18 +29,31 @@
 </section>
 <section class="custom-panel" id="config" hidden>
 <div class="section-heading"><div><span class="eyebrow">03 / PREPARATION + MODELING</span><h2>選擇 Target 與 Features</h2></div><span class="pill">Training only preprocessing</span></div>
-<div class="custom-config-grid"><label>預測目標（Target）<select id="target-select"></select></label><label>訓練資料比例<select id="train-split"><option value="0.7">70% 訓練 / 30% 測試</option><option value="0.8" selected>80% 訓練 / 20% 測試</option><option value="0.9">90% 訓練 / 10% 測試</option></select></label><label>選取特徵數（k）<select id="feature-k"><option value="1">1 個</option><option value="2">2 個</option><option value="3" selected>3 個</option><option value="4">4 個</option><option value="5">5 個</option></select></label><label>隨機種子<input id="random-seed" type="number" min="0" max="999999" value="42"></label></div>
+<div class="custom-config-grid"><label>預測目標（Target）<select id="target-select"></select></label><label>訓練資料比例<select id="train-split"><option value="0.7">70% 訓練 / 30% 測試</option><option value="0.8" selected>80% 訓練 / 20% 測試</option><option value="0.9">90% 訓練 / 10% 測試</option></select></label><label>檢視特徵數（k）<select id="feature-k"><option value="1">1 個</option><option value="2">2 個</option><option value="3" selected>3 個</option><option value="4">4 個</option><option value="5">5 個</option></select></label><label>隨機種子<input id="random-seed" type="number" min="0" max="999999" value="42"></label></div>
 <div class="custom-columns-header"><h3>輸入欄位</h3><p>取消勾選 ID、序號、無意義字串等欄位；點選欄位型態可改為數值或類別。</p></div>
 <div id="feature-fields" class="feature-fields"></div>
-<div class="custom-columns-header"><h3>特徵選擇方法</h3><p>Baseline 會自動計算，另外最多比較以下五種方法；為避免瀏覽器卡頓，EFS 限定 8 個候選。</p></div>
-<div class="selector-list" id="selector-list"><label><input type="checkbox" value="EFS" checked> EFS</label><label><input type="checkbox" value="RFECV" checked> RFECV / RFE</label><label><input type="checkbox" value="Lasso" checked> Lasso (L1)</label><label><input type="checkbox" value="Backward" checked> Backward</label><label><input type="checkbox" value="SFS" checked> SFS</label></div>
-<div class="run-bar"><p>執行前會自動去除缺少 Target 的列，並在訓練資料中擬合補值、One-Hot 及標準化。RFECV 以訓練 CV 選擇不超過 k 的特徵數；其他方法固定 k。</p><button id="run-analysis" class="primary-action" type="button">執行多元線性迴歸 ↗</button></div><div id="analysis-status" class="custom-status" aria-live="polite"></div>
+<div class="custom-columns-header"><h3>固定五種特徵選擇方法</h3><p>與 Cars、50 Startups 一致：一次計算每種方法的 k = 1–5，依實際編碼特徵數調整。</p></div>
+<div class="selector-list" id="selector-list" aria-label="固定五種特徵選擇方法"><span>EFS</span><span>RFECV / RFE</span><span>LassoCV</span><span>Backward</span><span>SFS</span></div>
+<div class="run-bar"><p>執行前會自動去除缺少 Target 的列，並在訓練資料中擬合補值、One-Hot 及標準化。每種方法都計算 k=1–5 的固定特徵數結果（RFECV 採固定 k 的 RFE 路徑）。上方 k 控制分析後的預設檢視，不會限制計算範圍。</p><button id="run-analysis" class="primary-action" type="button">執行多元線性迴歸 ↗</button></div><div id="analysis-status" class="custom-status" aria-live="polite"></div>
 </section>
 <section id="analysis-results" class="custom-panel" hidden><div class="section-heading"><div><span class="eyebrow">04 / EVALUATION</span><h2>模型與特徵比較</h2></div><button id="export-results" type="button" class="download">↓ 下載結果 CSV</button></div>
 <div id="model-summary" class="custom-metrics"></div>
+<section id="feature-curves" class="custom-feature-curves" aria-label="五方法固定特徵數曲線">
+  <div class="custom-result-heading custom-curve-heading">
+    <div><span class="eyebrow">FEATURE SELECTION / 05 METHODS × 01–05 FEATURES</span><h3>五種方法 · 特徵數曲線</h3><p class="custom-note">每種方法各有一張互動曲線。點選 k 的資料點可同步切換上方特徵數；點選「檢視此方法」查看實際預測與殘差。</p></div>
+    <label for="curve-metric">曲線指標 <select id="curve-metric"><option value="cvRmse">Train CV RMSE ↓</option><option value="testRmse">Test RMSE ↓</option><option value="r2">Test R² ↑</option></select></label>
+  </div>
+  <div class="five-curve-grid" id="five-curve-grid">
+    <article class="five-curve-card" data-method="EFS"><div class="five-curve-title"><div><span>01 / EXHAUSTIVE</span><h4>EFS</h4></div><button type="button" data-choose-method="EFS">檢視此方法 ↗</button></div><div class="five-curve-plot"></div><p class="five-curve-summary"></p></article>
+    <article class="five-curve-card" data-method="RFECV"><div class="five-curve-title"><div><span>02 / RFE PATH</span><h4>RFECV</h4></div><button type="button" data-choose-method="RFECV">檢視此方法 ↗</button></div><div class="five-curve-plot"></div><p class="five-curve-summary"></p></article>
+    <article class="five-curve-card" data-method="LassoCV"><div class="five-curve-title"><div><span>03 / L1 SHRINKAGE</span><h4>LassoCV</h4></div><button type="button" data-choose-method="LassoCV">檢視此方法 ↗</button></div><div class="five-curve-plot"></div><p class="five-curve-summary"></p></article>
+    <article class="five-curve-card" data-method="Backward"><div class="five-curve-title"><div><span>04 / BACKWARD SELECTION</span><h4>Backward</h4></div><button type="button" data-choose-method="Backward">檢視此方法 ↗</button></div><div class="five-curve-plot"></div><p class="five-curve-summary"></p></article>
+    <article class="five-curve-card" data-method="SFS"><div class="five-curve-title"><div><span>05 / FORWARD SELECTION</span><h4>SFS</h4></div><button type="button" data-choose-method="SFS">檢視此方法 ↗</button></div><div class="five-curve-plot"></div><p class="five-curve-summary"></p></article>
+  </div>
+</section>
 <div class="custom-result-heading"><div><span class="eyebrow">PERFORMANCE / MODEL COMPARISON</span><h3>模型表現圖表</h3></div><div class="custom-chart-legend"><span><i class="legend-cv"></i> Train CV</span><span><i class="legend-test"></i> Test</span></div></div>
 <div class="custom-chart-grid" aria-label="模型表現圖表">
-  <article class="chart-card custom-chart-card"><div class="chart-heading"><h3>RMSE 比較</h3><span>LOWER IS BETTER ↓</span></div><div id="rmse-compare-chart" class="custom-chart-plot"></div><p class="custom-chart-note">訓練交叉驗證 RMSE 與保留測試集 RMSE；滑鼠移至長條可看數值。</p></article>
+  <article class="chart-card custom-chart-card"><div class="chart-heading"><h3>RMSE 比較</h3><span>LOWER IS BETTER ↓</span></div><div id="rmse-compare-chart" class="custom-chart-plot"></div><p class="custom-chart-note">依目前選擇的 k，比較訓練交叉驗證 RMSE 與保留測試集 RMSE。</p></article>
   <article class="chart-card custom-chart-card"><div class="chart-heading"><h3>Test R² 比較</h3><span>HIGHER IS BETTER ↑</span></div><div id="r2-compare-chart" class="custom-chart-plot"></div><p class="custom-chart-note">R² 可以小於 0；目標值皆相同時顯示 N/A。</p></article>
 </div>
 <div class="custom-result-heading custom-diagnostic-heading"><div><span class="eyebrow">MODEL DIAGNOSTICS / HELD-OUT TEST</span><h3>實際預測與殘差分析</h3></div><label for="diagnostic-method">檢視模型 <select id="diagnostic-method"></select></label></div>
@@ -51,6 +64,6 @@
 </div>
 <div class="table-scroll"><table class="custom-table"><thead><tr><th>Method</th><th>Features</th><th>Train CV RMSE ↓</th><th>Test RMSE ↓</th><th>Test R² ↑</th><th>Selected Features</th></tr></thead><tbody id="model-results"></tbody></table></div><p class="custom-note">分析於瀏覽器中使用 JavaScript 計算，並非伺服器端 sklearn。特徵選擇及交叉驗證皆限訓練資料；測試資料不參與選擇。詳細演算法限制請見下方說明。</p>
 </section>
-<section class="methodology"><span class="eyebrow">METHODOLOGY / LIMITATIONS</span><h2>這個自訂實驗與原始範例有什麼不同？</h2><p>原有 Cars 與 50 Startups 保留 Python sklearn 離線匯出的既有結果；本頁為可即時操作的瀏覽器端分析版本。EFS 先依訓練集單變量相關性預選最多 8 個候選；SFS 預選最多 12 個候選；Backward 逐步移除OLS 係數絕對值較小的特徵；RFECV 使用 RFE 係數淘汰路徑並以訓練 CV 選擇 1–k；Lasso 透過 L1 係數排名，再由 OLS 重訓。與原 Python 實驗的內層選擇／參數規則不完全一致，結果不應視為完全相同。</p><p class="caveat">安全限制：最多 3,000 筆有效分析資料、60 個原始欄位、40 個編碼後欄位、5 個特徵選取上限。類別超過 12 種的欄位不參與模型。EFS、SFS 是限制候選數的近似搜尋；訓練 CV 於已由整體訓練資料擬合的編碼特徵上執行，可能略為樂觀。正式報告可使用完整 sklearn Pipeline 在交叉驗證各折內重新擬合。</p></section>
+<section class="methodology"><span class="eyebrow">METHODOLOGY / LIMITATIONS</span><h2>這個自訂實驗與原始範例有什麼不同？</h2><p>原有 Cars 與 50 Startups 保留 Python sklearn 離線匯出的既有結果；本頁為可即時操作的瀏覽器端分析版本。EFS 先依訓練集單變量相關性預選最多 8 個候選；SFS 預選最多 12 個候選；Backward 逐步移除OLS 係數絕對值較小的特徵；RFECV 使用固定 k 的 RFE 係數淘汰路徑（不自動決定 k）；Lasso 透過 L1 係數排名，再由 OLS 重訓。與原 Python 實驗的內層選擇／參數規則不完全一致，結果不應視為完全相同。</p><p class="caveat">安全限制：最多 3,000 筆有效分析資料、60 個原始欄位、40 個編碼後欄位、5 個特徵選取上限。類別超過 12 種的欄位不參與模型。EFS、SFS 是限制候選數的近似搜尋；訓練 CV 於已由整體訓練資料擬合的編碼特徵上執行，可能略為樂觀。正式報告可使用完整 sklearn Pipeline 在交叉驗證各折內重新擬合。</p></section>
 <footer><span>Feature Lab / Custom Dataset</span><span>Private in-browser processing.</span></footer>
 </main></body></html>
