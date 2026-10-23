@@ -79,3 +79,7 @@
   .custom-results-table .table-scroll{overflow-x:auto}
   .custom-results-table table{min-width:580px}
 }
+
+.custom-table-actions{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:10px}
+.custom-table-actions .download{font-size:12px;padding:10px 14px}
+@media(max-width:760px){.custom-table-actions{justify-content:flex-start}.custom-table-actions .download{margin-top:0}}
