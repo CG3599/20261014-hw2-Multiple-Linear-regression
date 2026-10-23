@@ -8,6 +8,8 @@ require('../docs/custom-model.js');
 const model = global.FeatureLabModel;
 require('../docs/custom-charts.js');
 const charts = global.FeatureLabCharts;
+require('../docs/custom-curves.js');
+const curves = global.FeatureLabCurves;
 function numericTest() {
   const headers=['x1','x2','target'];
   const rows=Array.from({length:45},(_,i)=>[String(i),String((i%6)-2),String(500+23*i-9*((i%6)-2))]);
@@ -33,6 +35,26 @@ function startupTest() {
   assert.equal(out.data.raw,4);
   assert.equal(out.data.encoded,5);
   assert.equal(out.results.length,6);
+  assert.equal(out.curves.length,25);
+  assert.equal(out.maxK,5);
+  assert.equal(out.selectedK,3);
+  for(const method of curves.methods){
+    const methodRows=out.curves.filter(row=>row.method===method);
+    assert.deepEqual(methodRows.map(row=>row.count),[1,2,3,4,5]);
+    for(const row of methodRows){
+      assert(Number.isFinite(row.cvRmse));
+      assert.equal(row.features.length,row.count);
+      assert.equal(row.testActual.length,10);
+      assert.equal(row.testPredicted.length,10);
+    }
+    for(const metric of ['cvRmse','testRmse','r2']){
+      const svg=curves.curveSvg(methodRows,metric,3,method);
+      assert(svg.startsWith('<svg'));
+      assert.equal((svg.match(/class="feature-curve-point/g)||[]).length,5);
+      assert(svg.includes('data-k="3"'));
+    }
+  }
+  assert(curves.curveSvg([{method:'EFS',count:1,r2:null}],'r2',1,'EFS').includes('沒有有效指標'));
   for (const r of out.results) {
     assert.equal(r.testActual.length,10);
     assert.equal(r.testPredicted.length,10);
