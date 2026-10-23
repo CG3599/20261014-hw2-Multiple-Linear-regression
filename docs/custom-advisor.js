@@ -25,10 +25,14 @@ window.FeatureLabAdvisor=(()=>{
       };
     });
   }
-  function evaluate(headers,rows,fields,target){
+  function evaluate(headers,rows,fields,target,split=.8){
     const info=stats(headers,rows,fields);
     const targetIndex=headers.indexOf(target);
     const numericTargets=rows.map(row=>row[targetIndex]).filter(v=>!missing(v)&&Number.isFinite(Number(String(v).replace(/,/g,'')))).length;
+    const ratio=[.7,.8,.9].includes(Number(split))?Number(split):.8;
+    const trainCount=Math.max(10,Math.min(numericTargets-3,Math.floor(numericTargets*ratio)));
+    const trainBudget=Math.max(0,trainCount-10);
+    const maxEncoded=Math.min(80,trainBudget);
     const reasons=[],blocked=new Set();
     function suggest(item,description){
       if(blocked.has(item.name))return;
@@ -45,22 +49,22 @@ window.FeatureLabAdvisor=(()=>{
     const chosen=info.filter(c=>c.name!==target&&c.use);
     const active=chosen.filter(c=>!blocked.has(c.name));
     let encoded=active.reduce((v,c)=>v+c.encodedCost,0);
-    // To stay below One-Hot / matrix size limits, first remove categories that
-    // produce the most dummy columns; do not claim these are poor predictors.
+    // These are feature-budget suggestions, not predictor-quality rankings.
+    // Prefer dropping expensive One-Hot fields before dropping numeric fields.
     const candidates=[...active].sort((a,b)=>{
       const cost=b.encodedCost-a.encodedCost;
       if(cost)return cost;
       return headers.indexOf(b.name)-headers.indexOf(a.name);
     });
     for(const c of candidates){
-      const kept=active.filter(item=>!blocked.has(item.name));
-      if(kept.length<=39&&encoded<=40)break;
+      const current=active.filter(item=>!blocked.has(item.name));
+      if(current.length<=60&&encoded<=maxEncoded)break;
       blocked.add(c.name);
       encoded-=c.encodedCost;
+      const reason=current.length>60?'60 個原始特徵':(maxEncoded<80?'訓練 '+trainCount+' 筆、最多 '+maxEncoded+' 個編碼特徵':'80 個編碼特徵');
       reasons.push({
         name:c.name,
-        description:'為符合 '+(kept.length>39?'39 個原始特徵':'40 個編碼後特徵')+
-          '的分析上限；此欄位預估增加 '+c.encodedCost+' 個編碼特徵',
+        description:'為符合 '+reason+'的分析限制；此欄位預估增加 '+c.encodedCost+' 個編碼特徵',
         selected:true
       });
     }
@@ -70,17 +74,20 @@ window.FeatureLabAdvisor=(()=>{
     const warnings=[];
     if(numericTargets<15)warnings.push('Target「'+target+'」只有 '+numericTargets+' 筆有效數值，至少需要 15 筆。');
     if(numericTargets>3000)warnings.push('Target 有 '+numericTargets+' 筆有效數值，超過 3,000 筆分析上限。');
-    if(beforeEncoded>40)warnings.push('目前選取欄位的 One-Hot 預估為 '+beforeEncoded+' 個，超過 40 個運算上限。');
-    if(chosen.length>39)warnings.push('目前選了 '+chosen.length+' 個原始 Features，超過 39 個上限。');
+    if(beforeEncoded>80)warnings.push('目前 One-Hot 預估 '+beforeEncoded+' 個特徵，超過 80 個硬性上限。');
+    if(beforeEncoded>trainBudget)warnings.push('依 '+trainCount+' 筆訓練資料減 10，編碼後最多 '+trainBudget+' 個；目前預估 '+beforeEncoded+' 個。');
+    if(chosen.length>60)warnings.push('目前選了 '+chosen.length+' 個原始 Features，超過 60 個上限。');
+    if(beforeEncoded>trainCount/3)warnings.push('過擬合風險提醒：編碼後預估 '+beforeEncoded+' 個特徵，超過訓練資料 '+trainCount+' 筆的三分之一（'+Math.floor(trainCount/3)+' 個）。建議比較較小 k 並驗證測試表現。');
     const toExclude=reasons.filter(r=>r.selected).map(r=>r.name);
     const raw=kept.length,enc=kept.reduce((v,c)=>v+c.encodedCost,0);
     return {
-      target,validTargets:numericTargets,totalRows:rows.length,
+      target,validTargets:numericTargets,totalRows:rows.length,trainCount,maxEncoded,
+      overfitRisk:beforeEncoded>trainCount/3,recommendedOverfitRisk:enc>trainCount/3,
       currentRaw:chosen.length,currentEncoded:beforeEncoded,
       recommendedRaw:raw,recommendedEncoded:enc,
       selectedNames,toExclude,reasons,warnings,
       canApply:toExclude.length>0,
-      ready:numericTargets>=15&&numericTargets<=3000&&raw>=1&&raw<=39&&enc>=1&&enc<=40
+      ready:numericTargets>=15&&numericTargets<=3000&&raw>=1&&raw<=60&&enc>=1&&enc<=maxEncoded
     };
   }
   return {evaluate,idColumn,stats};
