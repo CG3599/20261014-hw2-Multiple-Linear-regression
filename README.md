@@ -49,16 +49,19 @@
 - 若運算較慢，請縮小資料筆數或排除不必要的候選欄位；本頁固定執行五方法的整組曲線，瀏覽器計算不適合大型 EFS。
 
 
-### 自訂資料分析圖表
+### 自訂資料分析圖表（對齊 50 Startups 與 Cars）
 
-執行 Custom Dataset 後，網站會顯示 **五張特徵選取曲線**（EFS、RFECV、LassoCV、Backward、SFS），各自可查看 k=1–5 的 RMSE 與 R²。另外保留：
+執行 Custom Dataset 的回歸分析後，結果版面與原有 50 Startups 相同：
 
-- **RMSE 比較圖**：各方法的 Train CV RMSE 與 Test RMSE（兩種顏色的長條圖）。
-- **Test R² 比較圖**：各方法在保留測試集上的 R²，包含可能出現的負值。
-- **Actual vs Predicted 散佈圖**：測試集實際目標值與模型預測值，虛線代表完美預測。
-- **Residual Plot（殘差圖）**：Residual = Actual − Predicted，以 0 水平線判讀模型誤差。
+- **五種方法分頁**：EFS、RFECV（固定 k RFE 路徑）、LassoCV（L1 簡化）、Backward、SFS。
+- **特徵數滑桿**：依編碼後可用欄位數，自動比較 k=1–5。
+- **同時比較五種方法**：可勾選疊加五條曲線，當前方法以較粗實線顯示。
+- **只保留兩種特徵數曲線**：RMSE 與 R-squared，皆為共同保留測試集上的指標，與既有範例一致。點選曲線圓點可以切換方法與 k。
+- **「Backward · 特徵組合與表現」表格**：標題依目前方法變動，列出該方法各個 k 的 Selected Features、Test RMSE 與 Test R²。點選表格列同步更新曲線。
+- **「從資料到預測，一步一步重現」**：動態顯示本次上傳資料的 CRISP-DM 六大階段，包括 Target、欄位、資料筆數、編碼後特徵數、訓練測試切分、五種選擇方法，以及目前選取組合的評估分數。
+- **完整 CSV 匯出**：五方法所有 k=1–5 的結果，加上 Baseline；僅切換畫面時不會重新訓練模型。
 
-圖表使用不依賴外部函式庫的 SVG。可以在診斷圖切換 Baseline、EFS、RFECV、LassoCV、Backward 或 SFS，也能點選曲線資料點或全部 25 組結果表格列，同步切換方法與 k。預設使用 **訓練 CV RMSE 最低**的模型作為診斷圖，不依測試集成績選模型。測試集如果超過 220 個點，散佈圖會等間距抽樣顯示，但各種指標仍使用完整測試集計算。結果 CSV 包含五方法全部固定 k 組合的分數與選取特徵，以及 Baseline。
+特徵選取只使用訓練資料；圖中 RMSE 與 R² 為 Test 指標。預設顯示 Backward 與 k=2；切換選取不會依測試集成績重新選擇最好的模型。自訂頁仍是受計算上限保護的 JavaScript 實作，與 sklearn 的同名方法不完全等價。
 
 ## 原有 Python 範例實驗
 
@@ -87,8 +90,7 @@ docs/
 ├── custom.html              # 自訂 Dataset UI
 ├── custom.css               # 自訂介面排版
 ├── custom.js                # 匯入 / 預覽 / 設定 / 匯出
-├── custom-curves.js         # 五張固定 k 特徵數 SVG 曲線
-├── custom-charts.js         # RMSE / R² / 模型診斷圖
+├── custom-curves.js         # RMSE 與 R² 特徵數 SVG 曲線（支援五方法疊圖）
 ├── custom-model.js          # 瀏覽器端 OLS 和五方法特徵選擇
 ├── sample-startups.csv      # 可一鍵載入的原始範例
 ├── pages.js / pages.css     # 共用導覽
@@ -105,4 +107,4 @@ GitHub Pages 使用 `main` 分支的 `/docs` 目錄；提交後需等 GitHub Pag
 
 ## 自動化檢查
 
-若本機已安裝 Node.js，可從專案根目錄執行 `node tests/custom-model.test.cjs`，用合成回歸資料與 50 Startups 樣本測試 Baseline、25 組固定 k 輸出、五張曲線與四種評估 SVG 圖表。
+若本機已安裝 Node.js，可從專案根目錄執行 `node tests/custom-model.test.cjs`，用合成回歸資料與 50 Startups 樣本測試 Baseline、五方法 × k=1–5 的特徵組合、兩張曲線及五方法疊圖的邊界狀況。
