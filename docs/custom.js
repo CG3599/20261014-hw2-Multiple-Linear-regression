@@ -100,6 +100,11 @@ function renderView(){
   $('method-note').textContent=methodNotes[selectedMethod];
   $('table-title').textContent=selectedMethod+' · 特徵組合與表現';
   $('table-badge').textContent=analysisOutput.maxK+' combinations';
+  for(const tr of $('method-compare-rows').querySelectorAll('tr[data-method]')){
+    const active=tr.dataset.method===selectedMethod;
+    tr.classList.toggle('selected',active);
+    tr.setAttribute('aria-selected',String(active));
+  }
   const tabs=$('method-tabs');
   for(const button of tabs.querySelectorAll('[role="tab"]')){
     const active=button.dataset.method===selectedMethod;
@@ -275,6 +280,12 @@ $('run-analysis').addEventListener('click',async()=>{
     await new Promise(resolve=>setTimeout(resolve,70));
     if(!window.FeatureLabModel||!window.FeatureLabCurves)throw Error('迴歸或繪圖程式未載入，請重新整理。');
     const out=window.FeatureLabModel.analyze(payload);
+    if(!window.FeatureLabMethodComparison)throw Error('方法比較表格程式未載入，請重新整理。');
+    window.FeatureLabMethodComparison.render(
+      $('method-compare-rows'),
+      window.FeatureLabMethodComparison.fromCustom(out),
+      {selected:'Backward',onSelect:row=>changeView(row.method,row.count)}
+    );
     analysisOutput=out;results=out.curves;selectedK=Math.min(2,out.maxK);selectedMethod='Backward';compare=false;
     $('model-summary').textContent=out.data.valid+' 筆有效資料 / '+out.data.train+' 訓練 / '+out.data.test+
        ' 測試 · '+out.data.raw+' 個原始特徵 / '+out.data.encoded+' 個編碼後特徵';
