@@ -206,6 +206,7 @@ $('run-analysis').addEventListener('click',async()=>{
     analysisOutput=out;results=out.curves;selectedK=Math.min(2,out.maxK);selectedMethod='Backward';compare=false;
     $('model-summary').textContent=out.data.valid+' 筆有效資料 / '+out.data.train+' 訓練 / '+out.data.test+
        ' 測試 · '+out.data.raw+' 個原始特徵 / '+out.data.encoded+' 個編碼後特徵';
+    $('curve-heading').textContent=out.maxK===out.data.encoded?'從 1 個特徵，到完整模型':'從 1 個特徵，到 '+out.maxK+' 個特徵';
     initTabs();initCount();renderMethodology();renderView();
     $('analysis-results').hidden=false;
     status('分析完成：'+out.curves.length+' 組固定特徵數結果及 Baseline。',false,'analysis-status');
