@@ -119,4 +119,4 @@ GitHub Pages 使用 `main` 分支的 `/docs` 目錄；提交後需等 GitHub Pag
 
 ## 自動化檢查
 
-若本機已安裝 Node.js，可從專案根目錄執行 `node tests/custom-model.test.cjs`，用合成回歸資料與 50 Startups 樣本測試 Baseline、五方法 × k=1–5 的特徵組合、兩張曲線及五方法疊圖的邊界狀況。
+若本機已安裝 Node.js，可從專案根目錄執行 `node tests/custom-model.test.cjs`，驗證 Baseline、五方法 × k=1–5、RMSE／R² 曲線及五方法疊圖；再執行 `node tests/custom-advisor.test.cjs`，檢查 120 欄上限、ID／高類別數判定、超額 One-Hot 的一鍵建議及 50 Startups 範例。
