@@ -56,7 +56,7 @@ window.FeatureLabAdvisor=(()=>{
       if(cost)return cost;
       return headers.indexOf(b.name)-headers.indexOf(a.name);
     });
-    for(const c of candidates){
+    for(const c of (maxEncoded>=1?candidates:[])){
       const current=active.filter(item=>!blocked.has(item.name));
       if(current.length<=60&&encoded<=maxEncoded)break;
       blocked.add(c.name);
@@ -73,6 +73,7 @@ window.FeatureLabAdvisor=(()=>{
     const beforeEncoded=chosen.reduce((v,c)=>v+c.encodedCost,0);
     const warnings=[];
     if(numericTargets<15)warnings.push('Target「'+target+'」只有 '+numericTargets+' 筆有效數值，至少需要 15 筆。');
+    if(trainBudget<1)warnings.push('目前訓練資料約 '+trainCount+' 筆，套用「訓練筆數減 10」後無法保留任何特徵。請增加有效資料或提高訓練比例。');
     if(numericTargets>3000)warnings.push('Target 有 '+numericTargets+' 筆有效數值，超過 3,000 筆分析上限。');
     if(beforeEncoded>80)warnings.push('目前 One-Hot 預估 '+beforeEncoded+' 個特徵，超過 80 個硬性上限。');
     if(beforeEncoded>trainBudget)warnings.push('依 '+trainCount+' 筆訓練資料減 10，編碼後最多 '+trainBudget+' 個；目前預估 '+beforeEncoded+' 個。');
