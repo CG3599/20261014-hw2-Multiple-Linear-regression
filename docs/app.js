@@ -75,3 +75,9 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
 });
 updateThemeToggle();
 
+const startupPrediction=window.FeatureLabPrediction.render($('prediction-plot'),STARTUPS_PREDICTION.points,'USD');
+$('prediction-model').textContent=STARTUPS_PREDICTION.method+' · R&D Spend';
+$('prediction-stat').textContent='名目涵蓋率：95%\\n訓練集：'+STARTUPS_PREDICTION.trainCount+' 筆\\n測試集：'+startupPrediction.total+' 筆\\n實際涵蓋：'+startupPrediction.covered+' / '+startupPrediction.total+'（'+fmt(startupPrediction.rate*100,1)+'%）';
+$('prediction-explanation').textContent='OLS Student-t 個別預測區間（df='+STARTUPS_PREDICTION.df+'），包含新觀測的隨機誤差與特徵槓桿值；不是平均預測值的信賴區間。';
+
+
