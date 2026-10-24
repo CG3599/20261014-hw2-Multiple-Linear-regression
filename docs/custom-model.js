@@ -42,6 +42,55 @@ window.FeatureLabModel = (() => {
     if(colNames.length<1)throw Error('編碼後沒有可用 Features。');if(colNames.length>80)throw Error('One-Hot 後有 '+colNames.length+' 個特徵，超過 80 個編碼特徵的運算上限。');const maxForTrain=trainCount-10;if(colNames.length>maxForTrain)throw Error('訓練資料 '+trainCount+' 筆，依訓練筆數減 10 的規則，最多可使用 '+Math.max(0,maxForTrain)+' 個編碼後特徵；目前為 '+colNames.length+' 個。請減少 Features 或增加有效資料筆數。');
     function convert(items){return items.map(o=>{let arr=[];for(const m of meta){let value=String(o.row[m.pos]??'').trim();if(isMissing(value))value=String(m.impute);if(m.type==='numeric'){let n=Number(value);if(!Number.isFinite(n))n=m.impute;arr.push((n-m.impute)/m.std);}else {for(const c of m.classes.slice(1))arr.push(Number(value===c));}}return arr;});}
     return {X:convert(trainRows),y:trainRows.map(o=>o.target),Xt:convert(testRows),yt:testRows.map(o=>o.target),names:colNames,trainCount,testCount:testRows.length,valid:filtered.length,overfitRisk:colNames.length>trainCount/3};}
+
+  // Approximate Student-t critical value (Cornish-Fisher expansion).
+  function t95(df){
+    if(df<1)return NaN;
+    const z=1.959963984540054;
+    const z2=z*z,z3=z2*z,z5=z3*z2,z7=z5*z2;
+    return z+(z3+z)/(4*df)+(5*z5+16*z3+3*z)/(96*df*df)+(3*z7+19*z5+17*z3-15*z)/(384*df*df*df);
+  }
+  function inverseGram(X,selected){
+    const p=selected.length+1,n=X.length;
+    const a=Array.from({length:p},()=>Array(p*2).fill(0));
+    for(let j=0;j<p;j++)a[j][p+j]=1;
+    for(const row of X){
+      const v=[1,...selected.map(i=>row[i])];
+      for(let i=0;i<p;i++)for(let j=0;j<p;j++)a[i][j]+=v[i]*v[j];
+    }
+    for(let i=0;i<p;i++){
+      let pivot=i;
+      for(let j=i+1;j<p;j++)if(Math.abs(a[j][i])>Math.abs(a[pivot][i]))pivot=j;
+      if(Math.abs(a[pivot][i])<1e-8)return null;
+      [a[i],a[pivot]]=[a[pivot],a[i]];
+      const val=a[i][i];
+      for(let k=0;k<2*p;k++)a[i][k]/=val;
+      for(let j=0;j<p;j++)if(j!==i){
+        const factor=a[j][i];if(!factor)continue;
+        for(let k=0;k<2*p;k++)a[j][k]-=factor*a[i][k];
+      }
+    }
+    return a.map(row=>row.slice(p));
+  }
+  function predictionIntervals(X,y,Xt,yt,selected,beta,preds){
+    const df=X.length-selected.length-1;
+    if(df<3)return null;
+    const inv=inverseGram(X,selected);
+    if(!inv)return null;
+    const residuals=predict(X,beta,selected).map((p,i)=>y[i]-p);
+    const s2=residuals.reduce((total,v)=>total+v*v,0)/df;
+    const t=t95(df);
+    if(!Number.isFinite(s2)||!Number.isFinite(t))return null;
+    const pts=Xt.map((row,i)=>{
+      const v=[1,...selected.map(j=>row[j])];
+      let leverage=0;
+      for(let j=0;j<v.length;j++)for(let k=0;k<v.length;k++)leverage+=v[j]*inv[j][k]*v[k];
+      if(leverage<-.00001||!Number.isFinite(leverage))return null;
+      const margin=t*Math.sqrt(s2*(1+Math.max(0,leverage)));
+      return {actual:yt[i],predicted:preds[i],lower:preds[i]-margin,upper:preds[i]+margin};
+    });
+    return pts.some(p=>p==null||![p.actual,p.predicted,p.lower,p.upper].every(Number.isFinite))?null:pts;
+  }
   function analyze(payload){
     const {rows,headers,target,fields,split,seed,methods,k}=payload;
     const prepared=prepare(rows,headers,target,fields);
@@ -60,7 +109,8 @@ window.FeatureLabModel = (() => {
         features:selected.map(i=>names[i]),
         cvRmse:cv(X,y,selected,seed),
         testRmse:rmse(yt,prediction),r2:r2(yt,prediction),
-        testActual:yt.slice(),testPredicted:prediction
+        testActual:yt.slice(),testPredicted:prediction,
+        predictionPoints:method==='Baseline'?null:predictionIntervals(X,y,Xt,yt,selected,beta,prediction)
       };
     };
     const baseline=evaluate('Baseline',names.map((_,i)=>i),names.length);
