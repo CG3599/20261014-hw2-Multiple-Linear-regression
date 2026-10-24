@@ -136,6 +136,18 @@ function renderView(){
   }
   $('selection-detail').textContent=row
     ?'目前查看：'+selectedMethod+' / '+selectedK+' 個特徵 / '+row.features.join(' + '):'';
+  // Plot the currently selected trained model; interval width is based only
+  // on training residuals and leverage, never on the held-out test outcomes.
+  $('prediction-model').textContent=selectedMethod+' · '+selectedK+' 個特徵';
+  if(row&&row.predictionPoints&&window.FeatureLabPrediction){
+    const assessed=window.FeatureLabPrediction.render($('prediction-plot'),row.predictionPoints);
+    $('prediction-stat').textContent='近似 95% 預測區間\n測試資料：'+assessed.total+' 筆\n區間涵蓋：'+assessed.covered+' / '+assessed.total+'（'+fmt(assessed.rate*100,1)+'%）';
+    $('prediction-explanation').textContent='本圖對應 '+row.features.join(' + ')+'。區間使用訓練殘差變異、槓桿值及 Student-t 近似計算；測試資料不參與區間寬度估計。';
+  }else{
+    $('prediction-plot').innerHTML='<p class="prediction-empty">此模型的訓練資料不足或特徵矩陣不可逆，無法可靠估計預測區間。</p>';
+    $('prediction-stat').textContent='區間無法估計';
+    $('prediction-explanation').textContent='可嘗試較少的特徵數、排除完全共線欄位，或增加有效訓練資料。';
+  }
   const evalExample=$('crisp-evaluation-example');
   if(evalExample&&row) evalExample.textContent=selectedMethod+' k='+selectedK+' 的 Test RMSE = '+fmt(row.testRmse,2)+'，Test R² = '+fmt(row.r2,4)+'；這是目前切分的結果，不代表所有 Dataset 或其他切分都相同。';
 }
