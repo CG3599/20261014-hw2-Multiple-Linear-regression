@@ -3,8 +3,8 @@
 <meta name="description" content="Feature Lab 自訂 Dataset：CSV、Excel 或網址匯入，設定特徵與 Target，在瀏覽器執行多元線性迴歸及特徵選擇。">
 <title>Custom Dataset · Feature Lab</title>
 <script>(()=>{let t;try{t=localStorage.getItem('feature-lab-theme')}catch{}document.documentElement.dataset.theme=['light','dark'].includes(t)?t:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')})();</script>
-<link rel="stylesheet" href="style.css?v=2"><link rel="stylesheet" href="theme.css?v=2"><link rel="stylesheet" href="pages.css?v=10"><link rel="stylesheet" href="custom.css?v=9">
-<script src="pages.js?v=9" defer></script><script src="custom-model.js?v=4" defer></script><script src="custom-curves.js?v=2" defer></script><script src="custom-advisor.js?v=3" defer></script><script src="method-comparison.js?v=2" defer></script><script src="custom.js?v=8" defer></script>
+<link rel="stylesheet" href="style.css?v=2"><link rel="stylesheet" href="theme.css?v=2"><link rel="stylesheet" href="pages.css?v=12"><link rel="stylesheet" href="custom.css?v=9">
+<script src="pages.js?v=9" defer></script><script src="custom-model.js?v=5" defer></script><script src="custom-curves.js?v=2" defer></script><script src="custom-advisor.js?v=3" defer></script><script src="method-comparison.js?v=2" defer></script><script src="prediction-uncertainty.js?v=1" defer></script><script src="custom.js?v=9" defer></script>
 </head><body>
 <aside><a class="brand" href="./"><span class="brand-icon">ƒ</span> Feature Lab</a><span class="aside-label">AIoT / DATA ANALYTICS</span>
 <div class="side-title">特徵選擇實驗室</div><p>用更少的特徵，<br>理解模型的表現。</p>
@@ -80,6 +80,12 @@
   <div class="section-heading"><div><span class="eyebrow">METHOD COMPARISON / SIX SCHEMES</span><h2>方法比較與選取特徵</h2></div><span class="pill">6 methods</span></div>
   <div class="table-scroll"><table class="method-comparison-table"><thead><tr><th>Method</th><th>特徵數</th><th>Selected Features</th><th>CV RMSE ↓</th><th>Test RMSE ↓</th><th>Test R² ↑</th></tr></thead><tbody id="method-compare-rows"></tbody></table></div>
   <p class="method-comparison-note">Baseline 使用所有編碼後 Features；其餘各方法從 k=1–5 中，以<strong>訓練 CV RMSE 最低</strong>的特徵數代表該方法。Test 數值僅用於評估，沒有參與選擇；本頁是瀏覽器端簡化版本，不是 sklearn 的完整自動方法。</p>
+</section>
+<section class="workspace prediction-section" id="prediction-uncertainty">
+  <div class="section-heading"><div><span class="eyebrow">PREDICTION / UNCERTAINTY</span><h2>預測結果與不確定性</h2><p class="prediction-subtitle">Prediction Results &amp; Uncertainty</p></div><span class="pill">Approx. 95% Prediction Interval</span></div>
+  <p class="prediction-intro">隨上方選擇的特徵選擇方法與 k 數更新，以目前模型在獨立測試集的「實際值 vs 預測值」及訓練資料估計的預測區間呈現。</p>
+  <div class="prediction-layout"><div class="prediction-chart-wrap"><div id="prediction-plot" class="prediction-plot"></div><div class="prediction-legend"><span><i class="prediction-legend-dot"></i> 實際觀測</span><span><i class="prediction-legend-outside"></i> 區間外</span><span><i class="prediction-legend-bar"></i> 約 95% 預測區間</span><span><i class="prediction-legend-reference"></i> 理想預測線</span></div></div><aside class="prediction-aside"><h3 id="prediction-model">依模型產生結果</h3><p id="prediction-stat" aria-live="polite"></p><p id="prediction-explanation"></p></aside></div>
+  <p class="prediction-caveat">根據目前所選模型的訓練殘差變異、設計矩陣槓桿值與 Student-t 近似臨界值，估計個別新樣本的 95% 預測區間。區間只用訓練資料計算，不用測試結果調整寬度；但瀏覽器 OLS 含微小數值正則化與 t 值近似，且需線性、獨立、常態、等變異及足夠秩的假設。當特徵共線或樣本不足時，不會宣稱具有可靠的區間。</p>
 </section>
 <section class="methodology crisp-methodology" id="methodology">
   <div class="crisp-heading"><div><span class="eyebrow">BEHIND THE EXPERIMENT / CRISP-DM</span><h2>從資料到預測，一步一步重現</h2><p>依據這次匯入的 Dataset、Target、欄位與實際模型結果，解釋六大資料探勘流程。</p></div><span class="crisp-counter">06 <small>STAGES</small></span></div>
