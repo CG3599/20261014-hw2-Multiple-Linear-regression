@@ -2,6 +2,19 @@
 
 多元線性迴歸（Multiple Linear Regression）與五種特徵選擇方法的互動式網站。採 GitHub Pages 靜態部署，資料集與結果均可在瀏覽器檢視。
 
+## Dataset 來源連結與 RAW CSV 匯入
+
+**Cars** 與 **50 Startups** 頁面右上角設有三個資料來源按鈕：Kaggle、Dataset · GitHub（供人閱讀的檔案頁）、Dataset · RAW（直接取得 CSV）。原本的「專案 GitHub」按鈕仍保留，與資料來源分開標示。
+
+- Cars Kaggle：<https://www.kaggle.com/datasets/vishakhdapat/price-of-used-toyota-corolla-cars>
+- Cars Dataset：<https://github.com/reisanar/datasets/blob/master/ToyotaCorolla.csv>
+- Cars RAW：<https://raw.githubusercontent.com/reisanar/datasets/refs/heads/master/ToyotaCorolla.csv>
+- 50 Startups Kaggle：<https://www.kaggle.com/datasets/abhishek14398/50startups>
+- 50 Startups Dataset：<https://github.com/Avik-Jain/100-Days-Of-ML-Code/blob/master/datasets/50_Startups.csv>
+- 50 Startups RAW：<https://raw.githubusercontent.com/Avik-Jain/100-Days-Of-ML-Code/refs/heads/master/datasets/50_Startups.csv>
+
+Custom Dataset 的「URL 匯入」請填 **RAW CSV/TSV 檔案直接網址**，例如 `raw.githubusercontent.com`，而不是 GitHub 的 `/blob/` 瀏覽頁或 Kaggle 資料集頁；且網址需允許 CORS。此提醒顯示在輸入欄位旁。
+
 ## 入口與資料集
 
 | 頁面 | URL | 說明 |
