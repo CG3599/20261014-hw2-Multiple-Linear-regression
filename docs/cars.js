@@ -76,6 +76,6 @@ renderTheme();
 const carsPrediction=window.FeatureLabPrediction.cars(data);
 const carsCoverage=window.FeatureLabPrediction.render($('prediction-plot'),carsPrediction.points,'EUR');
 $('prediction-model').textContent=data.best_method+' · Toyota Corolla';
-$('prediction-stat').textContent='95% 名目區間：± €'+fmt(carsPrediction.q,0)+'\\n校準集：'+carsPrediction.calibration+' 筆\\n展示集：'+carsPrediction.evaluation+' 筆\\n實際涵蓋：'+carsCoverage.covered+' / '+carsCoverage.total+'（'+fmt(carsCoverage.rate*100,1)+'%）';
+$('prediction-stat').textContent='95% 名目區間：± €'+fmt(carsPrediction.q,0)+'\n校準集：'+carsPrediction.calibration+' 筆\n展示集：'+carsPrediction.evaluation+' 筆\n實際涵蓋：'+carsCoverage.covered+' / '+carsCoverage.total+'（'+fmt(carsCoverage.rate*100,1)+'%）';
 $('prediction-explanation').textContent='分割式 Conformal 預測區間 · 區間寬度僅由校準資料計算。原頁的 Test 指標仍對應全部 287 筆原測試資料。';
 
