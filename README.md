@@ -88,6 +88,16 @@ Custom Dataset 的「URL 匯入」請填 **RAW CSV/TSV 檔案直接網址**，�
 
 特徵選取只使用訓練資料；圖中 RMSE 與 R² 為 Test 指標。預設顯示 Backward 與 k=2；切換選取不會依測試集成績重新選擇最好的模型。自訂頁仍是受計算上限保護的 JavaScript 實作，與 sklearn 的同名方法不完全等價。
 
+### 預測結果與不確定性（Prediction Results & Uncertainty）
+
+三頁都在「方法比較與選取特徵」後、CRISP-DM 六階段說明前，新增同樣設計的「**實際值 vs 預測值**」散點圖；橫軸是預測值，縱軸是實際值。每筆樣本的垂直誤差棒顯示 **95% 預測區間（Prediction Interval）**，而不是僅對平均值的信賴區間；額外提供名目涵蓋率、實際測試涵蓋率、區間估計方法與限制。
+
+- **Cars**：重用原先的最佳 Baseline 模型對 287 筆測試資料的已儲存預測。將其預測拆成 143 筆區間校準資料、144 筆展示資料，使用 **split-conformal 95% 預測區間**（校準絕對殘差的 \`ceil((n+1) × 0.95)\` 階順序統計量）。區間寬度未使用展示資料調整。原本 Test RMSE、Test R² 仍基於原先全部 287 筆，不可與新圖的 144 筆區間驗證結果混為一談。Conformal 的覆蓋保證需假設資料可交換，是**邊際**保證而非每個車價區間的條件保證。
+- **50 Startups**：使用 sklearn \`train_test_split(test_size=0.2, random_state=42)\` 的原始分割，40 筆訓練、10 筆測試；重現最佳 **Backward k=1（R&D Spend）** 的 OLS 模型，Test RMSE 與原本結果吻合。使用 \`Student-t(df=38)\`、訓練殘差變異及槓桿值計算**參數式 95% 個別預測區間**。此方法依賴線性關係、獨立、等變異與常態誤差假設。使用預先計算的 \`docs/startups-prediction-data.js\`。
+- **Custom Dataset**：每次使用者分析資料時，依目前方法與 k 值計算並繪製**近似 95% OLS 預測區間**：從訓練資料的殘差變異、設計矩陣的逆矩陣（槓桿值）和 Student-t 臨界值近似推得。**測試資料僅用於展示及實測涵蓋率，不會用來計算區間寬度**。網站的線性回歸使用微小正則化以提高數值穩定性，故區間為參數式近似而非分布無關保證；當矩陣無法可靠求逆、樣本太少時，顯示無法估計區間，不虛構數值。
+
+三頁共用 \`docs/prediction-uncertainty.js\` 和 \`docs/pages.css\` 的圖表與配色。圖上綠點代表實際值落在 95% 區間內、橘點代表落在區間外；虛線是理想預測值等於實際值。若樣本較多會減少可視的垂直誤差棒數量以保持圖表清晰，但涵蓋率統計仍計算**完整展示樣本**。
+
 ### 三頁統一的六方法比較表
 
 三個頁面都在「特徵數曲線／特徵組合」之後、**CRISP-DM 六階段說明之前**放置「方法比較與選取特徵」表格。表格標題、順序與六欄完全一致：
@@ -146,6 +156,6 @@ GitHub Pages 使用 `main` 分支的 `/docs` 目錄；提交後需等 GitHub Pag
 
 ## 自動化檢查
 
-建議也執行 `node tests/method-comparison.test.cjs`，檢查三頁表格欄位、方法分數、特徵名稱、資料來源與區塊順序。
+建議也執行 `node tests/prediction-uncertainty.test.cjs` 驗證三頁預測區間的來源、覆蓋率和頁面區塊位置，再執行 `node tests/method-comparison.test.cjs`，檢查三頁表格欄位、方法分數、特徵名稱、資料來源與區塊順序。
 
 若本機已安裝 Node.js，可從專案根目錄執行 `node tests/custom-model.test.cjs`，驗證 Baseline、五方法 × k=1–5、RMSE／R² 曲線及五方法疊圖；再執行 `node tests/custom-advisor.test.cjs`，檢查 120 欄上限、ID／高類別數判定、超額 One-Hot 的一鍵建議及 50 Startups 範例。
