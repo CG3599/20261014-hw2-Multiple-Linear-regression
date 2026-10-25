@@ -1,161 +1,336 @@
-# Feature Lab · 特徵選擇實驗室
+# Feature Lab｜特徵選擇實驗室
 
-多元線性迴歸（Multiple Linear Regression）與五種特徵選擇方法的互動式網站。採 GitHub Pages 靜態部署，資料集與結果均可在瀏覽器檢視。
+> **每個特徵，都值得被驗證。**  
+> *Feature Selection · Multiple Linear Regression · Model Evaluation · Prediction Uncertainty*
 
-## Dataset 來源連結與 RAW CSV 匯入
+Feature Lab 是依照 **CRISP-DM** 建構的互動式線性迴歸實驗網站，核心問題是：「**在降低特徵數量與模型複雜度的同時，能否維持良好的預測能力？**」網站提供兩個公開資料集實驗，以及一套可自行匯入資料、執行特徵選擇與比較預測結果的瀏覽器工具。
 
-**Cars** 與 **50 Startups** 頁面右上角設有三個資料來源按鈕：Kaggle、Dataset · GitHub（供人閱讀的檔案頁）、Dataset · RAW（直接取得 CSV）。原本的「專案 GitHub」按鈕仍保留，與資料來源分開標示。
+[**Live Demo — Cars**](https://cg3599.github.io/20261014-hw2-Multiple-Linear-regression/) · [**Live Demo — 50 Startups**](https://cg3599.github.io/20261014-hw2-Multiple-Linear-regression/startups.html) · [**Live Demo — Custom Dataset**](https://cg3599.github.io/20261014-hw2-Multiple-Linear-regression/custom.html)
 
-- Cars Kaggle：<https://www.kaggle.com/datasets/vishakhdapat/price-of-used-toyota-corolla-cars>
-- Cars Dataset：<https://github.com/reisanar/datasets/blob/master/ToyotaCorolla.csv>
-- Cars RAW：<https://raw.githubusercontent.com/reisanar/datasets/refs/heads/master/ToyotaCorolla.csv>
-- 50 Startups Kaggle：<https://www.kaggle.com/datasets/abhishek14398/50startups>
-- 50 Startups Dataset：<https://github.com/Avik-Jain/100-Days-Of-ML-Code/blob/master/datasets/50_Startups.csv>
-- 50 Startups RAW：<https://raw.githubusercontent.com/Avik-Jain/100-Days-Of-ML-Code/refs/heads/master/datasets/50_Startups.csv>
+## 目錄
 
-Custom Dataset 的「URL 匯入」請填 **RAW CSV/TSV 檔案直接網址**，例如 `raw.githubusercontent.com`，而不是 GitHub 的 `/blob/` 瀏覽頁或 Kaggle 資料集頁；且網址需允許 CORS。此提醒顯示在輸入欄位旁。
+- [Live Demo 與三個頁面](#live-demo-與三個頁面)
+- [頁面預覽：Cars + Custom Dataset 五步驟](#頁面預覽cars--custom-dataset-五步驟)
+- [技術架構與資料處理流程](#技術架構與資料處理流程)
+- [線性迴歸與模型評估原則](#線性迴歸與模型評估原則)
+- [五種特徵選擇方法](#五種特徵選擇方法)
+- [實驗一：Cars — Toyota Corolla](#實驗一cars--toyota-corolla)
+- [實驗二：50 Startups](#實驗二50-startups)
+- [實驗三：Custom Dataset](#實驗三custom-dataset)
+- [預測區間與不確定性](#預測區間與不確定性)
+- [CRISP-DM 六階段](#crisp-dm-六階段)
+- [重現方式、目錄與限制](#重現方式目錄與限制)
 
-## 入口與資料集
+## Live Demo 與三個頁面
 
-| 頁面 | URL | 說明 |
+| 頁面 | Live Demo | 主要任務 | 模型執行環境 |
+| --- | --- | --- | --- |
+| **Cars（首頁）** | [開啟 Cars](https://cg3599.github.io/20261014-hw2-Multiple-Linear-regression/) | 使用 Toyota Corolla 的規格預測車價，分析大量特徵的取捨 | Python / scikit-learn **離線訓練**；網頁展示匯出結果 |
+| **50 Startups** | [開啟 50 Startups](https://cg3599.github.io/20261014-hw2-Multiple-Linear-regression/startups.html) | 以研發、管理、行銷費用及地區預測企業獲利 | Python / scikit-learn **離線訓練**；網頁展示匯出結果 |
+| **Custom Dataset** | [開啟自訂實驗室](https://cg3599.github.io/20261014-hw2-Multiple-Linear-regression/custom.html) | 匯入自有 CSV／Excel／RAW URL、選 Target 與 Features，立即分析 | **瀏覽器內 JavaScript** 模型與互動圖表 |
+
+三頁共用深色／明亮主題、資料集切換選單、方法比較版型和 **「實際值 vs. 預測值 + 95% 預測區間」**。GitHub Pages 採靜態部署，無需替網站架設 Python 後端。
+
+## 頁面預覽：Cars + Custom Dataset 五步驟
+
+以下 **6 張圖片均為實際網站畫面截圖**；Cars 提供首頁總覽，Custom Dataset 以五個畫面呈現完整工作流程。
+
+### Cars｜汽車售價特徵選擇
+
+![Cars 首頁：資料集總覽、模型評估、五種特徵選擇及 CV RMSE／R² 曲線](assets/readme/cars-overview.png)
+
+**畫面重點：** 1,435 筆有效資料、6 種模型（Baseline + 5 種方法）、特徵數滑桿、五方法疊圖、CV RMSE／R² 與訓練 CV 選出的最佳方法。
+
+### Custom Dataset｜完整操作流程
+
+**01｜匯入 Dataset** — 上傳 CSV／TSV／Excel、輸入公開 RAW CSV 網址或貼上表格資料。資料匯入成功後，自動捲動至資料檢查區。
+
+![Custom Dataset：匯入檔案、RAW URL 或貼上資料的入口](assets/readme/custom-import.png)
+
+**02｜檢查資料與特徵** — 預覽資料列、原始欄位與編碼後欄位預估數，確認 Target 與特徵是否合理。
+
+![Custom Dataset：資料筆數、欄位概覽與前五列資料預覽](assets/readme/custom-preview.png)
+
+**03｜模型設定與特徵篩選建議** — 設定 Target、訓練／測試比例、隨機種子，檢視自動排除 ID、高基數類別與缺失過多欄位的建議；仍可手動調整。
+
+![Custom Dataset：Target、Features、訓練切分及智慧資料檢查](assets/readme/custom-config.png)
+
+**04｜執行多元線性迴歸與比較** — 執行 Baseline 與 EFS、RFECV/RFE、LassoCV、Backward、SFS，在指定特徵數下檢視 RMSE／R² 曲線與各方法特徵組合。
+
+![Custom Dataset：五種特徵選擇方法比較與特徵數曲線](assets/readme/custom-curves.png)
+
+**05｜預測結果與不確定性** — 觀察實際值 vs. 預測值散點圖、理想預測線與近似 95% 個別預測區間；方法與特徵數變更時同步更新。
+
+![Custom Dataset：Actual vs Predicted 和近似 95% Prediction Interval](assets/readme/custom-prediction-interval.png)
+
+> **階段式導覽：** 尚未匯入資料時，只顯示「匯入 Dataset」；匯入後顯示「資料預覽／模型設定」；成功完成模型分析後，才開放特徵曲線、特徵組合、方法比較、預測區間與 CRISP-DM。修改設定使結果失效時，分析選單會再次隱藏。
+
+## 技術架構與資料處理流程
+
+| 層級 | 技術／套件 | 用途 |
 | --- | --- | --- |
-| Cars · 汽車售價（首頁） | [Cars](https://cg3599.github.io/20261014-hw2-Multiple-Linear-regression/) | Toyota Corolla，保留原本 Python sklearn 離線計算成果 |
-| 50 Startups · 創業獲利 | [50 Startups](https://cg3599.github.io/20261014-hw2-Multiple-Linear-regression/startups.html) | 50 Startups，保留原有五方法的互動圖表 |
-| Custom Dataset · 自訂資料集 | [Custom Dataset](https://cg3599.github.io/20261014-hw2-Multiple-Linear-regression/custom.html) | 自行匯入、選擇 Target 與 Features、進行瀏覽器端迴歸分析 |
+| 資料處理與正式實驗 | **Python、pandas、NumPy** | 清理 CSV、數值處理、資料切分與統計計算 |
+| 模型與特徵選擇 | **scikit-learn** | `LinearRegression`、`Pipeline`、`ColumnTransformer`、`OneHotEncoder`、`RFECV`、`LassoCV` 等 |
+| 統計檢定／Backward | **statsmodels** | OLS、p-value 型 Backward Elimination（Python 範例） |
+| 實驗圖與結果匯出 | **Matplotlib、JSON／JavaScript、CSV、joblib** | 離線產生分析圖與預測結果，供靜態網頁展示 |
+| 網站介面 | **HTML、CSS、原生 JavaScript、SVG** | 深淺色主題、特徵曲線、可展開特徵清單、預測區間視覺化 |
+| 自訂資料匯入 | **File API、Fetch API、SheetJS** | 上傳 CSV／TSV／Excel、匯入公開 RAW 網址與貼上表格；Excel 解析需要載入外部函式庫 |
+| 部署／版本控制 | **GitHub、GitHub Pages** | 以 `main` 分支的 `/docs` 提供 Live Demo；README 與程式版本同步管理 |
 
-三頁共用左側「切換實驗 / DATASET」選單、首頁連結與明暗模式。舊 `cars.html` 導向 Cars 首頁。
+**兩條實作路徑：**
 
-## 自訂 Dataset 操作
+```text
+Cars / 50 Startups（Python 預先計算）
+公開 CSV → 清理與切分 → sklearn Pipeline → 五方法特徵選擇
+         → 訓練 CV 選擇模型 → 保留測試集評估 → 匯出 JS/CSV → GitHub Pages
 
-1. 切換至 **Custom Dataset**。
-2. 選擇輸入來源：
-   - **CSV / TSV / Excel (.xlsx / .xls)** 本機檔案上傳或拖曳。
-   - **公開 CSV / TSV 直接網址**，須允許 CORS；Kaggle 介紹頁不是原始 CSV 網址。
-   - **貼上 CSV / TSV**：支援 Excel 複製貼上及有引號的 CSV。
-   - **範例**：可直接開啟 Cars 或 50 Startups 既有展示頁，也可在自訂頁一鍵載入原始 `50_Startups.csv`。
-3. 檢視前五列預覽、原始欄數、所選輸入特徵數與 One-Hot 後特徵數的估算。
-4. 選擇數值型 **Target**。在「建議分析設定」查看目前 / 建議的原始特徵數及 One-Hot 編碼後欄數、建議排除欄位與原因；可按「套用建議排除欄位」一鍵處理，亦可保留手動編輯權。ID、常數欄、類別數超過 12、缺失率高以及讓編碼數超過 40 的欄位都會提供說明。
-5. 設定訓練測試切分及隨機種子；固定執行 EFS、RFECV、LassoCV、Backward、SFS 五種方法在 k=1–5 的所有組合。分析完成後使用特徵數滑桿切換檢視。
-6. 點選 **執行多元線性迴歸**，一次計算最多 **25 個固定 k 模型**（五方法 × 1–5 特徵）及 1 個 Baseline，並繪製 RMSE 與 R² 兩張曲線；可切換方法並勾選五方法疊圖，下載完整結果 CSV。
+Custom Dataset（瀏覽器即時運算）
+檔案 / RAW URL / 貼上 → Target & Features 設定 → 訓練集補值、編碼、標準化
+         → Baseline + 五種固定 k 選法 → 訓練 CV / 保留測試集
+         → SVG 圖表、方法比較、近似預測區間、CSV 匯出
+```
 
-這一頁使用原生 JavaScript 在**本機瀏覽器**進行回歸與特徵選擇，資料不會傳送至本專案伺服器。Excel 解析會另外載入官方 SheetJS 0.20.3 函式庫，若無網路或第三方函式庫被阻擋，請另存成 CSV 上傳。匯入公開網址時，瀏覽器會向使用者所填的網址發出請求。
+## 線性迴歸與模型評估原則
 
-### 五種方法（自訂頁的有限計算版本）
+### 1. 迴歸模型如何預測？
 
-| 方法 | 執行方式 |
+本專案以**多元線性迴歸（Multiple Linear Regression）**為共同的最終預測器，假設目標值能由選定特徵的線性組合近似：
+
+$\n\hat{y} = \beta_0 + \beta_1 x_1 + \cdots + \beta_k x_k\n$
+
+- **Cars Target：** `price`（單位 EUR），輸入例如 `age_08_04`、`km`、`weight`、`hp` 等汽車特徵。
+- **50 Startups Target：** `Profit`，輸入如 `R&D Spend`、`Administration`、`Marketing Spend`、`State`。
+- **Custom Target：** 由使用者自行選擇**數值型**目標欄位。
+
+EFS、RFECV/RFE、Lasso、Backward、SFS 是**決定留下哪些輸入特徵的程序**；最終比較的預測模型仍以線性迴歸擬合。Lasso 的 L1 正則化也被用於特徵重要性判定。
+
+### 2. 為什麼要做 Feature Selection？
+
+同時考慮 **預測誤差（RMSE）**、**解釋能力（R²）**、**特徵數**、**模型複雜度**及**計算成本**。加入更多欄位不保證泛化能力提升，過多欄位也可能造成共線性、雜訊與過擬合。評估特徵價值時，應以訓練資料內的交叉驗證為主要選擇依據，而不是反覆查看測試成績挑模型。
+
+### 3. 資料切分、CV 與測試集的分工
+
+1. **Data Preparation：** 缺失值補齊、類別 One-Hot Encoding、必要時標準化；避免 Dummy Variable Trap，對有截距項的模型省略一個類別基準欄。
+2. **Train/Test Split：** 使用訓練資料進行擬合、特徵選取與調參，保留測試資料評估最終表現。
+3. **Cross-Validation：** 主要以 **CV RMSE（越小越好）** 比較候選方法及特徵組合；CV R² 提供額外參考。
+4. **Model Evaluation：** 使用 **RMSE、MAE、R²**；RMSE 對較大誤差較敏感，MAE 是平均絕對誤差，R² 衡量相對於目標平均值基準的解釋能力。
+5. **Prediction Interval：** 額外估計單筆新觀測的不確定性，而不只是提供一個點預測。
+
+**重要區別：** Cars 的固定 k 曲線是**訓練三折 CV** 指標；50 Startups 與 Custom Dataset 的固定 k 曲線是**保留測試集**指標。三頁曲線的評估來源**不完全相同**，不可直接把曲線數值當作同一個公平排名；正式選模型仍應以訓練 CV 為準。
+
+## 五種特徵選擇方法
+
+| 方法 | 英文名稱 | 基本原則 | 適用情境與注意事項 |
+| --- | --- | --- | --- |
+| **EFS** | Exhaustive Feature Selection | 窮舉候選特徵子集合，逐一計算 CV 誤差後選較佳組合 | 小候選集較精確，但組合數隨欄位數快速增加 |
+| **RFECV / RFE** | Recursive Feature Elimination with Cross-Validation | 先用模型估計重要性、移除較弱特徵；RFECV 再利用 CV 決定保留數量 | RFE 固定 k 與 RFECV 自動選 k **是兩種不同設定** |
+| **Lasso / LassoCV** | Least Absolute Shrinkage and Selection Operator | L1 正則化使部分係數變成 0 或接近 0，再選擇具代表性的特徵 | 係數受量綱影響，通常先標準化；LassoCV 用 CV 選懲罰強度 |
+| **Backward** | Backward Elimination | 從較完整特徵集合開始，反覆刪除符合移除規則的特徵 | Python 範例依 OLS **p-value**；Custom 簡化版依**係數絕對值**，不能視為相同方法 |
+| **SFS** | Sequential Forward Selection | 從空集合開始，每輪加入對 CV RMSE 改善較有幫助的特徵 | 比全面窮舉省運算，但貪婪式搜尋可能錯過全域最佳組合 |
+
+### 三頁的實際特徵選擇設定
+
+| 方法 | Cars：Python 正式實驗 | 50 Startups：Python 正式實驗 | Custom：JavaScript 即時實驗 |
+| --- | --- | --- | --- |
+| EFS | 依 F-score 預選 8 個候選，窮舉 **1–3 個**特徵，以內層 3 折 CV RMSE 比較 | 從編碼後 5 個特徵中窮舉子集合，CV 決定組合 | 先挑最多 **8 個候選**，固定每個 k=1–5 窮舉，依訓練三折 CV RMSE 選擇 |
+| RFECV／RFE | 標準化後遞迴移除（step=3、min=2），內層 CV 決定保留數量 | 原始比較使用 RFECV；固定 k 曲線是 RFE 消除路徑 | 最多 **15 個候選**；固定 k 用係數大小逐步移除，**非**完整自動 RFECV |
+| LassoCV | 標準化 LassoCV 選非零係數，再由 LinearRegression 重擬合 | 使用 LassoCV 特徵選擇／固定 k 係數排序 | 簡化版 L1 係數比較懲罰強度，選出固定 k 後以線性迴歸重擬合 |
+| Backward | 從完整集合反覆移除最大 p-value，直到皆 ≤ 0.05 或僅剩一項 | Python 使用 Backward 規則比較 | 最多 **18 個候選**，依線性迴歸係數絕對值逐步刪減至 k，**不使用 p-value** |
+| SFS | 依 F-score 預選 15 個候選，以內層 3 折 CV 向前選取 8 個 | CV 驅動前向選取 | 最多 **12 個候選**；每輪新增使三折 CV RMSE 最佳的欄位 |
+
+> 表中 **Baseline** 指「不執行特徵刪減的完整線性模型」，用來對照五種 Feature Selection 方法。Cars、50 Startups 的方法比較表是各方法原始自動／既定規則的輸出；Custom 則從固定 k=1–5 的結果中，以**訓練 CV RMSE 最低**者代表該方法，**不是 sklearn 原生的自動選特徵數**。
+
+## 實驗一：Cars — Toyota Corolla
+
+### 資料來源與問題定義
+
+- **Kaggle：** [Price of Used Toyota Corolla Cars](https://www.kaggle.com/datasets/vishakhdapat/price-of-used-toyota-corolla-cars)
+- **GitHub Dataset：** [ToyotaCorolla.csv](https://github.com/reisanar/datasets/blob/master/ToyotaCorolla.csv)
+- **RAW CSV：** [直接開啟原始資料](https://raw.githubusercontent.com/reisanar/datasets/refs/heads/master/ToyotaCorolla.csv)
+- **Target：** 二手車售價 `price`（EUR）。
+
+| 資料與實驗設定 | 結果 |
+| --- | ---: |
+| 原始資料 | **1,436 筆** |
+| 去重後有效資料 | **1,435 筆** |
+| 原始輸入 Features | **33 個**（31 個數值、2 個類別） |
+| One-Hot 等前處理後完整 Features | **42 個** |
+| 訓練／測試 | **1,148／287 筆** |
+| 訓練 CV | **3 折**，`random_state=42` |
+
+**前處理：** 排除 `model`、常數欄 `cylinders`、與車齡重複的 `mfg_month`／`mfg_year`；數值與類別缺失分別使用中位數、眾數；`cc`、`weight`、`hp` 根據訓練折分位數作 0.5%–99.5% 截尾；類別 `fuel_type`、`color` 使用 One-Hot。相關前處理放在 scikit-learn Pipeline 中，外層 CV 各折重新擬合。
+
+### 五方法與 Baseline：原始設定結果
+
+以**訓練 CV RMSE** 由低至高排序：
+
+| 方法 | 選取的編碼後特徵數 | CV RMSE ↓ | 設定說明 |
+| --- | ---: | ---: | --- |
+| **Baseline** | **42** | **€1,191.06** | 完整特徵集合，訓練 CV 最佳 |
+| RFECV | 42 | €1,197.12 | RFECV 遞迴選擇 |
+| Lasso | 40 | €1,199.55 | L1 特徵稀疏化 |
+| Backward | 21 | €1,211.20 | OLS p-value 排除 |
+| SFS | 8 | €1,269.24 | 循序向前選取 |
+| EFS | 3 | €1,433.01 | 小型候選集合的窮舉 |
+
+**最終測試結果：** 由訓練 CV 選出的 **Baseline**，Test **RMSE = €1,088.79**、**MAE = €792.72**、**R² = 0.9012**。網站並未為其他五種方法儲存相同獨立測試集的個別 Test 分數，因此相應欄位顯示 `—`，不以 CV 代替 Test。
+
+**研究解讀：** 原始設定下 Baseline 有最低的 CV RMSE；但 Backward、SFS 與 EFS 以較少特徵換取更簡單的模型，說明這是一個**誤差、解釋性與特徵成本的取捨**，而非只追求特徵數越少越好。
+
+## 實驗二：50 Startups
+
+### 資料來源與目標
+
+- **Kaggle：** [50 Startups](https://www.kaggle.com/datasets/abhishek14398/50startups)
+- **GitHub Dataset：** [50_Startups.csv](https://github.com/Avik-Jain/100-Days-Of-ML-Code/blob/master/datasets/50_Startups.csv)
+- **RAW CSV：** [直接開啟原始資料](https://raw.githubusercontent.com/Avik-Jain/100-Days-Of-ML-Code/refs/heads/master/datasets/50_Startups.csv)
+- **Target：** `Profit`。
+
+資料包含 **50 筆紀錄**、**4 個原始輸入特徵**（`R&D Spend`、`Administration`、`Marketing Spend`、`State`）；`State` 做 One-Hot 並移除基準欄後，變成 **5 個編碼特徵**。使用 `random_state=42` 切為 **40 筆訓練／10 筆測試**；Python 範例定義內層 4 折、外層 5 折 CV。頁面除了五方法的固定 k=1–5 曲線，也保留原始自動方法比較。
+
+| 方法 | 選取特徵數 | CV RMSE ↓ | Test RMSE ↓ | Test R² ↑ |
+| --- | ---: | ---: | ---: | ---: |
+| **Backward** | **1** | **9,744.13** | **7,714.33** | **0.9265** |
+| LassoCV | 2 | 9,764.07 | 8,206.33 | 0.9168 |
+| SFS | 2 | 9,866.29 | 9,152.27 | 0.8966 |
+| EFS | 2 | 9,866.29 | 9,152.27 | 0.8966 |
+| Baseline | 5 | 9,994.28 | 9,055.96 | 0.8987 |
+| RFECV | 4 | 10,399.10 | 9,316.54 | 0.8928 |
+
+**結果：** 這次切分中，Backward 以單一 **`R&D Spend`** 特徵取得最低訓練 CV RMSE，也有最佳展示的 Test RMSE。這是特定資料與隨機切分下的結果，**不表示其他資料集也只需要一個特徵**。
+
+> **作業要求補充：** 50 Startups 原始特徵僅有 4 個，不符合「資料集需超過 13 個原始 Features」的獨立門檻。若作業要求擇一具有大於 13 個特徵的資料集，應以 **Cars（33 個原始 Features）作為正式繳交案例**，將 50 Startups 當作對照實驗。
+
+## 實驗三：Custom Dataset
+
+### 使用方式
+
+1. **匯入：** 上傳 CSV／TSV／Excel（XLSX、XLS）、貼上 CSV／Excel 表格，或輸入可供瀏覽器讀取的公開 CSV／TSV **RAW URL**。GitHub 的 `/blob/` 檔案頁及 Kaggle 介紹頁不是直接資料網址。
+2. **預覽：** 匯入成功後，頁面自動捲動到「檢查資料與特徵」，顯示資料量、欄位數、前五列及編碼後特徵預估。
+3. **設定：** 自訂數值型 Target、Features、欄位型態、訓練比例（70/30、80/20、90/10）與隨機種子。
+4. **檢查建議：** 提示疑似 ID、常數特徵、缺失達 50% 的欄、高基數類別與編碼成本，必要時可套用建議排除欄位；**使用者仍保有最終選擇權**。
+5. **分析：** 以 JavaScript 計算 Baseline 及五方法 × k=1–5（若可用編碼特徵少於 5，則只計算可行的 k）；依訓練 CV RMSE 選出各方法代表組合。
+6. **解讀與匯出：** 五方法 RMSE／R² 曲線與疊圖、選取特徵清單、Test RMSE／Test R²、預測散點圖及近似 95% 預測區間，並可下載 CSV。
+
+**資料與運算上限：**
+
+| 項目 | 規則 |
 | --- | --- |
-| EFS | 最多預選 8 個候選特徵，窮舉指定 k 個特徵的組合，以訓練資料三折 CV RMSE 評估 |
-| RFECV / RFE | 先預選最多 15 個候選，依 OLS 係數遞迴消除；固定 k 曲線使用 RFE 路徑，不是 RFECV 自動決定特徵數 |
-| LassoCV (L1) | 以 JavaScript 的 L1 係數比較不同懲罰強度，依係數大小選出 k 個特徵，再以 OLS 重訓；非 sklearn 原生 LassoCV |
-| Backward | 最多預選 18 個候選，反覆刪除 OLS 係數絕對值最小的特徵，直到 k 個 |
-| SFS | 最多預選 12 個候選，依訓練 CV 逐輪加入對表現最有幫助的特徵，直到 k 個 |
+| 檔案大小 | **最多 5 MiB** |
+| 原始 CSV 欄位 | **最多 120 欄** |
+| 分析可用資料 | **最多 3,000 筆有效紀錄** |
+| 使用者勾選的原始 Features | **最多 60 個** |
+| One-Hot 後 Features | **最多 80 個，且 ≤ 訓練筆數 − 10** |
+| 類別欄位基數 | **單欄不超過 12 個類別** |
+| CV／方法比較 | **訓練集 3 折 CV**；五方法固定 k=1–5 |
+| 過擬合提醒 | 編碼後特徵數超過訓練資料約 **1/3** 時提示風險 |
 
-**重要**：自訂頁是運算量受限的 JavaScript 版本，並非原版 `sklearn` 的完全等價實作。Backwards 使用係數排名，而不是原有 Python 版本的 p-value 刪除策略。RFECV 固定 k 曲線使用 RFE 消除路徑，不等於 RFECV 自動選擇 k。自訂頁以訓練資料擬合補值及編碼，接著在編碼好的訓練集上執行三折 CV；內層預處理未完全隔離，CV 分數可能偏樂觀。獨立測試集不參與特徵選擇。**正式報告應以 sklearn Pipeline 的訓練折內前處理和完整巢狀交叉驗證為準。**
+數值缺失依訓練集統計補齊並做尺度調整；類別使用訓練集決定類別集合、補值與移除基準類別的 One-Hot。分析資料**不會傳到本專案的伺服器**；若使用 URL 匯入，瀏覽器仍會直接向該公開網址請求資料；Excel 需要外部 SheetJS 函式庫。
 
-### 限制與注意事項
+### Custom 的方法實作不等同 sklearn
 
-- 匯入檔案大小上限 **5 MB**；預覽至多讀取 **6,000 列**。
-- 分析最多 **3,000 筆有效資料**、**120 個原始欄位**、**60 個選取的原始 Features**、**80 個編碼後 Features**，且**編碼後數量不可超過訓練筆數減 10**。
-- 類別特徵超過 **12 種不同類別**，請排除或自行整理；One-Hot 使用移除第一個類別的表示方式。
-- Target 須為可轉為數值的欄位；缺漏的 Target 列會移除。前處理統計由訓練集決定。
-- 網站仍提示原始特徵是否落在 HW2 的 **14–39 個輸入特徵**要求內；這只是作業檢查提示，不再是程式的 39 個特徵硬限制。若實際編碼特徵數超過訓練筆數三分之一，網站會提醒過擬合風險。
-- 若運算較慢，請縮小資料筆數或排除不必要的候選欄位；本頁固定執行五方法的整組曲線，瀏覽器計算不適合大型 EFS。
+Custom 為降低瀏覽器運算量而做了**候選數量限制與演算法簡化**。其中 RFECV 名稱對應固定 k 的 RFE 消除路徑，Backward 不以 statsmodels 的 p-value 為準，LassoCV 亦非直接呼叫 sklearn。本頁固定 k 組合的**特徵選取依據為訓練 CV**；上方曲線顯示同一保留測試集上的 Test RMSE／R²，**不應以 Test 分數挑模型**。
 
+瀏覽器版本在部分內層 CV 折次重用已由整體訓練集擬合的編碼與前處理統計，可能使 CV 指標略顯樂觀；若需要發表等級的嚴格公平比較，建議將選取、補值、編碼與標準化封裝為 **sklearn Pipeline**，在各 CV 訓練折內重新擬合，必要時使用完整 Nested CV。
 
-### 自動分析設定建議
+## 預測區間與不確定性
 
-「建議分析設定」位於 **Target / 訓練切分**設定下方、完整欄位勾選清單上方，匯入成功後即顯示。其建議是為了讓模型能在本網站運算上限內執行，並非為某資料集尋找最佳測試分數：
+三個頁面均呈現 **Actual vs Predicted** 散點圖：橫軸為預測值、縱軸為實際值，虛線代表理想的 `Actual = Predicted`。每個誤差棒表示**對個別新觀測值的 95% 預測區間（Prediction Interval）**，不同於「平均預測值的 95% 信賴區間」。
 
-- 原始欄名看似 **ID / 流水號**（例如 `car_ID`）時建議排除。
-- **類別值超過 12 種**（例如 `CarName`）的欄位會註明原因，避免高維 One-Hot。
-- **只有 0–1 種有效值或缺失值超過一半**的欄位會提醒使用者。
-- 如果選取欄位超過 60 個原始 Features、One-Hot 後預計超過 80 個 Features，或編碼數超過預估訓練筆數減 10，會優先建議排除最增加編碼欄數的欄位。新版 Car Price 的 `fuelsystem` 可以保留，除非其他選取欄位使運算預算超標。
-- 顯示目前的選取數與按建議套用後的數量；**按鈕只會取消建議排除的勾選**，不會自動改動 Target 或重新選回使用者已取消的特徵。切換 Target、手動更改欄位勾選或型態時，建議會重新計算。
+| 頁面 | 預測區間方法 | 使用的資料與已知限制 |
+| --- | --- | --- |
+| **Cars** | **Split Conformal Prediction** | 將既有 287 筆測試預測拆成 **143 筆校準**與 **144 筆展示**；由校準絕對殘差的有限樣本分位數求區間寬度，展示集實測涵蓋 **138/144 ≈ 95.8%**。在交換性假設下為*邊際*涵蓋保證；原 Test RMSE／R² 仍基於原 287 筆資料 |
+| **50 Startups** | **參數式 OLS Student-t 個別預測區間** | 原始 40 筆訓練／10 筆測試；對訓練 CV 選出的 Backward（`R&D Spend`）以殘差變異、槓桿值與 `df=38` 的 t 臨界值計算；需線性、獨立、常態、等變異誤差等假設 |
+| **Custom Dataset** | **近似 OLS Student-t 預測區間** | 隨方法與 k 即時更新，由訓練殘差變異及設計矩陣槓桿值估計；使用數值穩定修正及 t 臨界值近似，不保證分布無關覆蓋率，資料不足或矩陣不可逆則提示無法估計 |
 
-**注意：** 建議是依名稱與基本欄位統計推估，**不保證 RMSE 最低或 R² 最高**。編碼後數量的預估使用完整匯入資料，真正的編碼欄數以模型訓練資料為準。120 欄僅為**匯入上限**，不是可同時投入模型的特徵數上限。編碼特徵數大於訓練資料三分之一時，網站會顯示過擬合風險提示，但仍允許在硬性運算上限內分析。URL 匯入若因格式或欄數不符而失敗，現在會與網路 / CORS 失敗分開顯示。
+圖中綠點表示實際值落在預測區間內，橘點表示落在區間外；**實測涵蓋率不等於對所有未來資料的保證**。若點數較多，圖表會抽樣顯示誤差棒以避免重疊，涵蓋率統計仍採完整展示樣本。
 
-### 自訂資料分析圖表（對齊 50 Startups 與 Cars）
+## CRISP-DM 六階段
 
-執行 Custom Dataset 的回歸分析後，結果版面與原有 50 Startups 相同：
+| 階段 | 網站中的具體實作 |
+| --- | --- |
+| **1. Business Understanding** | 定義預測任務：二手車售價、創業獲利或使用者自訂 Target；衡量特徵簡化的價值 |
+| **2. Data Understanding** | 檢視紀錄數、欄位、數值／類別、缺失狀況與資料來源 |
+| **3. Data Preparation** | 清理、去重、訓練測試分割、補值、One-Hot、標準化與候選特徵篩選 |
+| **4. Modeling** | Baseline 多元線性迴歸，搭配 EFS、RFECV/RFE、Lasso、Backward、SFS |
+| **5. Evaluation** | CV RMSE／R²、Test RMSE／MAE／R²、特徵數和預測區間，避免利用 Test 挑模型 |
+| **6. Deployment** | Python 離線匯出結果、Custom 前端即時計算，GitHub Pages 發布與 README／CSV 供重現 |
 
-- **五種方法分頁**：EFS、RFECV（固定 k RFE 路徑）、LassoCV（L1 簡化）、Backward、SFS。
-- **特徵數滑桿**：依編碼後可用欄位數，自動比較 k=1–5。
-- **同時比較五種方法**：可勾選疊加五條曲線，當前方法以較粗實線顯示。
-- **只保留兩種特徵數曲線**：RMSE 與 R-squared，皆為共同保留測試集上的指標，與既有範例一致。點選曲線圓點可以切換方法與 k。
-- **「Backward · 特徵組合與表現」表格**：標題依目前方法變動，列出該方法各個 k 的 Selected Features、Test RMSE 與 Test R²。點選表格列同步更新曲線。
-- **「從資料到預測，一步一步重現」**：動態顯示本次上傳資料的 CRISP-DM 六大階段，包括 Target、欄位、資料筆數、編碼後特徵數、訓練測試切分、五種選擇方法，以及目前選取組合的評估分數。
-- **完整 CSV 匯出**：五方法所有 k=1–5 的結果，加上 Baseline；僅切換畫面時不會重新訓練模型。
+Cars 與 50 Startups 使用已寫好的靜態六階段說明；Custom 依當次 Dataset、Target、Features、分割設定與模型評估動態呈現六階段內容。
 
-特徵選取只使用訓練資料；圖中 RMSE 與 R² 為 Test 指標。預設顯示 Backward 與 k=2；切換選取不會依測試集成績重新選擇最好的模型。自訂頁仍是受計算上限保護的 JavaScript 實作，與 sklearn 的同名方法不完全等價。
+## 重現方式、目錄與限制
 
-### 預測結果與不確定性（Prediction Results & Uncertainty）
+### 網站本機預覽
 
-三頁都在「方法比較與選取特徵」後、CRISP-DM 六階段說明前，新增同樣設計的「**實際值 vs 預測值**」散點圖；橫軸是預測值，縱軸是實際值。每筆樣本的垂直誤差棒顯示 **95% 預測區間（Prediction Interval）**，而不是僅對平均值的信賴區間；額外提供名目涵蓋率、實際測試涵蓋率、區間估計方法與限制。
-
-- **Cars**：重用原先的最佳 Baseline 模型對 287 筆測試資料的已儲存預測。將其預測拆成 143 筆區間校準資料、144 筆展示資料，使用 **split-conformal 95% 預測區間**（校準絕對殘差的 \`ceil((n+1) × 0.95)\` 階順序統計量）。區間寬度未使用展示資料調整。原本 Test RMSE、Test R² 仍基於原先全部 287 筆，不可與新圖的 144 筆區間驗證結果混為一談。Conformal 的覆蓋保證需假設資料可交換，是**邊際**保證而非每個車價區間的條件保證。
-- **50 Startups**：使用 sklearn \`train_test_split(test_size=0.2, random_state=42)\` 的原始分割，40 筆訓練、10 筆測試；重現最佳 **Backward k=1（R&D Spend）** 的 OLS 模型，Test RMSE 與原本結果吻合。使用 \`Student-t(df=38)\`、訓練殘差變異及槓桿值計算**參數式 95% 個別預測區間**。此方法依賴線性關係、獨立、等變異與常態誤差假設。使用預先計算的 \`docs/startups-prediction-data.js\`。
-- **Custom Dataset**：每次使用者分析資料時，依目前方法與 k 值計算並繪製**近似 95% OLS 預測區間**：從訓練資料的殘差變異、設計矩陣的逆矩陣（槓桿值）和 Student-t 臨界值近似推得。**測試資料僅用於展示及實測涵蓋率，不會用來計算區間寬度**。網站的線性回歸使用微小正則化以提高數值穩定性，故區間為參數式近似而非分布無關保證；當矩陣無法可靠求逆、樣本太少時，顯示無法估計區間，不虛構數值。
-
-三頁共用 \`docs/prediction-uncertainty.js\` 和 \`docs/pages.css\` 的圖表與配色。圖上綠點代表實際值落在 95% 區間內、橘點代表落在區間外；虛線是理想預測值等於實際值。若樣本較多會減少可視的垂直誤差棒數量以保持圖表清晰，但涵蓋率統計仍計算**完整展示樣本**。
-
-### 三頁統一的六方法比較表
-
-三個頁面都在「特徵數曲線／特徵組合」之後、**CRISP-DM 六階段說明之前**放置「方法比較與選取特徵」表格。表格標題、順序與六欄完全一致：
-
-`Method | 特徵數 | Selected Features | CV RMSE ↓ | Test RMSE ↓ | Test R² ↑`
-
-- **Cars**：六種方法皆使用現有 Python 匯出選定的特徵與 CV RMSE；原始檔只有以訓練 CV 選出的 **Baseline** 儲存 Test RMSE／Test R²，其他五種方法顯示 `—`，絕不以 CV 代填測試分數。CV 標準差仍在選取方法的明細中。
-- **50 Startups**：把原先 CRISP-DM 折疊內的「原始自動選擇方法的比較」移到同一位置；六方法有 CV 與 Test 指標，選取特徵則依同方法、同特徵數、同 Test RMSE 的既有曲線資料對應。
-- **Custom Dataset**：Baseline 使用所有編碼特徵，其餘五方法各從 **k=1–5** 中選訓練 CV RMSE 最小的模型做摘要，**不是**原生 sklearn 自動特徵選擇；不以 Test RMSE／R² 選模型。上方的固定 k 曲線與每方法特徵組合表格仍保留。
-- 選取特徵過多時先顯示前四個，按「展開其餘 N 個特徵」查看完整清單。三頁共用 `docs/method-comparison.js` 與 `docs/pages.css` 的同一套表格渲染與版面。
-
-注意：**三份 Dataset 的目標變數、資料切分與 CV 設定不盡相同**，不同資料集的 RMSE 數值不可直接橫向排名。尚未提供的 Test 分數會標示為 `—`，避免誤導。
-
-## 原有 Python 範例實驗
-
-### Cars — Toyota Corolla
-
-`main5.py` 用 ToyotaCorolla.csv 預測 Price（歐元）。原始 1,436 筆、去重後 1,435 筆；使用 **33 個原始輸入特徵**，編碼後完整模型為 42 欄。切分訓練 1,148 筆／測試 287 筆，固定特徵數曲線比較 1–5 個編碼特徵的訓練三折 CV。首頁保留 Baseline、EFS、RFECV、Lasso、Backward、SFS 的原始結果。原先 `data/cars.csv` 與 `main2.py` 是舊版 Draco Cars 練習，不是目前首頁 Toyota Corolla 的模型資料來源。
-
-### 50 Startups
-
-`main.py` 使用 `50_Startups.csv` 預測 Profit。原始四個 Features：R&D Spend、Administration、Marketing Spend、State；One-Hot 後五個輸入特徵。採 80/20 切分，原網頁的固定 1–5 個特徵曲線展示既有 Python 計算的保留測試集結果。兩個既有範例均展示 CRISP-DM 六大階段及五種特徵選擇方法。
-
-## 本機啟動
-
-```sh
+```bash
+git clone https://github.com/CG3599/20261014-hw2-Multiple-Linear-regression.git
+cd 20261014-hw2-Multiple-Linear-regression
 python -m http.server 8000 --directory docs
 ```
 
-開啟 `http://localhost:8000/`，即可使用三個頁面。Python 範例的額外依賴列於 `requirements.txt`；Custom Dataset 不需要在 GitHub Pages 部署 Python 後端。
+開啟 <http://localhost:8000/>。Custom Dataset 的一般 CSV 與模型分析在瀏覽器內完成；若開啟 Excel 需要外部 SheetJS 套件，匯入 RAW URL 則受 CORS 限制。
 
-## 專案主要檔案
+### Python 實驗重現
 
-```text
-docs/
-├── index.html               # Cars 首頁
-├── startups.html            # 50 Startups
-├── custom.html              # 自訂 Dataset UI
-├── custom.css               # 自訂介面排版
-├── custom.js                # 匯入 / 預覽 / 設定 / 匯出
-├── method-comparison.js     # 三頁共用六種方法的表格比較
-├── custom-curves.js         # RMSE 與 R² 特徵數 SVG 曲線（支援五方法疊圖）
-├── custom-model.js          # 瀏覽器端 OLS 和五方法特徵選擇
-├── sample-startups.csv      # 可一鍵載入的原始範例
-├── pages.js / pages.css     # 共用導覽
-├── cars-data.js             # Cars Python 結果
-├── cars-curves-data.js      # Cars 固定特徵數結果
-├── data.js                  # 50 Startups Python 結果
-├── style.css / theme.css    # Feature Lab 網站風格
-main.py                      # 50 Startups Python
-main5.py                     # Toyota Corolla Python
-50_Startups.csv              # 原始資料
+```bash
+pip install -r requirements.txt
+python main.py     # 50 Startups；使用專案根目錄的 50_Startups.csv
+python main5.py    # Cars；需要先放置 ToyotaCorolla.csv（見下）
 ```
 
-GitHub Pages 使用 `main` 分支的 `/docs` 目錄；提交後需等 GitHub Pages 完成部署才能看到更新。
+**Cars 路徑注意：** `main5.py` 現有程式碼使用 `PROJECT_ROOT.parent / "ToyotaCorolla.csv"`，也就是 **GitHub 專案資料夾的上一層**。重跑前請先從上述 RAW CSV 下載至該位置；程式若找不到檔案會報錯。此說明保留程式目前的真實讀取位置，不假設 CSV 已包含在 repository 根目錄。已匯出的示例數據可直接透過 Live Demo 檢視，不需重新訓練。
 
-## 自動化檢查
+### 主要檔案結構
 
-建議也執行 `node tests/prediction-uncertainty.test.cjs` 驗證三頁預測區間的來源、覆蓋率和頁面區塊位置，再執行 `node tests/method-comparison.test.cjs`，檢查三頁表格欄位、方法分數、特徵名稱、資料來源與區塊順序。
+```text
+README.md
+main.py                         # 50 Startups / sklearn
+main5.py                        # Toyota Corolla / sklearn
+requirements.txt                # Python 依賴
+50_Startups.csv
+assets/readme/                  # 本 README 六張網站畫面截圖
+  cars-overview.png
+  custom-import.png
+  custom-preview.png
+  custom-config.png
+  custom-curves.png
+  custom-prediction-interval.png
+docs/
+  index.html                    # Cars 首頁
+  startups.html                 # 50 Startups
+  custom.html                   # 自訂 Dataset
+  data.js / cars-data.js        # Python 實驗結果
+  startups-prediction-data.js   # 50 Startups 預測區間
+  cars-curves-data.js           # Cars 固定 k 實驗結果
+  custom-model.js               # JavaScript OLS、特徵選擇與區間
+  custom-advisor.js             # 欄位檢查與建議
+  custom.js / custom-curves.js  # 匯入、互動與圖表
+  method-comparison.js          # 三頁共用方法比較表
+  prediction-uncertainty.js     # 三頁共用預測圖
+  pages.js / pages.css          # 導覽／視覺樣式
+  style.css / theme.css / custom.css
+results/                         # CSV、圖表與實驗匯出資料
+tests/                           # Node.js 結構與模型檢查
+```
 
-若本機已安裝 Node.js，可從專案根目錄執行 `node tests/custom-model.test.cjs`，驗證 Baseline、五方法 × k=1–5、RMSE／R² 曲線及五方法疊圖；再執行 `node tests/custom-advisor.test.cjs`，檢查 120 欄上限、ID／高類別數判定、超額 One-Hot 的一鍵建議及 50 Startups 範例。
+### 建議的檢查指令
+
+```bash
+node tests/custom-model.test.cjs
+node tests/custom-advisor.test.cjs
+node tests/method-comparison.test.cjs
+node tests/prediction-uncertainty.test.cjs
+```
+
+### 評估與研究限制
+
+- **不同資料集的 RMSE 不可直接比較**：Cars 與 Startups 的預測目標、數值尺度與實驗設定不同。
+- **50 Startups 是對照範例**：原始 Features 未超過 13；需要符合課堂「>13 Features」門檻時，正式案例請採 Cars。
+- **CV 與 Test 應分開解讀**：Cars 的 Test 分數僅為最終 Baseline 已匯出數值；不要把其餘方法的 CV RMSE 誤寫為 Test RMSE。
+- **Custom 是 JavaScript 教學／互動實作**，演算法、候選限制與 CV 前處理細節皆可能不同於完整 sklearn Pipeline；不宜將三頁的「同名方法」視為逐步完全等價。
+- **95% 預測區間具有前提條件**：對誤差結構或可交換性等假設的依賴，應與實驗結果一併說明。
+
+---
+
+**Feature Lab｜以更少的特徵，理解模型的表現。**  
+[Live Demo](https://cg3599.github.io/20261014-hw2-Multiple-Linear-regression/) · [原始程式碼](https://github.com/CG3599/20261014-hw2-Multiple-Linear-regression)
