@@ -47,8 +47,6 @@ Feature Lab 是依照 **CRISP-DM** 建構的互動式線性迴歸實驗網站，
 
 **畫面重點：** 以 50 筆創業公司資料分析 `Profit`，使用 **4 個原始特徵**（R&D Spend、Administration、Marketing Spend、State），One-Hot 編碼後共有 **5 個特徵**；可比較 EFS、RFECV、LassoCV、Backward 與 SFS 的特徵組合、RMSE 和 R²。**截圖示範的是 Backward、k=2 的指定組合**，顯示 Test RMSE **8,206.33**、Test R² **0.9168**；這是目前畫面的選取狀態，並非「原始自動選擇」的最佳特徵數。
 
-**[開啟 50 Startups Live Demo](https://cg3599.github.io/20261014-hw2-Multiple-Linear-regression/startups.html)**
-
 ### Custom Dataset｜完整操作流程
 
 **01｜匯入 Dataset** — 上傳 CSV／TSV／Excel、輸入公開 RAW CSV 網址或貼上表格資料。資料匯入成功後，自動捲動至資料檢查區。
