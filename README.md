@@ -10,7 +10,7 @@ Feature Lab 是依照 **CRISP-DM** 建構的互動式線性迴歸實驗網站，
 ## 目錄
 
 - [Live Demo 與三個頁面](#live-demo-與三個頁面)
-- [頁面預覽：Cars + Custom Dataset 五步驟](#頁面預覽cars--custom-dataset-五步驟)
+- [頁面預覽：Cars + 50 Startups + Custom Dataset 五步驟](#頁面預覽cars--50-startups--custom-dataset-五步驟)
 - [技術架構與資料處理流程](#技術架構與資料處理流程)
 - [線性迴歸與模型評估原則](#線性迴歸與模型評估原則)
 - [五種特徵選擇方法](#五種特徵選擇方法)
@@ -31,15 +31,23 @@ Feature Lab 是依照 **CRISP-DM** 建構的互動式線性迴歸實驗網站，
 
 三頁共用深色／明亮主題、資料集切換選單、方法比較版型和 **「實際值 vs. 預測值 + 95% 預測區間」**。GitHub Pages 採靜態部署，無需替網站架設 Python 後端。
 
-## 頁面預覽：Cars + Custom Dataset 五步驟
+## 頁面預覽：Cars + 50 Startups + Custom Dataset 五步驟
 
-以下 **6 張圖片均為實際網站畫面截圖**；Cars 提供首頁總覽，Custom Dataset 以五個畫面呈現完整工作流程。
+以下 **7 張圖片均為實際網站畫面截圖**：Cars 與 50 Startups 各提供一張實驗首頁總覽，Custom Dataset 以五個畫面呈現完整工作流程。
 
 ### Cars｜汽車售價特徵選擇
 
 ![Cars 首頁：資料集總覽、模型評估、五種特徵選擇及 CV RMSE／R² 曲線](assets/readme/cars-overview.png)
 
 **畫面重點：** 1,435 筆有效資料、6 種模型（Baseline + 5 種方法）、特徵數滑桿、五方法疊圖、CV RMSE／R² 與訓練 CV 選出的最佳方法。
+
+### 50 Startups｜創業獲利特徵選擇
+
+![50 Startups 實驗首頁：50 筆資料、五種特徵選擇方法與 RMSE／R² 曲線](assets/readme/startups-overview.png)
+
+**畫面重點：** 以 50 筆創業公司資料分析 `Profit`，使用 **4 個原始特徵**（R&D Spend、Administration、Marketing Spend、State），One-Hot 編碼後共有 **5 個特徵**；可比較 EFS、RFECV、LassoCV、Backward 與 SFS 的特徵組合、RMSE 和 R²。**截圖示範的是 Backward、k=2 的指定組合**，顯示 Test RMSE **8,206.33**、Test R² **0.9168**；這是目前畫面的選取狀態，並非「原始自動選擇」的最佳特徵數。
+
+**[開啟 50 Startups Live Demo](https://cg3599.github.io/20261014-hw2-Multiple-Linear-regression/startups.html)**
 
 ### Custom Dataset｜完整操作流程
 
