@@ -80,7 +80,18 @@ const methodNotes={
   SFS:'從空集合開始，在最多 12 個預選候選中，每次依訓練三折 CV RMSE 加入下一個特徵。'
 };
 const fmt=(v,n=2)=>Number.isFinite(v)?v.toLocaleString('en-US',{minimumFractionDigits:n,maximumFractionDigits:n}):'N/A';
-function hideResults(){$('analysis-results').hidden=true;analysisOutput=null;results=[];}
+function syncSidebar(){
+  const imported=!!dataset;
+  const analyzed=imported&&!!analysisOutput&&!$('analysis-results').hidden;
+  for(const link of document.querySelectorAll('#custom-side-nav [data-nav-stage]')){
+    const stage=link.dataset.navStage;
+    link.hidden=stage==='imported'?!imported:stage==='analyzed'?!analyzed:false;
+  }
+  const links=[...document.querySelectorAll('#custom-side-nav a:not([hidden])')];
+  const active=links.find(link=>link.classList.contains('active'));
+  if(!active&&links.length)links[0].classList.add('active');
+}
+function hideResults(){$('analysis-results').hidden=true;analysisOutput=null;results=[];syncSidebar();}
 function currentRow(){
   return analysisOutput?.curves.find(row=>row.method===selectedMethod&&row.count===selectedK);
 }
@@ -308,6 +319,7 @@ $('run-analysis').addEventListener('click',async()=>{
       '過擬合風險提醒：本次編碼後使用 '+out.data.encoded+' 個特徵，已超過 '+out.data.train+' 筆訓練資料的三分之一。建議查看較少特徵的曲線，並留意測試集表現。':'';
     initTabs();initCount();renderMethodology();renderView();
     $('analysis-results').hidden=false;
+    syncSidebar();
     status('分析完成：'+out.curves.length+' 組固定特徵數結果及 Baseline。',false,'analysis-status');
     $('analysis-results').scrollIntoView({behavior:'smooth',block:'start'});
   }catch(e){status('分析失敗：'+e.message,true,'analysis-status');}finally{btn.disabled=false;}
@@ -341,4 +353,5 @@ $('export-results').addEventListener('click',()=>{
 
 const toggle=$('theme-toggle');function drawTheme(){const dark=document.documentElement.dataset.theme==='dark';toggle.textContent=dark?'☀ 淺色模式':'☾ 黑暗模式';toggle.setAttribute('aria-pressed',String(dark));}
 toggle.addEventListener('click',()=>{const next=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=next;try{localStorage.setItem('feature-lab-theme',next);}catch{}drawTheme();});drawTheme();
+syncSidebar();
 })();
