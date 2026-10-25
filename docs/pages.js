@@ -35,8 +35,11 @@ if (sideNav) {
   // Both experiment pages use the same section-nav active-state behavior.
   const links = [...sideNav.querySelectorAll('a[href^="#"]')];
   const updateActive = () => {
-    const sections = links.map(link => ({ link, section: document.getElementById(link.hash.slice(1)) })).filter(item => item.section);
+    const sections = links.filter(link => !link.hidden).map(link => ({ link, section: document.getElementById(link.hash.slice(1)) })).filter(item => item.section && !item.section.closest('[hidden]'));
     const current = [...sections].reverse().find(item => item.section.getBoundingClientRect().top <= 160) || sections[0];
+    for (const link of links) {
+      if (link.hidden) { link.classList.remove('active'); link.removeAttribute('aria-current'); }
+    }
     for (const item of sections) {
       item.link.classList.toggle('active', item === current);
       if (item === current) item.link.setAttribute('aria-current', 'location');
