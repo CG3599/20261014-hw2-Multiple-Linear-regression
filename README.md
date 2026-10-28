@@ -5,8 +5,6 @@
 
 Feature Lab 是依照 **CRISP-DM** 建構的互動式線性迴歸實驗網站，核心問題是：「**在降低特徵數量與模型複雜度的同時，能否維持良好的預測能力？**」網站提供兩個公開資料集實驗，以及一套可自行匯入資料、執行特徵選擇與比較預測結果的瀏覽器工具。
 
-[**Live Demo — Cars**](https://cg3599.github.io/20261014-hw2-Multiple-Linear-regression/) · [**Live Demo — 50 Startups**](https://cg3599.github.io/20261014-hw2-Multiple-Linear-regression/startups.html) · [**Live Demo — Custom Dataset**](https://cg3599.github.io/20261014-hw2-Multiple-Linear-regression/custom.html)
-
 ## 目錄
 
 - [Live Demo 與三個頁面](#live-demo-與三個頁面)
